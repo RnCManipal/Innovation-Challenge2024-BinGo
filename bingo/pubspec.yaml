@@ -66,6 +66,10 @@ flutter:
     - Images\Natural Food.png
     - Images/glogo.png
     - Images/logo2.png
+    - Images/Polygon 1.png
+    - Images/Polygon 2.png
+    - Images/Rectangle 7.png
+    - Images/Bg.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
