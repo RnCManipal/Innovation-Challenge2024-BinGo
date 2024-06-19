@@ -4,6 +4,8 @@ void main() {
   runApp(const MyApp());
 }
 
+const int _customLightCyanPrimaryValue = 0xFFE0FFFF;
+
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
@@ -12,13 +14,14 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.deepPurple),
-        // useMaterial3 is deprecated, no longer needed
+        colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.orange),
       ),
       home: const LoginPage(),
     );
   }
 }
+
+
 
 class LoginPage extends StatelessWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -41,24 +44,24 @@ class LoginPage extends StatelessWidget {
       backgroundColor: const Color(0xFFE0FFFF),
       resizeToAvoidBottomInset: false, // Prevent the keyboard from resizing the screen
       body: SingleChildScrollView( // Make the whole screen scrollable
-        child: Container(
+        child: SizedBox(
           height: screenSize.height,
           child: Stack(
             children: <Widget>[
               Positioned(
                 top: 0,
                 right: 0,
-                child: Image(image: AssetImage('Images/Ellipse 1.png'), height: screenSize.height * 0.15),
+                child: Image.asset('Images/Ellipse 1.png', height: screenSize.height * 0.15),
               ),
               Positioned(
                 bottom: 0,
                 right: 0,
-                child: Image(image: AssetImage('Images/Bonsai.png'), height: screenSize.height * 0.15),
+                child: Image.asset('Images/Bonsai.png', height: screenSize.height * 0.15),
               ),
               Positioned(
                 bottom: 0,
                 left: 0,
-                child: Image(image: AssetImage('Images/Natural Food.png'), height: screenSize.height * 0.16),
+                child: Image.asset('Images/Natural Food.png', height: screenSize.height * 0.16),
               ),
               Positioned(
                 top: screenSize.height * 0.15,
