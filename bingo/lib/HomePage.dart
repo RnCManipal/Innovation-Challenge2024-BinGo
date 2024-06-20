@@ -50,58 +50,68 @@ class _HomePageState extends State<HomePage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Spacer(
-                    flex: 1,
+                  SizedBox(
+                    width: 0.4,
                   ),
                   _buildImageWithSelectableBackground(
                     'Images/Home.png',
                     0,
-                    screenSize.height * 0.16,
-                    screenSize.width * 0.16,
-                    screenSize.height * 0.16,
+                    screenSize.height * 0.12,
+                    screenSize.width * 0.12,
+                    screenSize.height * 0.12,
                   ),
-                  Spacer(
-                    flex: 1,
+                  SizedBox(
+                    width: 0.4,
                   ),
                   _buildImageWithSelectableBackground(
                     'Images/Location.png',
                     1,
-                    screenSize.height * 0.16,
-                    screenSize.width * 0.16,
-                    screenSize.height * 0.16,
+                    screenSize.height * 0.12,
+                    screenSize.width * 0.12,
+                    screenSize.height * 0.12,
                   ),
-                  Spacer(
-                    flex: 1,
+                  SizedBox(
+                    width: 0.4,
                   ),
                   _buildImageWithSelectableBackground(
                     'Images/Megaphone.png',
                     2,
-                    screenSize.height * 0.16,
-                    screenSize.width * 0.16,
-                    screenSize.height * 0.16,
+                    screenSize.height * 0.12,
+                    screenSize.width * 0.12,
+                    screenSize.height * 0.12,
                   ),
-                  Spacer(
-                    flex: 1,
+                  SizedBox(
+                    width: 0.4,
                   ),
                   _buildImageWithSelectableBackground(
                     'Images/Qr Code.png',
                     3,
-                    screenSize.height * 0.16,
-                    screenSize.width * 0.16,
-                    screenSize.height * 0.16,
+                    screenSize.height * 0.12,
+                    screenSize.width * 0.12,
+                    screenSize.height * 0.12,
                   ),
-                  Spacer(
-                    flex: 1,
+                  SizedBox(
+                    width: 0.4,
                   ),
                   _buildImageWithSelectableBackground(
                     'Images/Discount.png',
                     4,
-                    screenSize.height * 0.16,
-                    screenSize.width * 0.16,
-                    screenSize.height * 0.16,
+                    screenSize.height * 0.12,
+                    screenSize.width * 0.12,
+                    screenSize.height * 0.12,
                   ),
-                  Spacer(
-                    flex: 1,
+                  SizedBox(
+                    width: 0.4,
+                  ),
+                  _buildImageWithSelectableBackground(
+                    'Images/User.png',
+                    5,
+                    screenSize.height * 0.12,
+                    screenSize.width * 0.12,
+                    screenSize.height * 0.12,
+                  ),
+                  SizedBox(
+                    width: 0.4,
                   ),
                 ],
               ),
