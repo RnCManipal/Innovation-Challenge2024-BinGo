@@ -1,28 +1,56 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'auth.dart'; // Import your signInWithGoogle function from auth.dart
+import 'HomePage.dart'; // Import your HomePage
 
-class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
+class LoginPage extends StatefulWidget {
+  const LoginPage({Key? key}) : super(key: key);
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  User? user;
+
+  @override
+  void initState() {
+    super.initState();
+    FirebaseAuth.instance.signOut(); // Ensure user starts fresh on login screen
+  }
+
+  void click() async {
+    User? user = await signInWithGoogle(); // Call your signInWithGoogle function
+    if (user != null) {
+      setState(() {
+        this.user = user;
+      });
+      // Navigate to HomePage after successful login
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => HomePage()),
+      );
+    } else {
+      // Handle sign-in failure if needed
+      print('Sign-in with Google failed');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    // Get the screen size
     final Size screenSize = MediaQuery.of(context).size;
 
-    // Determine a minimum height for the container
     double minButtonHeight = screenSize.height * 0.055;
     double minHeight = screenSize.height * 0.42;
     if (screenSize.height <= 690) {
-      // Adjust minimum height for smaller screens
       minHeight = screenSize.height * 0.48;
       minButtonHeight = screenSize.height * 0.063;
     }
 
     return Scaffold(
       backgroundColor: const Color(0xFFE0FFFF),
-      resizeToAvoidBottomInset:
-          false, // Prevent the keyboard from resizing the screen
+      resizeToAvoidBottomInset: false,
       body: SingleChildScrollView(
-        // Make the whole screen scrollable
         child: SizedBox(
           height: screenSize.height,
           child: Stack(
@@ -61,10 +89,7 @@ class LoginPage extends StatelessWidget {
                 top: screenSize.height * 0.25,
                 left: screenSize.width * 0.05,
                 child: InkWell(
-                  onTap: () {
-                    // Handle tap action here
-                    print("Container clicked!");
-                  },
+                  onTap: click,
                   child: Ink(
                     width: screenSize.width * 0.9,
                     height: screenSize.height * 0.07,
@@ -77,8 +102,7 @@ class LoginPage extends StatelessWidget {
                           color: Colors.grey.withOpacity(0.5),
                           spreadRadius: screenSize.width * 0.005,
                           blurRadius: screenSize.width * 0.02,
-                          offset: Offset(0,
-                              screenSize.width * 0.01), // Corrected offset type
+                          offset: Offset(0, screenSize.width * 0.01),
                         ),
                       ],
                     ),
@@ -126,12 +150,11 @@ class LoginPage extends StatelessWidget {
                 left: screenSize.width * 0.05,
                 child: GestureDetector(
                   onTap: () {
-                    // Implement the forgot password action
                     print("Forgot password clicked!");
                   },
                   child: Container(
                     width: screenSize.width * 0.9,
-                    height: minHeight, // Set the minimum height here
+                    height: minHeight,
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius:
@@ -141,8 +164,7 @@ class LoginPage extends StatelessWidget {
                           color: Colors.grey.withOpacity(0.5),
                           spreadRadius: screenSize.width * 0.005,
                           blurRadius: screenSize.width * 0.02,
-                          offset: Offset(0,
-                              screenSize.width * 0.01), // Corrected offset type
+                          offset: Offset(0, screenSize.width * 0.01),
                         ),
                       ],
                     ),
@@ -249,15 +271,14 @@ class LoginPage extends StatelessWidget {
                               horizontal: screenSize.width * 0.3),
                           child: SizedBox(
                             width: screenSize.width * 0.3,
-                            height: minButtonHeight, // Adjust height here
+                            height: minButtonHeight,
                             child: TextButton(
                               onPressed: () {
-                                // Handle login button action
                                 print("Login button clicked!");
                               },
                               style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.all(
-                                    Color(0xFF0092D1)),
+                                backgroundColor:
+                                    MaterialStateProperty.all(Color(0xFF0092D1)),
                                 foregroundColor:
                                     MaterialStateProperty.all(Colors.white),
                                 padding: MaterialStateProperty.all(
