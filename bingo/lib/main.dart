@@ -1,5 +1,6 @@
-import 'package:bingo/LoginPage.dart';
-import 'package:bingo/SignupPage.dart';
+// ignore: unused_import
+import 'LoginPage.dart';
+import 'SignupPage.dart';
 import 'package:flutter/material.dart';
 
 void main() {

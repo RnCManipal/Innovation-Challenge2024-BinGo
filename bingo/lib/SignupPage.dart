@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 class SignupPage extends StatelessWidget {
   const SignupPage({super.key});
@@ -9,12 +10,12 @@ class SignupPage extends StatelessWidget {
     final Size screenSize = MediaQuery.of(context).size;
 
     // Determine a minimum height for the container
-    double minButtonHeight = screenSize.height * 0.055;
-    double minHeight = screenSize.height * 0.42;
+    double minButtonHeight = screenSize.height * 0.06;
+    double minHeight = screenSize.height * 0.6;
     if (screenSize.height <= 690) {
       // Adjust minimum height for smaller screens
-      minHeight = screenSize.height * 0.48;
-      minButtonHeight = screenSize.height * 0.063;
+      minHeight = screenSize.height * 0.5;
+      minButtonHeight = screenSize.height * 0.045;
     }
 
     return Scaffold(
@@ -25,51 +26,26 @@ class SignupPage extends StatelessWidget {
           height: screenSize.height,
           child: Stack(
             children: <Widget>[
-              Positioned(
-                left: 0,
-                child: Image.asset('Images/Bg.png',fit: BoxFit.cover,),
+              Positioned.fill(
+            child: Image.asset(
+              'Images/Bg.png',
+              fit: BoxFit.fill,
+                ),
               ),
-              // Positioned(
-              //   bottom: 0,
-              //   right: 0,
-              //   child: Image.asset('Images/Bonsai.png', height: screenSize.height * 0.15),
-              // ),
-              // Positioned(
-              //   bottom: 0,
-              //   left: 0,
-              //   child: Image.asset('Images/Natural Food.png', height: screenSize.height * 0.16),
-              // ),
               Positioned(
-                top: screenSize.height * 0.15,
+                top: screenSize.height * 0.1,
                 left: screenSize.width * 0.1,
                 child: Text(
-                  "Login",
+                  "Create a Free\nAccount",
                   style: TextStyle(
                     fontFamily: 'Jost',
                     fontWeight: FontWeight.bold,
-                    fontSize: screenSize.width * 0.1,
+                    fontSize: screenSize.width * 0.08,
                   ),
                 ),
               ),
               Positioned(
-                top: screenSize.height * 0.33,
-                left: screenSize.width * 0.15,
-                child: SizedBox(
-                  width: screenSize.width * 0.9,
-                  height: screenSize.height * 0.04,
-                  child: Text(
-                    "-----------------  or  -----------------",
-                    style: TextStyle(
-                      fontFamily: 'Roboto',
-                      fontWeight: FontWeight.normal,
-                      fontSize: screenSize.width * 0.05,
-                      color: Colors.black.withOpacity(0.80),
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                top: screenSize.height * 0.25,
+                top: screenSize.height * 0.225,
                 left: screenSize.width * 0.05,
                 child: InkWell(
                   onTap: () {
@@ -84,7 +60,7 @@ class SignupPage extends StatelessWidget {
                       borderRadius: BorderRadius.circular(screenSize.width * 0.02),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.grey.withOpacity(0.5),
+                          color: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.5),
                           spreadRadius: screenSize.width * 0.005,
                           blurRadius: screenSize.width * 0.02,
                           offset: Offset(0, screenSize.width * 0.01), // Corrected offset type
@@ -114,13 +90,26 @@ class SignupPage extends StatelessWidget {
                 ),
               ),
               Positioned(
-                top: screenSize.height * 0.38,
+                top: screenSize.height * 0.29,
+                left: screenSize.width * 0.15,
+                child: SizedBox(
+                  width: screenSize.width * 0.9,
+                  height: screenSize.height * 0.04,
+                  child: Text(
+                    "-----------------  or  -----------------",
+                    style: TextStyle(
+                      fontFamily: 'Roboto',
+                      fontWeight: FontWeight.normal,
+                      fontSize: screenSize.width * 0.05,
+                      color: Colors.black.withOpacity(0.80),
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                top: screenSize.height * 0.33,
                 left: screenSize.width * 0.05,
                 child: GestureDetector(
-                  onTap: () {
-                    // Implement the forgot password action
-                    print("Forgot password clicked!");
-                  },
                   child: Container(
                     width: screenSize.width * 0.9,
                     height: minHeight, // Set the minimum height here
@@ -129,21 +118,24 @@ class SignupPage extends StatelessWidget {
                       borderRadius: BorderRadius.circular(screenSize.width * 0.02),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.grey.withOpacity(0.5),
+                          color: Color.fromARGB(120, 0, 0, 0).withOpacity(0.5),
                           spreadRadius: screenSize.width * 0.005,
                           blurRadius: screenSize.width * 0.02,
-                          offset: Offset(0, screenSize.width * 0.01), // Corrected offset type
+                          offset: Offset(0, screenSize.height * 0.01), // Corrected offset type
                         ),
                       ],
                     ),
+
+
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        SizedBox(height: screenSize.height * 0.03),
+
+                        SizedBox(height: screenSize.height * 0.015),
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
                           child: Text(
-                            "Username:",
+                            "Name:",
                             style: TextStyle(
                               fontFamily: 'Roboto',
                               fontSize: screenSize.width * 0.04,
@@ -151,10 +143,12 @@ class SignupPage extends StatelessWidget {
                             ),
                           ),
                         ),
-                        SizedBox(height: screenSize.height * 0.015),
+
+                        SizedBox(height: screenSize.height * 0.01),
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
                           child: SizedBox(
+                            height:screenSize.height *0.068,
                             width: screenSize.width * 0.85,
                             child: TextField(
                               obscureText: false,
@@ -168,18 +162,19 @@ class SignupPage extends StatelessWidget {
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(screenSize.width * 0.02),
+                                  borderRadius: BorderRadius.circular(screenSize.width * 0.1),
                                 ),
-                                hintText: 'Enter your username',
+                                hintText: 'Enter your name',
                               ),
                             ),
                           ),
                         ),
-                        SizedBox(height: screenSize.height * 0.03),
+                        
+                        SizedBox(height: screenSize.height * 0.015),
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
                           child: Text(
-                            "Password:",
+                            "Username:",
                             style: TextStyle(
                               fontFamily: 'Roboto',
                               fontSize: screenSize.width * 0.04,
@@ -187,10 +182,11 @@ class SignupPage extends StatelessWidget {
                             ),
                           ),
                         ),
-                        SizedBox(height: screenSize.height * 0.015),
+                        SizedBox(height: screenSize.height * 0.01),
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
                           child: SizedBox(
+                            height:screenSize.height *0.068,
                             width: screenSize.width * 0.85,
                             child: TextField(
                               obscureText: true,
@@ -204,27 +200,90 @@ class SignupPage extends StatelessWidget {
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(screenSize.width * 0.02),
+                                  borderRadius: BorderRadius.circular(screenSize.width * 0.1),
                                 ),
-                                hintText: 'Enter your password',
+                                hintText: 'Enter your username',
                               ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: screenSize.height * 0.015),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
+                          child: Text(
+                            "Password:",
+                            style: TextStyle(
+                              fontFamily: 'Roboto',
+                              fontSize: screenSize.width * 0.04,
+                              fontWeight: FontWeight.normal,
                             ),
                           ),
                         ),
                         SizedBox(height: screenSize.height * 0.01),
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
-                          child: Text(
-                            "Forgot password?",
-                            style: TextStyle(
-                              fontFamily: 'Roboto',
-                              fontSize: screenSize.width * 0.03,
-                              fontWeight: FontWeight.w400,
-                              color: Colors.black,
+                          child: SizedBox(
+                            height:screenSize.height *0.068,
+                            width: screenSize.width * 0.85,
+                            child: TextField(
+                              obscureText: true,
+                              decoration: InputDecoration(
+                                filled: true,
+                                fillColor: const Color(0xFFF0F0F0),
+                                border: InputBorder.none,
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide.none,
+                                  borderRadius: BorderRadius.circular(screenSize.width * 0.02),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide.none,
+                                  borderRadius: BorderRadius.circular(screenSize.width * 0.1),
+                                ),
+                                hintText: 'Enter your Password',
+                              ),
                             ),
                           ),
                         ),
-                        SizedBox(height: screenSize.height * 0.03),
+
+                        SizedBox(height: screenSize.height * 0.015),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
+                          child: Text(
+                            "Confirm Password:",
+                            style: TextStyle(
+                              fontFamily: 'Roboto',
+                              fontSize: screenSize.width * 0.04,
+                              fontWeight: FontWeight.normal,
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: screenSize.height * 0.01),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
+                          child: SizedBox(
+                            height:screenSize.height *0.068,
+                            width: screenSize.width * 0.85,
+                            child: TextField(
+                              obscureText: true,
+                              decoration: InputDecoration(
+                                filled: true,
+                                fillColor: const Color(0xFFF0F0F0),
+                                border: InputBorder.none,
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide.none,
+                                  borderRadius: BorderRadius.circular(screenSize.width * 0.02),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide.none,
+                                  borderRadius: BorderRadius.circular(screenSize.width * 0.1),
+                                ),
+                                hintText: 'Enter Password Again',
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        SizedBox(height: screenSize.height * 0.02),
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.3),
                           child: SizedBox(
@@ -233,7 +292,7 @@ class SignupPage extends StatelessWidget {
                             child: TextButton(
                               onPressed: () {
                                 // Handle login button action
-                                print("Login button clicked!");
+                                print("Conitnue button clicked!");
                               },
                               style: ButtonStyle(
                                 backgroundColor: MaterialStateProperty.all(Color(0xFF0092D1)),
@@ -249,10 +308,10 @@ class SignupPage extends StatelessWidget {
                               ),
                               child: Center(
                                 child: Text(
-                                  "Login",
+                                  "Continue",
                                   style: TextStyle(
-                                    fontSize: screenSize.width * 0.04,
-                                    fontWeight: FontWeight.bold,
+                                    fontSize: screenSize.width * 0.042,
+                                    fontWeight: FontWeight.normal,
                                   ),
                                 ),
                               ),
@@ -264,6 +323,36 @@ class SignupPage extends StatelessWidget {
                   ),
                 ),
               ),
+              Positioned(
+                top: screenSize.height * 0.946,
+                left: screenSize.width * 0.15,
+                child: Text(
+                  "Already have an account?",
+                  style: TextStyle(
+                    fontFamily: 'Jost',
+                    fontWeight: FontWeight.normal,
+                    fontSize: screenSize.width * 0.04,
+                    color: Color.fromARGB(255, 255, 255, 255)
+                  ),
+                ),             
+              ),        
+              Positioned(
+                top: screenSize.height * 0.94,
+                left: screenSize.width * 0.63,
+                child: GestureDetector(
+                  onTap: () {
+                  print('Login tapped!');
+                      },
+                  child: Text(
+                    'Login',
+                    style: TextStyle(
+                    fontSize: screenSize.height*0.03,
+                    fontWeight: FontWeight.bold,
+                    color: Color.fromARGB(255, 98, 255, 0),
+                     ),
+                  ),
+                )
+              )
             ],
           ),
         ),
