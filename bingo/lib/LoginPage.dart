@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'auth.dart'; // Import your signInWithGoogle function from auth.dart
+import 'package:google_sign_in/google_sign_in.dart';
 import 'HomePage.dart'; // Import your HomePage
 
 class LoginPage extends StatefulWidget {
@@ -13,26 +13,35 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   User? user;
 
-  @override
-  void initState() {
-    super.initState();
-    FirebaseAuth.instance.signOut(); // Ensure user starts fresh on login screen
-  }
-
   void click() async {
-    User? user = await signInWithGoogle(); // Call your signInWithGoogle function
-    if (user != null) {
-      setState(() {
-        this.user = user;
-      });
-      // Navigate to HomePage after successful login
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => HomePage()),
+    try {
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      final GoogleSignInAuthentication googleAuth = await googleUser!.authentication;
+
+      final OAuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
       );
-    } else {
-      // Handle sign-in failure if needed
-      print('Sign-in with Google failed');
+
+      final UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+      final User? newUser = userCredential.user;
+
+      if (newUser != null) {
+        setState(() {
+          user = newUser;
+        });
+        // Navigate to HomePage after successful login
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomePage()),
+        );
+      } else {
+        // Handle sign-in failure if needed
+        print('Sign-in with Google failed');
+      }
+    } catch (e) {
+      print('Error signing in with Google: $e');
+      // Handle sign-in error
     }
   }
 
@@ -58,20 +67,17 @@ class _LoginPageState extends State<LoginPage> {
               Positioned(
                 top: 0,
                 right: 0,
-                child: Image.asset('Images/Ellipse 1.png',
-                    height: screenSize.height * 0.15),
+                child: Image.asset('Images/Ellipse 1.png', height: screenSize.height * 0.15),
               ),
               Positioned(
                 bottom: 0,
                 right: 0,
-                child: Image.asset('Images/Bonsai.png',
-                    height: screenSize.height * 0.15),
+                child: Image.asset('Images/Bonsai.png', height: screenSize.height * 0.15),
               ),
               Positioned(
                 bottom: 0,
                 left: 0,
-                child: Image.asset('Images/Natural Food.png',
-                    height: screenSize.height * 0.16),
+                child: Image.asset('Images/Natural Food.png', height: screenSize.height * 0.16),
               ),
               Positioned(
                 top: screenSize.height * 0.15,
@@ -95,8 +101,7 @@ class _LoginPageState extends State<LoginPage> {
                     height: screenSize.height * 0.07,
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius:
-                          BorderRadius.circular(screenSize.width * 0.02),
+                      borderRadius: BorderRadius.circular(screenSize.width * 0.02),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.grey.withOpacity(0.5),
@@ -157,8 +162,7 @@ class _LoginPageState extends State<LoginPage> {
                     height: minHeight,
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius:
-                          BorderRadius.circular(screenSize.width * 0.02),
+                      borderRadius: BorderRadius.circular(screenSize.width * 0.02),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.grey.withOpacity(0.5),
@@ -173,8 +177,7 @@ class _LoginPageState extends State<LoginPage> {
                       children: <Widget>[
                         SizedBox(height: screenSize.height * 0.03),
                         Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: screenSize.width * 0.05),
+                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
                           child: Text(
                             "Username:",
                             style: TextStyle(
@@ -186,8 +189,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         SizedBox(height: screenSize.height * 0.015),
                         Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: screenSize.width * 0.05),
+                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
                           child: SizedBox(
                             width: screenSize.width * 0.85,
                             child: TextField(
@@ -198,13 +200,11 @@ class _LoginPageState extends State<LoginPage> {
                                 border: InputBorder.none,
                                 enabledBorder: OutlineInputBorder(
                                   borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(
-                                      screenSize.width * 0.02),
+                                  borderRadius: BorderRadius.circular(screenSize.width * 0.02),
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(
-                                      screenSize.width * 0.1),
+                                  borderRadius: BorderRadius.circular(screenSize.width * 0.1),
                                 ),
                                 hintText: 'Enter your username',
                               ),
@@ -213,8 +213,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         SizedBox(height: screenSize.height * 0.03),
                         Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: screenSize.width * 0.05),
+                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
                           child: Text(
                             "Password:",
                             style: TextStyle(
@@ -226,8 +225,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         SizedBox(height: screenSize.height * 0.015),
                         Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: screenSize.width * 0.05),
+                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
                           child: SizedBox(
                             width: screenSize.width * 0.85,
                             child: TextField(
@@ -238,13 +236,11 @@ class _LoginPageState extends State<LoginPage> {
                                 border: InputBorder.none,
                                 enabledBorder: OutlineInputBorder(
                                   borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(
-                                      screenSize.width * 0.02),
+                                  borderRadius: BorderRadius.circular(screenSize.width * 0.02),
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(
-                                      screenSize.width * 0.1),
+                                  borderRadius: BorderRadius.circular(screenSize.width * 0.1),
                                 ),
                                 hintText: 'Enter your password',
                               ),
@@ -253,8 +249,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         SizedBox(height: screenSize.height * 0.01),
                         Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: screenSize.width * 0.05),
+                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
                           child: Text(
                             "Forgot password?",
                             style: TextStyle(
@@ -267,8 +262,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         SizedBox(height: screenSize.height * 0.03),
                         Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: screenSize.width * 0.3),
+                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.3),
                           child: SizedBox(
                             width: screenSize.width * 0.3,
                             height: minButtonHeight,
@@ -277,18 +271,14 @@ class _LoginPageState extends State<LoginPage> {
                                 print("Login button clicked!");
                               },
                               style: ButtonStyle(
-                                backgroundColor:
-                                    MaterialStateProperty.all(Color(0xFF0092D1)),
-                                foregroundColor:
-                                    MaterialStateProperty.all(Colors.white),
+                                backgroundColor: MaterialStateProperty.all(Color(0xFF0092D1)),
+                                foregroundColor: MaterialStateProperty.all(Colors.white),
                                 padding: MaterialStateProperty.all(
-                                  EdgeInsets.symmetric(
-                                      vertical: screenSize.height * 0.015),
+                                  EdgeInsets.symmetric(vertical: screenSize.height * 0.015),
                                 ),
                                 shape: MaterialStateProperty.all(
                                   RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(
-                                        screenSize.width * 0.02),
+                                    borderRadius: BorderRadius.circular(screenSize.width * 0.02),
                                   ),
                                 ),
                               ),

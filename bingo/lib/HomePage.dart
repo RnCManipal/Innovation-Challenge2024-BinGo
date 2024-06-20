@@ -1,4 +1,7 @@
+import 'package:bingo/auth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -29,9 +32,52 @@ class _HomePageState extends State<HomePage> {
                 SizedBox(
                   height: textTopPadding, // Top space before text
                 ),
-                if (selectedImageIndex == 0) Home(),
+                if (selectedImageIndex == 0) Home(screenSize: screenSize),
               ],
             ),
+          ),
+          Center(
+            child: selectedImageIndex ==
+                    5 // Assuming selectedImageIndex 5 is for "User.png"
+                ? Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            await FirebaseAuth.instance.signOut();
+                            Navigator.pushNamedAndRemoveUntil(
+                                context, '/login', (route) => false);
+                          },
+                          child: Text('Logout'),
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            await signOutGoogle();
+                            signInWithGoogle().then((user) {
+                              if (user != null) {
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => HomePage()),
+                                );
+                              } else {
+                                // Handle sign-in failure
+                                print('Sign-in with Google failed');
+                              }
+                            });
+                          },
+                          child: Text('Change Account'),
+                        ),
+                      ),
+                    ],
+                  )
+                : Container(), // Empty container if selectedImageIndex is not 5
           ),
           Positioned(
             bottom: 0,
@@ -132,9 +178,11 @@ class _HomePageState extends State<HomePage> {
 }
 
 class Home extends StatelessWidget {
-  const Home({Key? key}) : super(key: key);
+  const Home({Key? key, required this.screenSize}) : super(key: key);
 
-  Widget _buildContainer(Size screenSize) {
+  final Size screenSize;
+
+  Widget _buildContainer() {
     return Container(
       height: 200, // Example height, adjust as needed
       width: screenSize.width * 0.8,
@@ -150,10 +198,9 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Size screenSize = MediaQuery.of(context).size;
     double textLeftPadding = screenSize.width * 0.1;
     double textWidth = screenSize.width * 0.8;
-    double textHeight = screenSize.height * 0.15;
+
     return Expanded(
       child: SingleChildScrollView(
         child: Center(
@@ -192,17 +239,17 @@ class Home extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 20), // Example spacing
-              _buildContainer(screenSize),
+              _buildContainer(),
               SizedBox(height: 20), // Example spacing
-              _buildContainer(screenSize),
+              _buildContainer(),
               SizedBox(height: 20), // Example spacing
-              _buildContainer(screenSize),
+              _buildContainer(),
               SizedBox(height: 20),
-              _buildContainer(screenSize),
+              _buildContainer(),
               SizedBox(height: 20),
-              _buildContainer(screenSize),
+              _buildContainer(),
               SizedBox(height: 20),
-              _buildContainer(screenSize),
+              _buildContainer(),
               SizedBox(height: 140), // Example spacing
             ],
           ),

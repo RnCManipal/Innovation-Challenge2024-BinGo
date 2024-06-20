@@ -5,28 +5,33 @@ final FirebaseAuth _auth = FirebaseAuth.instance;
 final GoogleSignIn googleSignIn = GoogleSignIn();
 
 Future<User?> signInWithGoogle() async {
-  final GoogleSignInAccount? googleSignInAccount = await googleSignIn.signInSilently() ?? await googleSignIn.signIn();
-  if (googleSignInAccount != null) {
-    final GoogleSignInAuthentication googleSignInAuthentication =
-        await googleSignInAccount.authentication;
+  try {
+    // Trigger the Google Authentication flow
+    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
-    final AuthCredential credential = GoogleAuthProvider.credential(
-      accessToken: googleSignInAuthentication.accessToken,
-      idToken: googleSignInAuthentication.idToken,
+    if (googleUser == null) {
+      return null; // Return null if sign-in was cancelled
+    }
+
+    // Obtain the auth details from the request
+    final GoogleSignInAuthentication googleAuth =
+        await googleUser.authentication;
+
+    // Create a new credential
+    final OAuthCredential credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
     );
 
-    final UserCredential authResult = await _auth.signInWithCredential(credential);
-    final User? user = authResult.user;
+    // Sign in to Firebase with the credential
+    final UserCredential userCredential =
+        await FirebaseAuth.instance.signInWithCredential(credential);
 
-    assert(user?.isAnonymous == false);
-    assert(await user?.getIdToken() != null);
-
-    final User? currentUser = _auth.currentUser;
-    assert(user?.uid == currentUser?.uid);
-
-    return user;
+    return userCredential.user;
+  } catch (e) {
+    print('Error signing in with Google: $e');
+    return null;
   }
-  return null;
 }
 
 Future<void> signOutGoogle() async {
