@@ -1,12 +1,12 @@
-import 'package:bingo/HomePage.dart';
-import 'package:bingo/LoginPage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:bingo/HomePage.dart'; // Replace with your home page import
+import 'package:bingo/LoginPage.dart'; // Replace with your login page import
 
 class SignupPage extends StatefulWidget {
-  const SignupPage({super.key});
+  const SignupPage({Key? key}) : super(key: key);
 
   @override
   State<SignupPage> createState() => _SignupPageState();
@@ -14,22 +14,66 @@ class SignupPage extends StatefulWidget {
 
 class _SignupPageState extends State<SignupPage> {
   User? user;
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
   @override
   void initState() {
     super.initState();
-
     // Check if the user is already authenticated
     User? currentUser = FirebaseAuth.instance.currentUser;
-
-    // If user is already authenticated, navigate to HomePage
     if (currentUser != null) {
+      // Navigate to HomePage if user is already logged in
       WidgetsBinding.instance!.addPostFrameCallback((_) {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => HomePage()),
         );
       });
+    }
+  }
+
+  Future<void> _registerWithEmailAndPassword() async {
+    try {
+      if (_passwordController.text != _confirmPasswordController.text) {
+        throw 'Passwords do not match';
+      }
+
+      UserCredential userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
+              email: _usernameController.text,
+              password: _passwordController.text);
+      setState(() {
+        user = userCredential.user;
+      });
+      // Navigate to HomePage after successful registration
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => HomePage()),
+      );
+    } catch (e) {
+      print('Error registering with email and password: $e');
+      // Handle registration failure if needed
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Registration Failed"),
+            content: Text(e.toString()),
+            actions: <Widget>[
+              TextButton(
+                child: Text("OK"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
     }
   }
 
@@ -69,24 +113,19 @@ class _SignupPageState extends State<SignupPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Get the screen size
     final Size screenSize = MediaQuery.of(context).size;
 
-    // Determine a minimum height for the container
     double minButtonHeight = screenSize.height * 0.06;
     double minHeight = screenSize.height * 0.6;
     if (screenSize.height <= 690) {
-      // Adjust minimum height for smaller screens
       minHeight = screenSize.height * 0.5;
       minButtonHeight = screenSize.height * 0.045;
     }
 
     return Scaffold(
       backgroundColor: const Color(0xFFE0FFFF),
-      resizeToAvoidBottomInset:
-          false, // Prevent the keyboard from resizing the screen
+      resizeToAvoidBottomInset: false,
       body: SingleChildScrollView(
-        // Make the whole screen scrollable
         child: SizedBox(
           height: screenSize.height,
           child: Stack(
@@ -114,7 +153,6 @@ class _SignupPageState extends State<SignupPage> {
                 left: screenSize.width * 0.05,
                 child: InkWell(
                   onTap: () {
-                    // Handle tap action here
                     click();
                   },
                   child: Ink(
@@ -122,16 +160,13 @@ class _SignupPageState extends State<SignupPage> {
                     height: screenSize.height * 0.07,
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius:
-                          BorderRadius.circular(screenSize.width * 0.02),
+                      borderRadius: BorderRadius.circular(screenSize.width * 0.02),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color.fromARGB(255, 0, 0, 0)
-                              .withOpacity(0.5),
+                          color: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.5),
                           spreadRadius: screenSize.width * 0.005,
                           blurRadius: screenSize.width * 0.02,
-                          offset: Offset(0,
-                              screenSize.width * 0.01), // Corrected offset type
+                          offset: Offset(0, screenSize.width * 0.01),
                         ),
                       ],
                     ),
@@ -180,31 +215,25 @@ class _SignupPageState extends State<SignupPage> {
                 child: GestureDetector(
                   child: Container(
                     width: screenSize.width * 0.9,
-                    height: minHeight, // Set the minimum height here
+                    height: minHeight,
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius:
-                          BorderRadius.circular(screenSize.width * 0.02),
+                      borderRadius: BorderRadius.circular(screenSize.width * 0.02),
                       boxShadow: [
                         BoxShadow(
                           color: Color.fromARGB(120, 0, 0, 0).withOpacity(0.5),
                           spreadRadius: screenSize.width * 0.005,
                           blurRadius: screenSize.width * 0.02,
-                          offset: Offset(
-                              0,
-                              screenSize.height *
-                                  0.01), // Corrected offset type
+                          offset: Offset(0, screenSize.height * 0.01),
                         ),
                       ],
                     ),
-
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         SizedBox(height: screenSize.height * 0.015),
                         Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: screenSize.width * 0.05),
+                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
                           child: Text(
                             "Name:",
                             style: TextStyle(
@@ -216,12 +245,12 @@ class _SignupPageState extends State<SignupPage> {
                         ),
                         SizedBox(height: screenSize.height * 0.01),
                         Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: screenSize.width * 0.05),
+                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
                           child: SizedBox(
                             height: screenSize.height * 0.068,
                             width: screenSize.width * 0.85,
                             child: TextField(
+                              controller: _nameController,
                               obscureText: false,
                               decoration: InputDecoration(
                                 filled: true,
@@ -229,13 +258,11 @@ class _SignupPageState extends State<SignupPage> {
                                 border: InputBorder.none,
                                 enabledBorder: OutlineInputBorder(
                                   borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(
-                                      screenSize.width * 0.02),
+                                  borderRadius: BorderRadius.circular(screenSize.width * 0.02),
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(
-                                      screenSize.width * 0.1),
+                                  borderRadius: BorderRadius.circular(screenSize.width * 0.1),
                                 ),
                                 hintText: 'Enter your name',
                               ),
@@ -244,8 +271,7 @@ class _SignupPageState extends State<SignupPage> {
                         ),
                         SizedBox(height: screenSize.height * 0.015),
                         Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: screenSize.width * 0.05),
+                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
                           child: Text(
                             "Username:",
                             style: TextStyle(
@@ -257,26 +283,24 @@ class _SignupPageState extends State<SignupPage> {
                         ),
                         SizedBox(height: screenSize.height * 0.01),
                         Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: screenSize.width * 0.05),
+                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
                           child: SizedBox(
                             height: screenSize.height * 0.068,
                             width: screenSize.width * 0.85,
                             child: TextField(
-                              obscureText: true,
+                              controller: _usernameController,
+                              obscureText: false,
                               decoration: InputDecoration(
                                 filled: true,
                                 fillColor: const Color(0xFFF0F0F0),
                                 border: InputBorder.none,
                                 enabledBorder: OutlineInputBorder(
                                   borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(
-                                      screenSize.width * 0.02),
+                                  borderRadius: BorderRadius.circular(screenSize.width * 0.02),
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(
-                                      screenSize.width * 0.1),
+                                  borderRadius: BorderRadius.circular(screenSize.width * 0.1),
                                 ),
                                 hintText: 'Enter your username',
                               ),
@@ -285,8 +309,7 @@ class _SignupPageState extends State<SignupPage> {
                         ),
                         SizedBox(height: screenSize.height * 0.015),
                         Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: screenSize.width * 0.05),
+                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
                           child: Text(
                             "Password:",
                             style: TextStyle(
@@ -298,12 +321,12 @@ class _SignupPageState extends State<SignupPage> {
                         ),
                         SizedBox(height: screenSize.height * 0.01),
                         Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: screenSize.width * 0.05),
+                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
                           child: SizedBox(
                             height: screenSize.height * 0.068,
                             width: screenSize.width * 0.85,
                             child: TextField(
+                              controller: _passwordController,
                               obscureText: true,
                               decoration: InputDecoration(
                                 filled: true,
@@ -311,13 +334,11 @@ class _SignupPageState extends State<SignupPage> {
                                 border: InputBorder.none,
                                 enabledBorder: OutlineInputBorder(
                                   borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(
-                                      screenSize.width * 0.02),
+                                  borderRadius: BorderRadius.circular(screenSize.width * 0.02),
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(
-                                      screenSize.width * 0.1),
+                                  borderRadius: BorderRadius.circular(screenSize.width * 0.1),
                                 ),
                                 hintText: 'Enter your Password',
                               ),
@@ -326,8 +347,7 @@ class _SignupPageState extends State<SignupPage> {
                         ),
                         SizedBox(height: screenSize.height * 0.015),
                         Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: screenSize.width * 0.05),
+                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
                           child: Text(
                             "Confirm Password:",
                             style: TextStyle(
@@ -339,12 +359,12 @@ class _SignupPageState extends State<SignupPage> {
                         ),
                         SizedBox(height: screenSize.height * 0.01),
                         Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: screenSize.width * 0.05),
+                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
                           child: SizedBox(
                             height: screenSize.height * 0.068,
                             width: screenSize.width * 0.85,
                             child: TextField(
+                              controller: _confirmPasswordController,
                               obscureText: true,
                               decoration: InputDecoration(
                                 filled: true,
@@ -352,13 +372,11 @@ class _SignupPageState extends State<SignupPage> {
                                 border: InputBorder.none,
                                 enabledBorder: OutlineInputBorder(
                                   borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(
-                                      screenSize.width * 0.02),
+                                  borderRadius: BorderRadius.circular(screenSize.width * 0.02),
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(
-                                      screenSize.width * 0.1),
+                                  borderRadius: BorderRadius.circular(screenSize.width * 0.1),
                                 ),
                                 hintText: 'Enter Password Again',
                               ),
@@ -367,29 +385,21 @@ class _SignupPageState extends State<SignupPage> {
                         ),
                         SizedBox(height: screenSize.height * 0.02),
                         Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: screenSize.width * 0.3),
+                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.3),
                           child: SizedBox(
                             width: screenSize.width * 0.3,
-                            height: minButtonHeight, // Adjust height here
+                            height: minButtonHeight,
                             child: TextButton(
-                              onPressed: () {
-                                // Handle login button action
-                                print("Conitnue button clicked!");
-                              },
+                              onPressed: _registerWithEmailAndPassword,
                               style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.all(
-                                    Color(0xFF0092D1)),
-                                foregroundColor:
-                                    MaterialStateProperty.all(Colors.white),
+                                backgroundColor: MaterialStateProperty.all(Color(0xFF0092D1)),
+                                foregroundColor: MaterialStateProperty.all(Colors.white),
                                 padding: MaterialStateProperty.all(
-                                  EdgeInsets.symmetric(
-                                      vertical: screenSize.height * 0.015),
+                                  EdgeInsets.symmetric(vertical: screenSize.height * 0.015),
                                 ),
                                 shape: MaterialStateProperty.all(
                                   RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(
-                                        screenSize.width * 0.02),
+                                    borderRadius: BorderRadius.circular(screenSize.width * 0.02),
                                   ),
                                 ),
                               ),
@@ -416,32 +426,33 @@ class _SignupPageState extends State<SignupPage> {
                 child: Text(
                   "Already have an account?",
                   style: TextStyle(
-                      fontFamily: 'Jost',
-                      fontWeight: FontWeight.normal,
-                      fontSize: screenSize.width * 0.04,
-                      color: Color.fromARGB(255, 255, 255, 255)),
+                    fontFamily: 'Jost',
+                    fontWeight: FontWeight.normal,
+                    fontSize: screenSize.width * 0.04,
+                    color: Color.fromARGB(255, 255, 255, 255),
+                  ),
                 ),
               ),
               Positioned(
-                  top: screenSize.height * 0.94,
-                  left: screenSize.width * 0.63,
-                  child: GestureDetector(
-                    onTap: () {
-                      // Navigate to the login page when tapped
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => LoginPage()),
-                      );
-                    },
-                    child: Text(
-                      'Login',
-                      style: TextStyle(
-                        fontSize: screenSize.height * 0.03,
-                        fontWeight: FontWeight.bold,
-                        color: Color.fromARGB(255, 98, 255, 0),
-                      ),
+                top: screenSize.height * 0.94,
+                left: screenSize.width * 0.63,
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => LoginPage()),
+                    );
+                  },
+                  child: Text(
+                    'Login',
+                    style: TextStyle(
+                      fontSize: screenSize.height * 0.03,
+                      fontWeight: FontWeight.bold,
+                      color: Color.fromARGB(255, 98, 255, 0),
                     ),
-                  ))
+                  ),
+                ),
+              )
             ],
           ),
         ),

@@ -1,7 +1,7 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'HomePage.dart'; // Import your HomePage
+import 'auth.dart'; // Import your auth.dart file
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -12,24 +12,18 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   User? user;
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   void click() async {
     try {
-      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-      final GoogleSignInAuthentication googleAuth = await googleUser!.authentication;
+      final User? googleUser = await signInWithGoogle();
 
-      final OAuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-
-      final UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
-      final User? newUser = userCredential.user;
-
-      if (newUser != null) {
+      if (googleUser != null) {
         setState(() {
-          user = newUser;
+          user = googleUser;
         });
+
         // Navigate to HomePage after successful login
         Navigator.pushReplacement(
           context,
@@ -42,6 +36,20 @@ class _LoginPageState extends State<LoginPage> {
     } catch (e) {
       print('Error signing in with Google: $e');
       // Handle sign-in error
+    }
+  }
+
+  Future<User?> signInWithEmailAndPassword(String email, String password) async {
+    try {
+      final UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      return userCredential.user;
+    } catch (e) {
+      print('Error signing in with email and password: $e');
+      throw e; // Re-throw the exception to handle it in the UI if needed
     }
   }
 
@@ -193,6 +201,7 @@ class _LoginPageState extends State<LoginPage> {
                           child: SizedBox(
                             width: screenSize.width * 0.85,
                             child: TextField(
+                              controller: _emailController,
                               obscureText: false,
                               decoration: InputDecoration(
                                 filled: true,
@@ -229,6 +238,7 @@ class _LoginPageState extends State<LoginPage> {
                           child: SizedBox(
                             width: screenSize.width * 0.85,
                             child: TextField(
+                              controller: _passwordController,
                               obscureText: true,
                               decoration: InputDecoration(
                                 filled: true,
@@ -268,7 +278,40 @@ class _LoginPageState extends State<LoginPage> {
                             height: minButtonHeight,
                             child: TextButton(
                               onPressed: () {
-                                print("Login button clicked!");
+                                signInWithEmailAndPassword(_emailController.text, _passwordController.text)
+                                  .then((user) {
+                                    if (user != null) {
+                                      // Navigate to HomePage after successful login
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => HomePage()),
+                                      );
+                                    } else {
+                                      // Handle sign-in failure if needed
+                                      print('Sign-in with email and password failed');
+                                    }
+                                  })
+                                  .catchError((e) {
+                                    // Handle sign-in error
+                                    print('Error signing in with email and password: $e');
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: Text("Login Failed"),
+                                          content: Text(e.toString()),
+                                          actions: <Widget>[
+                                            TextButton(
+                                              child: Text("OK"),
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  });
                               },
                               style: ButtonStyle(
                                 backgroundColor: MaterialStateProperty.all(Color(0xFF0092D1)),
