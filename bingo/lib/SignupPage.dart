@@ -1,9 +1,71 @@
+import 'package:bingo/HomePage.dart';
 import 'package:bingo/LoginPage.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
-class SignupPage extends StatelessWidget {
+class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
+
+  @override
+  State<SignupPage> createState() => _SignupPageState();
+}
+
+class _SignupPageState extends State<SignupPage> {
+  User? user;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Check if the user is already authenticated
+    User? currentUser = FirebaseAuth.instance.currentUser;
+
+    // If user is already authenticated, navigate to HomePage
+    if (currentUser != null) {
+      WidgetsBinding.instance!.addPostFrameCallback((_) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomePage()),
+        );
+      });
+    }
+  }
+
+  void click() async {
+    try {
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser!.authentication;
+
+      final OAuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      final UserCredential userCredential =
+          await FirebaseAuth.instance.signInWithCredential(credential);
+      final User? newUser = userCredential.user;
+
+      if (newUser != null) {
+        setState(() {
+          user = newUser;
+        });
+        // Navigate to HomePage after successful login
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomePage()),
+        );
+      } else {
+        // Handle sign-in failure if needed
+        print('Sign-in with Google failed');
+      }
+    } catch (e) {
+      print('Error signing in with Google: $e');
+      // Handle sign-in error
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +115,7 @@ class SignupPage extends StatelessWidget {
                 child: InkWell(
                   onTap: () {
                     // Handle tap action here
-                    print("Container clicked!");
+                    click();
                   },
                   child: Ink(
                     width: screenSize.width * 0.9,

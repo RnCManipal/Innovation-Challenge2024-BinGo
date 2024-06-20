@@ -48,7 +48,7 @@ class _HomePageState extends State<HomePage> {
                           onPressed: () async {
                             await FirebaseAuth.instance.signOut();
                             Navigator.pushNamedAndRemoveUntil(
-                                context, '/login', (route) => false);
+                                context, '/signup', (route) => false);
                           },
                           child: Text('Logout'),
                         ),
