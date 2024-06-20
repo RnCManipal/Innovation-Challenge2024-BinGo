@@ -70,6 +70,12 @@ flutter:
     - Images/Polygon 2.png
     - Images/Rectangle 7.png
     - Images/Bg.png
+    - Images/Discount.png
+    - Images/Home.png
+    - Images/Location.png
+    - Images/Megaphone.png
+    - Images/Qr Code.png
+    - Images/User.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

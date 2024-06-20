@@ -1,4 +1,6 @@
 // ignore: unused_import
+import 'package:bingo/HomePage.dart';
+
 import 'LoginPage.dart';
 import 'SignupPage.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +21,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.orange),
       ),
-      home: const SignupPage(),
+      home: const HomePage(),
     );
   }
 }
