@@ -19,8 +19,10 @@ class LoginPage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: const Color(0xFFE0FFFF),
-      resizeToAvoidBottomInset: false, // Prevent the keyboard from resizing the screen
-      body: SingleChildScrollView( // Make the whole screen scrollable
+      resizeToAvoidBottomInset:
+          false, // Prevent the keyboard from resizing the screen
+      body: SingleChildScrollView(
+        // Make the whole screen scrollable
         child: SizedBox(
           height: screenSize.height,
           child: Stack(
@@ -28,17 +30,20 @@ class LoginPage extends StatelessWidget {
               Positioned(
                 top: 0,
                 right: 0,
-                child: Image.asset('Images/Ellipse 1.png', height: screenSize.height * 0.15),
+                child: Image.asset('Images/Ellipse 1.png',
+                    height: screenSize.height * 0.15),
               ),
               Positioned(
                 bottom: 0,
                 right: 0,
-                child: Image.asset('Images/Bonsai.png', height: screenSize.height * 0.15),
+                child: Image.asset('Images/Bonsai.png',
+                    height: screenSize.height * 0.15),
               ),
               Positioned(
                 bottom: 0,
                 left: 0,
-                child: Image.asset('Images/Natural Food.png', height: screenSize.height * 0.16),
+                child: Image.asset('Images/Natural Food.png',
+                    height: screenSize.height * 0.16),
               ),
               Positioned(
                 top: screenSize.height * 0.15,
@@ -65,13 +70,15 @@ class LoginPage extends StatelessWidget {
                     height: screenSize.height * 0.07,
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(screenSize.width * 0.02),
+                      borderRadius:
+                          BorderRadius.circular(screenSize.width * 0.02),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.grey.withOpacity(0.5),
                           spreadRadius: screenSize.width * 0.005,
                           blurRadius: screenSize.width * 0.02,
-                          offset: Offset(0, screenSize.width * 0.01), // Corrected offset type
+                          offset: Offset(0,
+                              screenSize.width * 0.01), // Corrected offset type
                         ),
                       ],
                     ),
@@ -127,13 +134,15 @@ class LoginPage extends StatelessWidget {
                     height: minHeight, // Set the minimum height here
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(screenSize.width * 0.02),
+                      borderRadius:
+                          BorderRadius.circular(screenSize.width * 0.02),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.grey.withOpacity(0.5),
                           spreadRadius: screenSize.width * 0.005,
                           blurRadius: screenSize.width * 0.02,
-                          offset: Offset(0, screenSize.width * 0.01), // Corrected offset type
+                          offset: Offset(0,
+                              screenSize.width * 0.01), // Corrected offset type
                         ),
                       ],
                     ),
@@ -142,7 +151,8 @@ class LoginPage extends StatelessWidget {
                       children: <Widget>[
                         SizedBox(height: screenSize.height * 0.03),
                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: screenSize.width * 0.05),
                           child: Text(
                             "Username:",
                             style: TextStyle(
@@ -154,7 +164,8 @@ class LoginPage extends StatelessWidget {
                         ),
                         SizedBox(height: screenSize.height * 0.015),
                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: screenSize.width * 0.05),
                           child: SizedBox(
                             width: screenSize.width * 0.85,
                             child: TextField(
@@ -165,11 +176,13 @@ class LoginPage extends StatelessWidget {
                                 border: InputBorder.none,
                                 enabledBorder: OutlineInputBorder(
                                   borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(screenSize.width * 0.02),
+                                  borderRadius: BorderRadius.circular(
+                                      screenSize.width * 0.02),
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(screenSize.width * 0.02),
+                                  borderRadius: BorderRadius.circular(
+                                      screenSize.width * 0.1),
                                 ),
                                 hintText: 'Enter your username',
                               ),
@@ -178,7 +191,8 @@ class LoginPage extends StatelessWidget {
                         ),
                         SizedBox(height: screenSize.height * 0.03),
                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: screenSize.width * 0.05),
                           child: Text(
                             "Password:",
                             style: TextStyle(
@@ -190,7 +204,8 @@ class LoginPage extends StatelessWidget {
                         ),
                         SizedBox(height: screenSize.height * 0.015),
                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: screenSize.width * 0.05),
                           child: SizedBox(
                             width: screenSize.width * 0.85,
                             child: TextField(
@@ -201,11 +216,13 @@ class LoginPage extends StatelessWidget {
                                 border: InputBorder.none,
                                 enabledBorder: OutlineInputBorder(
                                   borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(screenSize.width * 0.02),
+                                  borderRadius: BorderRadius.circular(
+                                      screenSize.width * 0.02),
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(screenSize.width * 0.02),
+                                  borderRadius: BorderRadius.circular(
+                                      screenSize.width * 0.1),
                                 ),
                                 hintText: 'Enter your password',
                               ),
@@ -214,7 +231,8 @@ class LoginPage extends StatelessWidget {
                         ),
                         SizedBox(height: screenSize.height * 0.01),
                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: screenSize.width * 0.05),
                           child: Text(
                             "Forgot password?",
                             style: TextStyle(
@@ -227,7 +245,8 @@ class LoginPage extends StatelessWidget {
                         ),
                         SizedBox(height: screenSize.height * 0.03),
                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.3),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: screenSize.width * 0.3),
                           child: SizedBox(
                             width: screenSize.width * 0.3,
                             height: minButtonHeight, // Adjust height here
@@ -237,14 +256,18 @@ class LoginPage extends StatelessWidget {
                                 print("Login button clicked!");
                               },
                               style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.all(Color(0xFF0092D1)),
-                                foregroundColor: MaterialStateProperty.all(Colors.white),
+                                backgroundColor: MaterialStateProperty.all(
+                                    Color(0xFF0092D1)),
+                                foregroundColor:
+                                    MaterialStateProperty.all(Colors.white),
                                 padding: MaterialStateProperty.all(
-                                  EdgeInsets.symmetric(vertical: screenSize.height * 0.015),
+                                  EdgeInsets.symmetric(
+                                      vertical: screenSize.height * 0.015),
                                 ),
                                 shape: MaterialStateProperty.all(
                                   RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(screenSize.width * 0.02),
+                                    borderRadius: BorderRadius.circular(
+                                        screenSize.width * 0.02),
                                   ),
                                 ),
                               ),

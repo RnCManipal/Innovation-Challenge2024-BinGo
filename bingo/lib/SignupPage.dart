@@ -1,3 +1,4 @@
+import 'package:bingo/LoginPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
@@ -20,16 +21,18 @@ class SignupPage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: const Color(0xFFE0FFFF),
-      resizeToAvoidBottomInset: false, // Prevent the keyboard from resizing the screen
-      body: SingleChildScrollView( // Make the whole screen scrollable
+      resizeToAvoidBottomInset:
+          false, // Prevent the keyboard from resizing the screen
+      body: SingleChildScrollView(
+        // Make the whole screen scrollable
         child: SizedBox(
           height: screenSize.height,
           child: Stack(
             children: <Widget>[
               Positioned.fill(
-            child: Image.asset(
-              'Images/Bg.png',
-              fit: BoxFit.fill,
+                child: Image.asset(
+                  'Images/Bg.png',
+                  fit: BoxFit.fill,
                 ),
               ),
               Positioned(
@@ -57,13 +60,16 @@ class SignupPage extends StatelessWidget {
                     height: screenSize.height * 0.07,
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(screenSize.width * 0.02),
+                      borderRadius:
+                          BorderRadius.circular(screenSize.width * 0.02),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.5),
+                          color: const Color.fromARGB(255, 0, 0, 0)
+                              .withOpacity(0.5),
                           spreadRadius: screenSize.width * 0.005,
                           blurRadius: screenSize.width * 0.02,
-                          offset: Offset(0, screenSize.width * 0.01), // Corrected offset type
+                          offset: Offset(0,
+                              screenSize.width * 0.01), // Corrected offset type
                         ),
                       ],
                     ),
@@ -115,25 +121,28 @@ class SignupPage extends StatelessWidget {
                     height: minHeight, // Set the minimum height here
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(screenSize.width * 0.02),
+                      borderRadius:
+                          BorderRadius.circular(screenSize.width * 0.02),
                       boxShadow: [
                         BoxShadow(
                           color: Color.fromARGB(120, 0, 0, 0).withOpacity(0.5),
                           spreadRadius: screenSize.width * 0.005,
                           blurRadius: screenSize.width * 0.02,
-                          offset: Offset(0, screenSize.height * 0.01), // Corrected offset type
+                          offset: Offset(
+                              0,
+                              screenSize.height *
+                                  0.01), // Corrected offset type
                         ),
                       ],
                     ),
 
-
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-
                         SizedBox(height: screenSize.height * 0.015),
                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: screenSize.width * 0.05),
                           child: Text(
                             "Name:",
                             style: TextStyle(
@@ -143,12 +152,12 @@ class SignupPage extends StatelessWidget {
                             ),
                           ),
                         ),
-
                         SizedBox(height: screenSize.height * 0.01),
                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: screenSize.width * 0.05),
                           child: SizedBox(
-                            height:screenSize.height *0.068,
+                            height: screenSize.height * 0.068,
                             width: screenSize.width * 0.85,
                             child: TextField(
                               obscureText: false,
@@ -158,21 +167,23 @@ class SignupPage extends StatelessWidget {
                                 border: InputBorder.none,
                                 enabledBorder: OutlineInputBorder(
                                   borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(screenSize.width * 0.02),
+                                  borderRadius: BorderRadius.circular(
+                                      screenSize.width * 0.02),
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(screenSize.width * 0.1),
+                                  borderRadius: BorderRadius.circular(
+                                      screenSize.width * 0.1),
                                 ),
                                 hintText: 'Enter your name',
                               ),
                             ),
                           ),
                         ),
-                        
                         SizedBox(height: screenSize.height * 0.015),
                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: screenSize.width * 0.05),
                           child: Text(
                             "Username:",
                             style: TextStyle(
@@ -184,9 +195,10 @@ class SignupPage extends StatelessWidget {
                         ),
                         SizedBox(height: screenSize.height * 0.01),
                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: screenSize.width * 0.05),
                           child: SizedBox(
-                            height:screenSize.height *0.068,
+                            height: screenSize.height * 0.068,
                             width: screenSize.width * 0.85,
                             child: TextField(
                               obscureText: true,
@@ -196,11 +208,13 @@ class SignupPage extends StatelessWidget {
                                 border: InputBorder.none,
                                 enabledBorder: OutlineInputBorder(
                                   borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(screenSize.width * 0.02),
+                                  borderRadius: BorderRadius.circular(
+                                      screenSize.width * 0.02),
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(screenSize.width * 0.1),
+                                  borderRadius: BorderRadius.circular(
+                                      screenSize.width * 0.1),
                                 ),
                                 hintText: 'Enter your username',
                               ),
@@ -209,7 +223,8 @@ class SignupPage extends StatelessWidget {
                         ),
                         SizedBox(height: screenSize.height * 0.015),
                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: screenSize.width * 0.05),
                           child: Text(
                             "Password:",
                             style: TextStyle(
@@ -221,9 +236,10 @@ class SignupPage extends StatelessWidget {
                         ),
                         SizedBox(height: screenSize.height * 0.01),
                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: screenSize.width * 0.05),
                           child: SizedBox(
-                            height:screenSize.height *0.068,
+                            height: screenSize.height * 0.068,
                             width: screenSize.width * 0.85,
                             child: TextField(
                               obscureText: true,
@@ -233,21 +249,23 @@ class SignupPage extends StatelessWidget {
                                 border: InputBorder.none,
                                 enabledBorder: OutlineInputBorder(
                                   borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(screenSize.width * 0.02),
+                                  borderRadius: BorderRadius.circular(
+                                      screenSize.width * 0.02),
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(screenSize.width * 0.1),
+                                  borderRadius: BorderRadius.circular(
+                                      screenSize.width * 0.1),
                                 ),
                                 hintText: 'Enter your Password',
                               ),
                             ),
                           ),
                         ),
-
                         SizedBox(height: screenSize.height * 0.015),
                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: screenSize.width * 0.05),
                           child: Text(
                             "Confirm Password:",
                             style: TextStyle(
@@ -259,9 +277,10 @@ class SignupPage extends StatelessWidget {
                         ),
                         SizedBox(height: screenSize.height * 0.01),
                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: screenSize.width * 0.05),
                           child: SizedBox(
-                            height:screenSize.height *0.068,
+                            height: screenSize.height * 0.068,
                             width: screenSize.width * 0.85,
                             child: TextField(
                               obscureText: true,
@@ -271,21 +290,23 @@ class SignupPage extends StatelessWidget {
                                 border: InputBorder.none,
                                 enabledBorder: OutlineInputBorder(
                                   borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(screenSize.width * 0.02),
+                                  borderRadius: BorderRadius.circular(
+                                      screenSize.width * 0.02),
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(screenSize.width * 0.1),
+                                  borderRadius: BorderRadius.circular(
+                                      screenSize.width * 0.1),
                                 ),
                                 hintText: 'Enter Password Again',
                               ),
                             ),
                           ),
                         ),
-
                         SizedBox(height: screenSize.height * 0.02),
                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.3),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: screenSize.width * 0.3),
                           child: SizedBox(
                             width: screenSize.width * 0.3,
                             height: minButtonHeight, // Adjust height here
@@ -295,14 +316,18 @@ class SignupPage extends StatelessWidget {
                                 print("Conitnue button clicked!");
                               },
                               style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.all(Color(0xFF0092D1)),
-                                foregroundColor: MaterialStateProperty.all(Colors.white),
+                                backgroundColor: MaterialStateProperty.all(
+                                    Color(0xFF0092D1)),
+                                foregroundColor:
+                                    MaterialStateProperty.all(Colors.white),
                                 padding: MaterialStateProperty.all(
-                                  EdgeInsets.symmetric(vertical: screenSize.height * 0.015),
+                                  EdgeInsets.symmetric(
+                                      vertical: screenSize.height * 0.015),
                                 ),
                                 shape: MaterialStateProperty.all(
                                   RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(screenSize.width * 0.02),
+                                    borderRadius: BorderRadius.circular(
+                                        screenSize.width * 0.02),
                                   ),
                                 ),
                               ),
@@ -329,30 +354,32 @@ class SignupPage extends StatelessWidget {
                 child: Text(
                   "Already have an account?",
                   style: TextStyle(
-                    fontFamily: 'Jost',
-                    fontWeight: FontWeight.normal,
-                    fontSize: screenSize.width * 0.04,
-                    color: Color.fromARGB(255, 255, 255, 255)
-                  ),
-                ),             
-              ),        
+                      fontFamily: 'Jost',
+                      fontWeight: FontWeight.normal,
+                      fontSize: screenSize.width * 0.04,
+                      color: Color.fromARGB(255, 255, 255, 255)),
+                ),
+              ),
               Positioned(
-                top: screenSize.height * 0.94,
-                left: screenSize.width * 0.63,
-                child: GestureDetector(
-                  onTap: () {
-                  print('Login tapped!');
-                      },
-                  child: Text(
-                    'Login',
-                    style: TextStyle(
-                    fontSize: screenSize.height*0.03,
-                    fontWeight: FontWeight.bold,
-                    color: Color.fromARGB(255, 98, 255, 0),
-                     ),
-                  ),
-                )
-              )
+                  top: screenSize.height * 0.94,
+                  left: screenSize.width * 0.63,
+                  child: GestureDetector(
+                    onTap: () {
+                      // Navigate to the login page when tapped
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => LoginPage()),
+                      );
+                    },
+                    child: Text(
+                      'Login',
+                      style: TextStyle(
+                        fontSize: screenSize.height * 0.03,
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromARGB(255, 98, 255, 0),
+                      ),
+                    ),
+                  ))
             ],
           ),
         ),
