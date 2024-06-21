@@ -83,6 +83,9 @@ flutter:
     - Images/Megaphone.png
     - Images/Qr Code.png
     - Images/User.png
+    - Images/YellowMarker.png
+    - Images/RedMarker.png
+    - Images/GreenMarker.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

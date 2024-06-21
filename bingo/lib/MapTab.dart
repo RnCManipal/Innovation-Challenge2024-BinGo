@@ -1,8 +1,18 @@
 import 'dart:async';
-
+import 'dart:typed_data';
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
+
+List<String> images = ['Images/YellowMarker.png', 'Images/RedMarker.png', 'Images/GreenMarker.png'];
+final List<Marker> _markers = [];
+final List<LatLng> _Latlng = [
+  LatLng(22.7273, 75.8977),
+  LatLng(22.72586, 75.89697),
+  LatLng(22.72631, 75.89900)
+];
 
 class BinMap extends StatefulWidget {
   const BinMap({super.key});
@@ -12,32 +22,45 @@ class BinMap extends StatefulWidget {
 }
 
 class _BinMapState extends State<BinMap> {
-  late Future<void> _mapFuture;
+  late Future<void> _mapFuture = Future.value(); // Initialize with a completed future
   final Completer<GoogleMapController> _controller = Completer();
 
-  static const CameraPosition _initialCameraPosition = CameraPosition(
-    target: LatLng(13.3525, 74.7928),
+  CameraPosition _initialCameraPosition = CameraPosition(
+    target: LatLng(22.7273, 75.8977),
     zoom: 15,
   );
 
-  List<Marker> _markers = [];
-  List<Marker> list = const [
-    Marker(
-      markerId: MarkerId("1"),
-      position: LatLng(13.3525, 74.7928),
-      infoWindow: InfoWindow(title: "MIT Manipal"),
-    ),
-  ];
+  Future<Uint8List> getBytesFromAssets(String path, int width) async {
+    ByteData data = await rootBundle.load(path);
+    ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(), targetWidth: width);
+    ui.FrameInfo fi = await codec.getNextFrame();
+    return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!.buffer.asUint8List();
+  }
 
   LocationData? _currentLocation;
   final Location _location = Location();
 
+  _loadMarkers() async {
+    for (int i = 0; i < images.length; i++) {
+      final Uint8List markerIcon = await getBytesFromAssets(images[i], 50);
+      _markers.add(
+        Marker(
+          markerId: MarkerId(i.toString()),
+          position: _Latlng[i],
+          icon: BitmapDescriptor.fromBytes(markerIcon),
+        ),
+      );
+    }
+    setState(() {});
+  }
+
   @override
   void initState() {
     super.initState();
-    _mapFuture = _loadMap();
-    _markers.addAll(list);
-    _getCurrentLocation();
+    _getCurrentLocation().then((_) {
+      _mapFuture = _loadMap();
+      _loadMarkers();
+    });
   }
 
   Future<void> _loadMap() async {
@@ -66,7 +89,12 @@ class _BinMapState extends State<BinMap> {
 
     _currentLocation = await _location.getLocation();
     if (_currentLocation != null) {
-      _updateCameraPosition();
+      setState(() {
+        _initialCameraPosition = CameraPosition(
+          target: LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
+          zoom: 15,
+        );
+      });
     }
 
     _location.onLocationChanged.listen((LocationData currentLocation) {
