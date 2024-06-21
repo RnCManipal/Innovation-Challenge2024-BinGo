@@ -1,9 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:bingo/HomePage.dart'; // Replace with your home page import
-import 'package:bingo/LoginPage.dart'; // Replace with your login page import
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'HomePage.dart'; // Replace with your home page import
+import 'LoginPage.dart'; // Replace with your login page import
 
 class SignupPage extends StatefulWidget {
   const SignupPage({Key? key}) : super(key: key);
@@ -17,8 +16,7 @@ class _SignupPageState extends State<SignupPage> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController =
-      TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
 
   @override
   void initState() {
@@ -42,13 +40,21 @@ class _SignupPageState extends State<SignupPage> {
         throw 'Passwords do not match';
       }
 
-      UserCredential userCredential = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(
-              email: _usernameController.text,
-              password: _passwordController.text);
+      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: _usernameController.text,
+        password: _passwordController.text,
+      );
+
+      // Store additional user data in Firestore
+      await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).set({
+        'name': _nameController.text,
+        'email': _usernameController.text,
+      });
+
       setState(() {
         user = userCredential.user;
       });
+
       // Navigate to HomePage after successful registration
       Navigator.pushReplacement(
         context,
@@ -74,40 +80,6 @@ class _SignupPageState extends State<SignupPage> {
           );
         },
       );
-    }
-  }
-
-  void click() async {
-    try {
-      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser!.authentication;
-
-      final OAuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-
-      final UserCredential userCredential =
-          await FirebaseAuth.instance.signInWithCredential(credential);
-      final User? newUser = userCredential.user;
-
-      if (newUser != null) {
-        setState(() {
-          user = newUser;
-        });
-        // Navigate to HomePage after successful login
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => HomePage()),
-        );
-      } else {
-        // Handle sign-in failure if needed
-        print('Sign-in with Google failed');
-      }
-    } catch (e) {
-      print('Error signing in with Google: $e');
-      // Handle sign-in error
     }
   }
 
@@ -153,7 +125,7 @@ class _SignupPageState extends State<SignupPage> {
                 left: screenSize.width * 0.05,
                 child: InkWell(
                   onTap: () {
-                    click();
+                    // Implement Google sign-in here if needed
                   },
                   child: Ink(
                     width: screenSize.width * 0.9,

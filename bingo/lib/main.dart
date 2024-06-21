@@ -1,21 +1,16 @@
-// ignore: unused_import
-import 'package:bingo/HomePage.dart';
-import 'package:bingo/firebase_options.dart';
+import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 
-import 'LoginPage.dart';
-import 'SignupPage.dart';
-import 'package:flutter/material.dart';
+import 'HomePage.dart'; // Assuming you have a HomePage widget defined
+import 'SignupPage.dart'; // Assuming you have a SignupPage widget defined
 
-Future<void> main()async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  ); 
+  await Firebase.initializeApp();
+
   runApp(const MyApp());
 }
-
-const int _customLightCyanPrimaryValue = 0xFFE0FFFF;
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -27,13 +22,22 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.orange),
       ),
-      initialRoute: '/signup', // Initial route should point to your login page
-      routes: {
-        '/signup':(context) => SignupPage(),
-        '/login': (context) => LoginPage(),
-        '/home': (context) => HomePage(),
-        // Add other routes if needed
-      },
+      home: StreamBuilder(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (context, AsyncSnapshot<User?> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else {
+            if (snapshot.hasData && snapshot.data != null) {
+              // User is authenticated, navigate to HomePage
+              return HomePage();
+            } else {
+              // No user authenticated, navigate to SignupPage or LoginPage
+              return SignupPage(); // You can replace this with LoginPage or any other widget
+            }
+          }
+        },
+      ),
     );
   }
 }

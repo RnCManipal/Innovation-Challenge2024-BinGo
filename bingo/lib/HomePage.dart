@@ -1,7 +1,7 @@
-import 'package:bingo/auth.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'SignupPage.dart'; // Import your SignupPage.dart file
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -12,6 +12,23 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int selectedImageIndex = 0; // Track the index of the selected image
+  late User loggedInUser; // Variable to hold logged-in user details
+  late DocumentSnapshot userDoc; // Variable to hold user document from Firestore
+
+  @override
+  void initState() {
+    super.initState();
+    // Get the currently logged-in user
+    loggedInUser = FirebaseAuth.instance.currentUser!;
+    // Fetch user document from Firestore using the UID
+    FirebaseFirestore.instance.collection('users').doc(loggedInUser.uid).get().then((doc) {
+      setState(() {
+        userDoc = doc; // Store the fetched document
+      });
+    }).catchError((error) {
+      print('Error fetching user data: $error');
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,42 +54,35 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           Center(
-            child: selectedImageIndex ==
-                    5 // Assuming selectedImageIndex 5 is for "User.png"
+            child: selectedImageIndex == 5 // Assuming selectedImageIndex 5 is for "User.png"
                 ? Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
+                      // Profile information
+                      if (userDoc != null)
+                        Column(
+                          children: [
+                            Text(
+                              'Name: ${userDoc['name']}',
+                              style: TextStyle(fontSize: 18),
+                            ),
+                            Text(
+                              'Email: ${userDoc['email']}',
+                              style: TextStyle(fontSize: 18),
+                            ),
+                          ],
+                        ),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: ElevatedButton(
                           onPressed: () async {
                             await FirebaseAuth.instance.signOut();
-                            Navigator.pushNamedAndRemoveUntil(
-                                context, '/signup', (route) => false);
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(builder: (context) => SignupPage()),
+                            );
                           },
                           child: Text('Logout'),
-                        ),
-                      ),
-                      SizedBox(height: 10),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: ElevatedButton(
-                          onPressed: () async {
-                            await signOutGoogle();
-                            signInWithGoogle().then((user) {
-                              if (user != null) {
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => HomePage()),
-                                );
-                              } else {
-                                // Handle sign-in failure
-                                print('Sign-in with Google failed');
-                              }
-                            });
-                          },
-                          child: Text('Change Account'),
                         ),
                       ),
                     ],

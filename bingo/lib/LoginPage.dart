@@ -15,29 +15,31 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  void click() async {
-    try {
-      final User? googleUser = await signInWithGoogle();
 
-      if (googleUser != null) {
-        setState(() {
-          user = googleUser;
-        });
+  //Google login
+  // void click() async {
+  //   try {
+  //     final User? googleUser = await signInWithGoogle();
 
-        // Navigate to HomePage after successful login
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => HomePage()),
-        );
-      } else {
-        // Handle sign-in failure if needed
-        print('Sign-in with Google failed');
-      }
-    } catch (e) {
-      print('Error signing in with Google: $e');
-      // Handle sign-in error
-    }
-  }
+  //     if (googleUser != null) {
+  //       setState(() {
+  //         user = googleUser;
+  //       });
+
+  //       // Navigate to HomePage after successful login
+  //       Navigator.pushReplacement(
+  //         context,
+  //         MaterialPageRoute(builder: (context) => HomePage()),
+  //       );
+  //     } else {
+  //       // Handle sign-in failure if needed
+  //       print('Sign-in with Google failed');
+  //     }
+  //   } catch (e) {
+  //     print('Error signing in with Google: $e');
+  //     // Handle sign-in error
+  //   }
+  // }
 
   Future<User?> signInWithEmailAndPassword(String email, String password) async {
     try {
@@ -103,7 +105,7 @@ class _LoginPageState extends State<LoginPage> {
                 top: screenSize.height * 0.25,
                 left: screenSize.width * 0.05,
                 child: InkWell(
-                  onTap: click,
+                  // onTap: () {click},
                   child: Ink(
                     width: screenSize.width * 0.9,
                     height: screenSize.height * 0.07,
