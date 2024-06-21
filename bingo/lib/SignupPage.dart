@@ -35,53 +35,59 @@ class _SignupPageState extends State<SignupPage> {
   }
 
   Future<void> _registerWithEmailAndPassword() async {
-    try {
-      if (_passwordController.text != _confirmPasswordController.text) {
-        throw 'Passwords do not match';
-      }
-
-      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: _usernameController.text,
-        password: _passwordController.text,
-      );
-
-      // Store additional user data in Firestore
-      await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).set({
-        'name': _nameController.text,
-        'email': _usernameController.text,
-      });
-
-      setState(() {
-        user = userCredential.user;
-      });
-
-      // Navigate to HomePage after successful registration
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => HomePage()),
-      );
-    } catch (e) {
-      print('Error registering with email and password: $e');
-      // Handle registration failure if needed
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text("Registration Failed"),
-            content: Text(e.toString()),
-            actions: <Widget>[
-              TextButton(
-                child: Text("OK"),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
+  try {
+    if (_passwordController.text != _confirmPasswordController.text) {
+      throw 'Passwords do not match';
     }
+
+    UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      email: _usernameController.text,
+      password: _passwordController.text,
+    );
+
+    // Store additional user data in Firestore
+    await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).set({
+      'name': _nameController.text,
+      'email': _usernameController.text,
+    });
+
+    if (!mounted) return;
+
+    setState(() {
+      user = userCredential.user;
+    });
+
+    // Navigate to HomePage after successful registration
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => HomePage()),
+    );
+  } catch (e) {
+    print('Error registering with email and password: $e');
+
+    if (!mounted) return;
+
+    // Handle registration failure if needed
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Registration Failed"),
+          content: Text(e.toString()),
+          actions: <Widget>[
+            TextButton(
+              child: Text("OK"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
