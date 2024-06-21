@@ -1,3 +1,4 @@
+import 'package:bingo/MapTab.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -52,6 +53,11 @@ class _HomePageState extends State<HomePage> {
                 if (selectedImageIndex == 0) Home(screenSize: screenSize),
               ],
             ),
+          ),
+          Center(
+            child: selectedImageIndex == 1 // Assuming selectedImageIndex 5 is for "User.png"
+                ? const BinMap()
+                : Container(), // Empty container if selectedImageIndex is not 5
           ),
           Center(
             child: selectedImageIndex == 5 // Assuming selectedImageIndex 5 is for "User.png"
