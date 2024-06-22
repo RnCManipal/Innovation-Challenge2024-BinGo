@@ -1,3 +1,4 @@
+import 'package:bingo/SignupPage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'HomePage.dart'; // Import your HomePage
@@ -14,7 +15,6 @@ class _LoginPageState extends State<LoginPage> {
   User? user;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-
 
   //Google login
   // void click() async {
@@ -41,9 +41,11 @@ class _LoginPageState extends State<LoginPage> {
   //   }
   // }
 
-  Future<User?> signInWithEmailAndPassword(String email, String password) async {
+  Future<User?> signInWithEmailAndPassword(
+      String email, String password) async {
     try {
-      final UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+      final UserCredential userCredential =
+          await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
@@ -77,18 +79,34 @@ class _LoginPageState extends State<LoginPage> {
               Positioned(
                 top: 0,
                 right: 0,
-                child: Image.asset('Images/Ellipse 1.png', height: screenSize.height * 0.15),
+                child: Image.asset('Images/Ellipse 1.png',
+                    height: screenSize.height * 0.15),
               ),
               Positioned(
                 bottom: 0,
                 right: 0,
-                child: Image.asset('Images/Bonsai.png', height: screenSize.height * 0.15),
+                child: Image.asset('Images/Bonsai.png',
+                    height: screenSize.height * 0.15),
               ),
               Positioned(
                 bottom: 0,
                 left: 0,
-                child: Image.asset('Images/Natural Food.png', height: screenSize.height * 0.16),
+                child: Image.asset('Images/Natural Food.png',
+                    height: screenSize.height * 0.16),
               ),
+              Positioned(
+                  top: screenSize.height * 0.05,
+                  left: screenSize.width * 0.05,
+                  child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) =>const SignupPage()),
+                        );
+                      },
+                      child: Image(
+                        image: AssetImage('Images/BackButton.png'),
+                      ))),
               Positioned(
                 top: screenSize.height * 0.15,
                 left: screenSize.width * 0.1,
@@ -111,7 +129,8 @@ class _LoginPageState extends State<LoginPage> {
                     height: screenSize.height * 0.07,
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(screenSize.width * 0.02),
+                      borderRadius:
+                          BorderRadius.circular(screenSize.width * 0.02),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.grey.withOpacity(0.5),
@@ -172,7 +191,8 @@ class _LoginPageState extends State<LoginPage> {
                     height: minHeight,
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(screenSize.width * 0.02),
+                      borderRadius:
+                          BorderRadius.circular(screenSize.width * 0.02),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.grey.withOpacity(0.5),
@@ -187,7 +207,8 @@ class _LoginPageState extends State<LoginPage> {
                       children: <Widget>[
                         SizedBox(height: screenSize.height * 0.03),
                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: screenSize.width * 0.05),
                           child: Text(
                             "Username:",
                             style: TextStyle(
@@ -199,7 +220,8 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         SizedBox(height: screenSize.height * 0.015),
                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: screenSize.width * 0.05),
                           child: SizedBox(
                             width: screenSize.width * 0.85,
                             child: TextField(
@@ -211,11 +233,13 @@ class _LoginPageState extends State<LoginPage> {
                                 border: InputBorder.none,
                                 enabledBorder: OutlineInputBorder(
                                   borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(screenSize.width * 0.02),
+                                  borderRadius: BorderRadius.circular(
+                                      screenSize.width * 0.02),
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(screenSize.width * 0.1),
+                                  borderRadius: BorderRadius.circular(
+                                      screenSize.width * 0.1),
                                 ),
                                 hintText: 'Enter your username',
                               ),
@@ -224,7 +248,8 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         SizedBox(height: screenSize.height * 0.03),
                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: screenSize.width * 0.05),
                           child: Text(
                             "Password:",
                             style: TextStyle(
@@ -236,7 +261,8 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         SizedBox(height: screenSize.height * 0.015),
                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: screenSize.width * 0.05),
                           child: SizedBox(
                             width: screenSize.width * 0.85,
                             child: TextField(
@@ -248,11 +274,13 @@ class _LoginPageState extends State<LoginPage> {
                                 border: InputBorder.none,
                                 enabledBorder: OutlineInputBorder(
                                   borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(screenSize.width * 0.02),
+                                  borderRadius: BorderRadius.circular(
+                                      screenSize.width * 0.02),
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(screenSize.width * 0.1),
+                                  borderRadius: BorderRadius.circular(
+                                      screenSize.width * 0.1),
                                 ),
                                 hintText: 'Enter your password',
                               ),
@@ -261,7 +289,8 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         SizedBox(height: screenSize.height * 0.01),
                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: screenSize.width * 0.05),
                           child: Text(
                             "Forgot password?",
                             style: TextStyle(
@@ -274,56 +303,65 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         SizedBox(height: screenSize.height * 0.03),
                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.3),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: screenSize.width * 0.3),
                           child: SizedBox(
                             width: screenSize.width * 0.3,
                             height: minButtonHeight,
                             child: TextButton(
                               onPressed: () {
-                                signInWithEmailAndPassword(_emailController.text, _passwordController.text)
-                                  .then((user) {
-                                    if (user != null) {
-                                      // Navigate to HomePage after successful login
-                                      Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(builder: (context) => HomePage()),
-                                      );
-                                    } else {
-                                      // Handle sign-in failure if needed
-                                      print('Sign-in with email and password failed');
-                                    }
-                                  })
-                                  .catchError((e) {
-                                    // Handle sign-in error
-                                    print('Error signing in with email and password: $e');
-                                    showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return AlertDialog(
-                                          title: Text("Login Failed"),
-                                          content: Text(e.toString()),
-                                          actions: <Widget>[
-                                            TextButton(
-                                              child: Text("OK"),
-                                              onPressed: () {
-                                                Navigator.of(context).pop();
-                                              },
-                                            ),
-                                          ],
-                                        );
-                                      },
+                                signInWithEmailAndPassword(
+                                        _emailController.text,
+                                        _passwordController.text)
+                                    .then((user) {
+                                  if (user != null) {
+                                    // Navigate to HomePage after successful login
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => HomePage()),
                                     );
-                                  });
+                                  } else {
+                                    // Handle sign-in failure if needed
+                                    print(
+                                        'Sign-in with email and password failed');
+                                  }
+                                }).catchError((e) {
+                                  // Handle sign-in error
+                                  print(
+                                      'Error signing in with email and password: $e');
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: Text("Login Failed"),
+                                        content: Text(e.toString()),
+                                        actions: <Widget>[
+                                          TextButton(
+                                            child: Text("OK"),
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                });
                               },
                               style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.all(Color(0xFF0092D1)),
-                                foregroundColor: MaterialStateProperty.all(Colors.white),
+                                backgroundColor: MaterialStateProperty.all(
+                                    Color(0xFF0092D1)),
+                                foregroundColor:
+                                    MaterialStateProperty.all(Colors.white),
                                 padding: MaterialStateProperty.all(
-                                  EdgeInsets.symmetric(vertical: screenSize.height * 0.015),
+                                  EdgeInsets.symmetric(
+                                      vertical: screenSize.height * 0.015),
                                 ),
                                 shape: MaterialStateProperty.all(
                                   RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(screenSize.width * 0.02),
+                                    borderRadius: BorderRadius.circular(
+                                        screenSize.width * 0.02),
                                   ),
                                 ),
                               ),

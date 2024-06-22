@@ -86,6 +86,7 @@ flutter:
     - Images/YellowMarker.png
     - Images/RedMarker.png
     - Images/GreenMarker.png
+    - Images/BackButton.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
@@ -103,6 +104,7 @@ flutter:
       fonts:
         - asset: fonts/Jost-Regular.ttf
         - asset: fonts/Jost-Bold.ttf
+        - asset: fonts/Jost-Light.ttf
           weight: 700
     - family: Roboto
       fonts:

@@ -1,4 +1,6 @@
+import 'package:bingo/HomeTab.dart';
 import 'package:bingo/MapTab.dart';
+import 'package:bingo/ReportTab.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -31,6 +33,13 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  String getAccountType() {
+    if (userDoc != null && userDoc['accountType'] != null) {
+      return userDoc['accountType'];
+    }
+    return 'Loading...'; // Default to 'user' if accountType is not set
+  }
+
   @override
   Widget build(BuildContext context) {
     // Get the screen size
@@ -60,6 +69,11 @@ class _HomePageState extends State<HomePage> {
                 : Container(), // Empty container if selectedImageIndex is not 5
           ),
           Center(
+            child: selectedImageIndex == 2 // Assuming selectedImageIndex 5 is for "User.png"
+                ? const ReportTab()
+                : Container(), // Empty container if selectedImageIndex is not 5
+          ),
+          Center(
             child: selectedImageIndex == 5 // Assuming selectedImageIndex 5 is for "User.png"
                 ? Column(
                     mainAxisSize: MainAxisSize.min,
@@ -74,6 +88,10 @@ class _HomePageState extends State<HomePage> {
                             ),
                             Text(
                               'Email: ${userDoc['email']}',
+                              style: TextStyle(fontSize: 18),
+                            ),
+                            Text(
+                              'Account Type: ${getAccountType()}',
                               style: TextStyle(fontSize: 18),
                             ),
                           ],
@@ -100,7 +118,7 @@ class _HomePageState extends State<HomePage> {
             left: 0,
             right: 0,
             child: Container(
-              height: screenSize.height * 0.12, // Adjust container height
+              height: screenSize.height * 0.08, // Adjust container height
               width: screenSize.width,
               decoration: BoxDecoration(color: Color(0xffAFFF89)),
               child: Row(
@@ -187,88 +205,6 @@ class _HomePageState extends State<HomePage> {
         child: Image.asset(
           imagePath,
           height: height,
-        ),
-      ),
-    );
-  }
-}
-
-class Home extends StatelessWidget {
-  const Home({Key? key, required this.screenSize}) : super(key: key);
-
-  final Size screenSize;
-
-  Widget _buildContainer() {
-    return Container(
-      height: 200, // Example height, adjust as needed
-      width: screenSize.width * 0.8,
-      decoration: BoxDecoration(
-        color: Color(0xffE0FFFF),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Center(
-        child: Text("Scrollable Container"),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    double textLeftPadding = screenSize.width * 0.1;
-    double textWidth = screenSize.width * 0.8;
-
-    return Expanded(
-      child: SingleChildScrollView(
-        child: Center(
-          child: Column(
-            children: [
-              Padding(
-                padding: EdgeInsets.only(left: textLeftPadding),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      width: textWidth,
-                      child: Text(
-                        "Welcome to",
-                        style: TextStyle(
-                          fontFamily: 'Jost',
-                          fontWeight: FontWeight.bold,
-                          fontSize:
-                              screenSize.width * 0.1, // Responsive font size
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      width: textWidth,
-                      child: Text(
-                        "BinGo",
-                        style: TextStyle(
-                          fontFamily: 'Jost',
-                          fontWeight: FontWeight.bold,
-                          fontSize:
-                              screenSize.width * 0.1, // Responsive font size
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(height: 20), // Example spacing
-              _buildContainer(),
-              SizedBox(height: 20), // Example spacing
-              _buildContainer(),
-              SizedBox(height: 20), // Example spacing
-              _buildContainer(),
-              SizedBox(height: 20),
-              _buildContainer(),
-              SizedBox(height: 20),
-              _buildContainer(),
-              SizedBox(height: 20),
-              _buildContainer(),
-              SizedBox(height: 140), // Example spacing
-            ],
-          ),
         ),
       ),
     );

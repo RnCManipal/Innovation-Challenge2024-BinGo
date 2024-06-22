@@ -1,3 +1,4 @@
+import 'package:bingo/SignUpPage1.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -34,46 +35,18 @@ class _SignupPageState extends State<SignupPage> {
     }
   }
 
-  Future<void> _registerWithEmailAndPassword() async {
-  try {
-    if (_passwordController.text != _confirmPasswordController.text) {
-      throw 'Passwords do not match';
-    }
-
-    UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-      email: _usernameController.text,
-      password: _passwordController.text,
-    );
-
-    // Store additional user data in Firestore
-    await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).set({
-      'name': _nameController.text,
-      'email': _usernameController.text,
-    });
-
-    if (!mounted) return;
-
-    setState(() {
-      user = userCredential.user;
-    });
-
-    // Navigate to HomePage after successful registration
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => HomePage()),
-    );
-  } catch (e) {
-    print('Error registering with email and password: $e');
-
-    if (!mounted) return;
-
-    // Handle registration failure if needed
+void _navigateToSignupPageOne() {
+  // Check if any field is empty
+  if (_nameController.text.isEmpty ||
+      _usernameController.text.isEmpty ||
+      _passwordController.text.isEmpty ||
+      _confirmPasswordController.text.isEmpty) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("Registration Failed"),
-          content: Text(e.toString()),
+          title: Text("Error"),
+          content: Text("Please fill in all fields"),
           actions: <Widget>[
             TextButton(
               child: Text("OK"),
@@ -85,8 +58,44 @@ class _SignupPageState extends State<SignupPage> {
         );
       },
     );
+    return;
   }
+
+  // Check if passwords match
+  if (_passwordController.text != _confirmPasswordController.text) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Error"),
+          content: Text("Passwords do not match"),
+          actions: <Widget>[
+            TextButton(
+              child: Text("OK"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+    return;
+  }
+
+  // Proceed to next step
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => SignupPageOne(
+        name: _nameController.text,
+        email: _usernameController.text,
+        password: _passwordController.text,
+      ),
+    ),
+  );
 }
+
 
 
   @override
@@ -368,7 +377,7 @@ class _SignupPageState extends State<SignupPage> {
                             width: screenSize.width * 0.3,
                             height: minButtonHeight,
                             child: TextButton(
-                              onPressed: _registerWithEmailAndPassword,
+                              onPressed: _navigateToSignupPageOne,
                               style: ButtonStyle(
                                 backgroundColor: MaterialStateProperty.all(Color(0xFF0092D1)),
                                 foregroundColor: MaterialStateProperty.all(Colors.white),
