@@ -87,6 +87,8 @@ flutter:
     - Images/RedMarker.png
     - Images/GreenMarker.png
     - Images/BackButton.png
+    - Images/Upload.png
+    - Images/Camera.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
@@ -110,6 +112,10 @@ flutter:
       fonts:
         - asset: fonts/Roboto-Medium.ttf
         - asset: fonts/Roboto-Light.ttf
+          weight: 700
+    - family: Glory
+      fonts:
+        - asset: fonts/Glory-Regular.ttf
           weight: 700
 
 flutter_native_splash:

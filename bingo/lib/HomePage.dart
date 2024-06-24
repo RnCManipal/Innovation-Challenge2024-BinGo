@@ -16,7 +16,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int selectedImageIndex = 0; // Track the index of the selected image
   late User loggedInUser; // Variable to hold logged-in user details
-  late DocumentSnapshot userDoc; // Variable to hold user document from Firestore
+  late DocumentSnapshot
+      userDoc; // Variable to hold user document from Firestore
 
   @override
   void initState() {
@@ -24,7 +25,11 @@ class _HomePageState extends State<HomePage> {
     // Get the currently logged-in user
     loggedInUser = FirebaseAuth.instance.currentUser!;
     // Fetch user document from Firestore using the UID
-    FirebaseFirestore.instance.collection('users').doc(loggedInUser.uid).get().then((doc) {
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(loggedInUser.uid)
+        .get()
+        .then((doc) {
       setState(() {
         userDoc = doc; // Store the fetched document
       });
@@ -49,6 +54,7 @@ class _HomePageState extends State<HomePage> {
     double textTopPadding = screenSize.height * 0.1;
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: Color(0xffFFFFFF),
       body: Stack(
         children: [
@@ -64,17 +70,20 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           Center(
-            child: selectedImageIndex == 1 // Assuming selectedImageIndex 5 is for "User.png"
+            child: selectedImageIndex ==
+                    1 // Assuming selectedImageIndex 5 is for "User.png"
                 ? const BinMap()
                 : Container(), // Empty container if selectedImageIndex is not 5
           ),
           Center(
-            child: selectedImageIndex == 2 // Assuming selectedImageIndex 5 is for "User.png"
+            child: selectedImageIndex ==
+                    2 // Assuming selectedImageIndex 5 is for "User.png"
                 ? const ReportTab()
                 : Container(), // Empty container if selectedImageIndex is not 5
           ),
           Center(
-            child: selectedImageIndex == 5 // Assuming selectedImageIndex 5 is for "User.png"
+            child: selectedImageIndex ==
+                    5 // Assuming selectedImageIndex 5 is for "User.png"
                 ? Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -103,7 +112,8 @@ class _HomePageState extends State<HomePage> {
                             await FirebaseAuth.instance.signOut();
                             Navigator.pushReplacement(
                               context,
-                              MaterialPageRoute(builder: (context) => SignupPage()),
+                              MaterialPageRoute(
+                                  builder: (context) => SignupPage()),
                             );
                           },
                           child: Text('Logout'),
