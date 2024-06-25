@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:geocoding/geocoding.dart' as geocode;
 
 class UserReportTab extends StatefulWidget {
   const UserReportTab({Key? key}) : super(key: key);
@@ -15,9 +16,10 @@ class UserReportTab extends StatefulWidget {
 
 class _UserReportTabState extends State<UserReportTab> {
   File? image;
+  final TextEditingController titleController = TextEditingController();
   final TextEditingController locationController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
-  final TextEditingController severityController = TextEditingController();
+  String severity = "Medium"; // Default severity value
   bool uploading = false; // Flag to track image upload state
 
   @override
@@ -76,6 +78,7 @@ class _UserReportTabState extends State<UserReportTab> {
             left: screenWidth * 0.1,
             child: Container(
               width: screenWidth * 0.8,
+              height: screenHeight * 0.6, // Adjust height to fit the screen
               padding: EdgeInsets.all(screenWidth * 0.05),
               decoration: BoxDecoration(
                 color: Color(0xffE0FFFF),
@@ -89,155 +92,190 @@ class _UserReportTabState extends State<UserReportTab> {
                   ),
                 ],
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Location",
-                    style: TextStyle(
-                      fontSize: screenWidth * 0.04,
-                      fontFamily: 'Roboto',
-                      fontWeight: FontWeight.normal,
-                    ),
-                  ),
-                  SizedBox(height: screenWidth * 0.02),
-                  TextField(
-                    controller: locationController,
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.white,
-                      hintText: 'Enter location',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(screenWidth * 0.02),
-                        borderSide: BorderSide.none,
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Title",
+                      style: TextStyle(
+                        fontSize: screenWidth * 0.04,
+                        fontFamily: 'Roboto',
+                        fontWeight: FontWeight.normal,
                       ),
                     ),
-                  ),
-                  SizedBox(height: screenWidth * 0.04),
-                  Text(
-                    "Description",
-                    style: TextStyle(
-                      fontSize: screenWidth * 0.04,
-                      fontFamily: 'Roboto',
-                      fontWeight: FontWeight.normal,
-                    ),
-                  ),
-                  SizedBox(height: screenWidth * 0.02),
-                  TextField(
-                    controller: descriptionController,
-                    maxLines: 3,
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.white,
-                      hintText: 'Enter description',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(screenWidth * 0.02),
-                        borderSide: BorderSide.none,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: screenWidth * 0.04),
-                  Text(
-                    "Severity",
-                    style: TextStyle(
-                      fontSize: screenWidth * 0.04,
-                      fontFamily: 'Roboto',
-                      fontWeight: FontWeight.normal,
-                    ),
-                  ),
-                  SizedBox(height: screenWidth * 0.02),
-                  TextField(
-                    controller: severityController,
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.white,
-                      hintText: 'Enter severity',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(screenWidth * 0.02),
-                        borderSide: BorderSide.none,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: screenWidth * 0.04),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xFFFBBC05),
-                          shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(screenWidth * 0.02),
-                          ),
-                        ),
-                        onPressed: () async {
-                          final picture = await ImagePicker()
-                              .pickImage(source: ImageSource.camera);
-                          if (picture != null) {
-                            image = File(picture.path);
-                            setState(() {});
-                          }
-                        },
-                        icon: Icon(Icons.camera_alt, color: Colors.white),
-                        label: Text(
-                          'Camera',
-                          style: TextStyle(color: Colors.white),
+                    SizedBox(height: screenWidth * 0.02),
+                    TextField(
+                      controller: titleController,
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Colors.white,
+                        hintText: 'Enter title',
+                        border: OutlineInputBorder(
+                          borderRadius:
+                              BorderRadius.circular(screenWidth * 0.02),
+                          borderSide: BorderSide.none,
                         ),
                       ),
-                      ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xFFFBBC05),
-                          shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(screenWidth * 0.02),
-                          ),
-                        ),
-                        onPressed: () async {
-                          final picture = await ImagePicker()
-                              .pickImage(source: ImageSource.gallery);
-                          if (picture != null) {
-                            image = File(picture.path);
-                            setState(() {});
-                          }
-                        },
-                        icon: Icon(Icons.upload, color: Colors.white),
-                        label: Text(
-                          'Upload',
-                          style: TextStyle(color: Colors.white),
+                    ),
+                    SizedBox(height: screenWidth * 0.04),
+                    Text(
+                      "Description",
+                      style: TextStyle(
+                        fontSize: screenWidth * 0.04,
+                        fontFamily: 'Roboto',
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
+                    SizedBox(height: screenWidth * 0.02),
+                    TextField(
+                      controller: descriptionController,
+                      maxLines: 3,
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Colors.white,
+                        hintText: 'Enter description',
+                        border: OutlineInputBorder(
+                          borderRadius:
+                              BorderRadius.circular(screenWidth * 0.02),
+                          borderSide: BorderSide.none,
                         ),
                       ),
-                    ],
-                  ),
-                  SizedBox(height: screenWidth * 0.04),
-                  uploading
-                      ? Center(child: CircularProgressIndicator())
-                      : Center(
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Color(0xffF79839),
-                              shape: RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.circular(screenWidth * 0.02),
-                              ),
-                            ),
-                            onPressed: isButtonDisabled
-                                ? null // Disable button if no image selected
-                                : () {
-                                    // Handle "File a Report" button press
-                                    saveReportToFirestore();
-                                  },
-                            child: Text(
-                              'File a Report',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontFamily: 'Roboto',
-                                fontWeight: FontWeight.bold,
-                                fontSize: screenWidth * 0.04,
-                              ),
+                    ),
+                    SizedBox(height: screenWidth * 0.04),
+                    Text(
+                      "Severity",
+                      style: TextStyle(
+                        fontSize: screenWidth * 0.04,
+                        fontFamily: 'Roboto',
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
+                    SizedBox(height: screenWidth * 0.02),
+                    DropdownButtonFormField<String>(
+                      value: severity,
+                      items: ["High", "Medium", "Low"].map((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                      onChanged: (newValue) {
+                        setState(() {
+                          severity = newValue!;
+                        });
+                      },
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius:
+                              BorderRadius.circular(screenWidth * 0.02),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: screenWidth * 0.04),
+                    Text(
+                      "Location",
+                      style: TextStyle(
+                        fontSize: screenWidth * 0.04,
+                        fontFamily: 'Roboto',
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
+                    SizedBox(height: screenWidth * 0.02),
+                    TextField(
+                      controller: locationController,
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Colors.white,
+                        hintText: 'Enter location',
+                        border: OutlineInputBorder(
+                          borderRadius:
+                              BorderRadius.circular(screenWidth * 0.02),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: screenWidth * 0.04),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Color(0xFFFBBC05),
+                            shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.circular(screenWidth * 0.02),
                             ),
                           ),
+                          onPressed: () async {
+                            final picture = await ImagePicker()
+                                .pickImage(source: ImageSource.camera);
+                            if (picture != null) {
+                              image = File(picture.path);
+                              setState(() {});
+                            }
+                          },
+                          icon: Icon(Icons.camera_alt, color: Colors.white),
+                          label: Text(
+                            'Camera',
+                            style: TextStyle(color: Colors.white),
+                          ),
                         ),
-                ],
+                        ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Color(0xFFFBBC05),
+                            shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.circular(screenWidth * 0.02),
+                            ),
+                          ),
+                          onPressed: () async {
+                            final picture = await ImagePicker()
+                                .pickImage(source: ImageSource.gallery);
+                            if (picture != null) {
+                              image = File(picture.path);
+                              setState(() {});
+                            }
+                          },
+                          icon: Icon(Icons.upload, color: Colors.white),
+                          label: Text(
+                            'Upload',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: screenWidth * 0.04),
+                    uploading
+                        ? Center(child: CircularProgressIndicator())
+                        : Center(
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Color(0xffF79839),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.circular(screenWidth * 0.02),
+                                ),
+                              ),
+                              onPressed: isButtonDisabled
+                                  ? null
+                                  : saveReportToFirestore,
+                              child: Text(
+                                'File a Report',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontFamily: 'Roboto',
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: screenWidth * 0.04,
+                                ),
+                              ),
+                            ),
+                          ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -247,11 +285,14 @@ class _UserReportTabState extends State<UserReportTab> {
   }
 
   Future<void> saveReportToFirestore() async {
+    String title = titleController.text.trim();
     String location = locationController.text.trim();
     String description = descriptionController.text.trim();
-    String severity = severityController.text.trim();
 
-    if (location.isEmpty || description.isEmpty || severity.isEmpty) {
+    if (title.isEmpty ||
+        location.isEmpty ||
+        description.isEmpty ||
+        severity.isEmpty) {
       // Show an error dialog if any of the fields are empty
       showDialog(
         context: context,
@@ -278,16 +319,27 @@ class _UserReportTabState extends State<UserReportTab> {
     });
 
     try {
+      // Geocode the location to get latitude and longitude
+      List<geocode.Location> locations =
+          await geocode.locationFromAddress(location);
+      if (locations.isEmpty) {
+        throw Exception('Failed to get coordinates for the provided location');
+      }
+      double latitude = locations.first.latitude;
+      double longitude = locations.first.longitude;
+
       // Access Firestore instance and collection
       FirebaseFirestore firestore = FirebaseFirestore.instance;
       CollectionReference reports = firestore.collection('reports');
 
       // Add a new document with auto-generated ID
       DocumentReference ref = await reports.add({
-        'location': location,
+        'title': title,
+        'latitude': latitude,
+        'longitude': longitude,
         'description': description,
         'severity': severity,
-        'timestamp': FieldValue.serverTimestamp(),
+        'isResolved': "False",
       });
 
       // Upload image if available
@@ -304,9 +356,10 @@ class _UserReportTabState extends State<UserReportTab> {
       }
 
       // Clear input fields after saving
+      titleController.clear();
       locationController.clear();
       descriptionController.clear();
-      severityController.clear();
+      severity = "Medium"; // Reset severity to default
       image = null;
 
       // Show success message
