@@ -1,3 +1,4 @@
+import 'package:bingo/driverReportsTab.dart';
 import 'package:bingo/userReportsTab.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart'; // Import FirebaseAuth if needed
@@ -53,10 +54,7 @@ class _ReportTabState extends State<ReportTab> {
         child: accountType == 'User'
             ? UserReportTab()
             : accountType == 'Driver'
-                ? Text(
-                    'Driver Dashboard will be displayed here',
-                    style: TextStyle(fontSize: 18),
-                  )
+                ? DriverReportTab()
                 : Text(
                     'Unknown account type: $accountType',
                     style: TextStyle(fontSize: 18),
