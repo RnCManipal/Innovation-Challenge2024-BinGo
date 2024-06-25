@@ -1,6 +1,6 @@
-import 'package:bingo/ViewReportsPage.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:bingo/ViewReportsPage.dart'; // Import your ViewPage implementation
 
 class DriverReportTab extends StatefulWidget {
   const DriverReportTab({Key? key}) : super(key: key);
@@ -10,19 +10,19 @@ class DriverReportTab extends StatefulWidget {
 }
 
 class _DriverReportTabState extends State<DriverReportTab> {
-  String? selectedReportTitle; // Track selected report title
+  Map<String, dynamic>? selectedReport; // Track selected report details
 
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
-    return selectedReportTitle != null
+    return selectedReport != null
         ? ViewPage(
-            reportTitle: selectedReportTitle!,
+            report: selectedReport!,
             onClose: () {
               setState(() {
-                selectedReportTitle = null;
+                selectedReport = null;
               });
             },
           )
@@ -95,13 +95,21 @@ class _DriverReportTabState extends State<DriverReportTab> {
                           itemCount: reports.length,
                           itemBuilder: (context, index) {
                             var report = reports[index];
+
                             return Padding(
                               padding:
                                   EdgeInsets.only(bottom: screenWidth * 0.04),
                               child: GestureDetector(
                                 onTap: () {
                                   setState(() {
-                                    selectedReportTitle = report['title'];
+                                    selectedReport = {
+                                      'id': report.id, // Store document ID
+                                      'title': report['title'],
+                                      'description': report['description'],
+                                      'severity': report['severity'],
+                                      'imageUrl': report['imageUrl'],
+                                      'location': report['location'],
+                                    };
                                   });
                                 },
                                 child: Container(
@@ -149,8 +157,19 @@ class _DriverReportTabState extends State<DriverReportTab> {
                                             ),
                                             onPressed: () {
                                               setState(() {
-                                                selectedReportTitle =
-                                                    report['title'];
+                                                selectedReport = {
+                                                  'id': report
+                                                      .id, // Store document ID
+                                                  'title': report['title'],
+                                                  'description':
+                                                      report['description'],
+                                                  'severity':
+                                                      report['severity'],
+                                                  'imageUrl':
+                                                      report['imageUrl'],
+                                                  'location':
+                                                      report['location'],
+                                                };
                                               });
                                             },
                                             child: Row(

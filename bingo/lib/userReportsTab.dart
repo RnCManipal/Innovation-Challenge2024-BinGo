@@ -340,6 +340,7 @@ class _UserReportTabState extends State<UserReportTab> {
         'description': description,
         'severity': severity,
         'isResolved': "False",
+        'location': location
       });
 
       // Upload image if available
