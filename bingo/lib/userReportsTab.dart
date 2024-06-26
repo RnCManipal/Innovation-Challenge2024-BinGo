@@ -20,7 +20,53 @@ class _UserReportTabState extends State<UserReportTab> {
   final TextEditingController locationController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   String severity = "Medium"; // Default severity value
+  String city = "Indore";
+  String area = ""; // Default area value
+  List<String> areaList = []; // List to hold areas for the selected city
   bool uploading = false; // Flag to track image upload state
+
+  @override
+  void initState() {
+    super.initState();
+    // Fetch areas for the default city on initialization
+    fetchAreas();
+  }
+
+  Future<void> fetchAreas() async {
+  try {
+    // Access Firestore collection based on selected city name
+    DocumentSnapshot snapshot = await FirebaseFirestore.instance
+        .collection('city-wise-zones')
+        .doc(city)
+        .get();
+
+    if (snapshot.exists) {
+      // Extract areas from the document data
+      Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+      List<String> newAreaList = List<String>.from(data['zones']);
+      
+      setState(() {
+        areaList = newAreaList;
+        if (!areaList.contains(area)) {
+          area = areaList.isNotEmpty ? areaList[0] : '';
+        }
+      });
+    } else {
+      setState(() {
+        areaList = [];
+        area = '';
+      });
+      print('Document does not exist');
+    }
+  } catch (e) {
+    setState(() {
+      areaList = [];
+      area = '';
+    });
+    print('Error fetching areas: $e');
+  }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -75,9 +121,9 @@ class _UserReportTabState extends State<UserReportTab> {
           ),
           Positioned(
             top: screenHeight * 0.3,
-            left: screenWidth * 0.1,
+            left: screenWidth * 0.025,
             child: Container(
-              width: screenWidth * 0.8,
+              width: screenWidth * 0.95,
               height: screenHeight * 0.6, // Adjust height to fit the screen
               padding: EdgeInsets.all(screenWidth * 0.05),
               decoration: BoxDecoration(
@@ -199,6 +245,44 @@ class _UserReportTabState extends State<UserReportTab> {
                       ),
                     ),
                     SizedBox(height: screenWidth * 0.04),
+                    Text(
+                      "City",
+                      style: TextStyle(
+                        fontSize: screenWidth * 0.04,
+                        fontFamily: 'Roboto',
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
+                    SizedBox(height: screenWidth * 0.02),
+                    DropdownButtonFormField<String>(
+                      value: city,
+                      items:
+                          ["Indore", "Delhi", "Hyderabad"].map((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                      onChanged: (newValue) {
+                        setState(() {
+                          city = newValue!;
+                          // Fetch areas for the selected city
+                          fetchAreas();
+                        });
+                      },
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius:
+                              BorderRadius.circular(screenWidth * 0.02),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: screenWidth * 0.04),
+                    _buildAreaDropdown(screenWidth),
+                    SizedBox(height: screenWidth * 0.04),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -284,6 +368,51 @@ class _UserReportTabState extends State<UserReportTab> {
     );
   }
 
+  Widget _buildAreaDropdown(double screenWidth) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        "Area",
+        style: TextStyle(
+          fontSize: screenWidth * 0.04,
+          fontFamily: 'Roboto',
+          fontWeight: FontWeight.normal,
+        ),
+      ),
+      SizedBox(height: screenWidth * 0.02),
+      ConstrainedBox(
+        constraints: BoxConstraints(
+          maxHeight: screenWidth * 0.3, // Adjust maxHeight as needed
+        ),
+        child: DropdownButtonFormField<String>(
+          value: area,
+          items: areaList.map((String value) {
+            return DropdownMenuItem<String>(
+              value: value,
+              child: Text(value),
+            );
+          }).toList(),
+          onChanged: (newValue) {
+            setState(() {
+              area = newValue!;
+            });
+          },
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: Colors.white,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(screenWidth * 0.02),
+              borderSide: BorderSide.none,
+            ),
+          ),
+        ),
+      ),
+    ],
+  );
+}
+
+
   Future<void> saveReportToFirestore() async {
     String title = titleController.text.trim();
     String location = locationController.text.trim();
@@ -292,7 +421,9 @@ class _UserReportTabState extends State<UserReportTab> {
     if (title.isEmpty ||
         location.isEmpty ||
         description.isEmpty ||
-        severity.isEmpty) {
+        severity.isEmpty ||
+        city.isEmpty ||
+        area.isEmpty) {
       // Show an error dialog if any of the fields are empty
       showDialog(
         context: context,
@@ -340,7 +471,9 @@ class _UserReportTabState extends State<UserReportTab> {
         'description': description,
         'severity': severity,
         'isResolved': "False",
-        'location': location
+        'location': location,
+        'city': city,
+        'area': area,
       });
 
       // Upload image if available
@@ -361,6 +494,7 @@ class _UserReportTabState extends State<UserReportTab> {
       locationController.clear();
       descriptionController.clear();
       severity = "Medium"; // Reset severity to default
+      city = "Indore"; // Reset city to default
       image = null;
 
       // Show success message
