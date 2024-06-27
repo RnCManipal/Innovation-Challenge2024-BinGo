@@ -26,11 +26,11 @@ class _SignupPageOneState extends State<SignupPageOne> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text("Error"),
-            content: Text("Please select an account type"),
+            title: const Text("Error"),
+            content: const Text("Please select an account type"),
             actions: <Widget>[
               TextButton(
-                child: Text("OK"),
+                child: const Text("OK"),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -58,7 +58,7 @@ class _SignupPageOneState extends State<SignupPageOne> {
 
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => HomePage()),
+        MaterialPageRoute(builder: (context) => const HomePage()),
       );
     } catch (e) {
       print('Error creating account: $e');
@@ -69,11 +69,11 @@ class _SignupPageOneState extends State<SignupPageOne> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text("Account Creation Failed"),
+            title: const Text("Account Creation Failed"),
             content: Text(e.toString()),
             actions: <Widget>[
               TextButton(
-                child: Text("OK"),
+                child: const Text("OK"),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -144,7 +144,7 @@ class _SignupPageOneState extends State<SignupPageOne> {
                           MaterialPageRoute(builder: (context) =>const SignupPage()),
                         );
                       },
-                      child: Image(
+                      child: const Image(
                         image: AssetImage('Images/BackButton.png'),
                       ))),
               Positioned(
@@ -159,7 +159,7 @@ class _SignupPageOneState extends State<SignupPageOne> {
                       borderRadius: BorderRadius.circular(screenSize.width * 0.02),
                       boxShadow: [
                         BoxShadow(
-                          color: Color.fromARGB(120, 0, 0, 0).withOpacity(0.5),
+                          color: const Color.fromARGB(120, 0, 0, 0).withOpacity(0.5),
                           spreadRadius: screenSize.width * 0.005,
                           blurRadius: screenSize.width * 0.02,
                           offset: Offset(0, screenSize.height * 0.01),
@@ -189,13 +189,13 @@ class _SignupPageOneState extends State<SignupPageOne> {
                             width: screenSize.width * 0.85,
                             padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.02),
                             decoration: BoxDecoration(
-                              color: Color(0xFFF0F0F0), // Background color
+                              color: const Color(0xFFF0F0F0), // Background color
                               borderRadius: BorderRadius.circular(screenSize.width * 0.02),
                             ),
                             child: DropdownButtonHideUnderline(
                               child: DropdownButton<String>(
                                 value: _selectedAccountType,
-                                hint: Padding(
+                                hint: const Padding(
                                   padding: EdgeInsets.only(left: 8.0),
                                   child: Text('Select an item'),
                                 ),
@@ -204,7 +204,7 @@ class _SignupPageOneState extends State<SignupPageOne> {
                                   return DropdownMenuItem<String>(
                                     value: item,
                                     child: Padding(
-                                      padding: EdgeInsets.only(left: 8.0),
+                                      padding: const EdgeInsets.only(left: 8.0),
                                       child: Text(item),
                                     ),
                                   );
@@ -228,7 +228,7 @@ class _SignupPageOneState extends State<SignupPageOne> {
                             child: TextButton(
                               onPressed: _createAccount,
                               style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.all(Color(0xFF0092D1)),
+                                backgroundColor: MaterialStateProperty.all(const Color(0xFF0092D1)),
                                 foregroundColor: MaterialStateProperty.all(Colors.white),
                                 padding: MaterialStateProperty.all(
                                   EdgeInsets.symmetric(vertical: screenSize.height * 0.015),
@@ -265,7 +265,7 @@ class _SignupPageOneState extends State<SignupPageOne> {
                     fontFamily: 'Jost',
                     fontWeight: FontWeight.normal,
                     fontSize: screenSize.width * 0.04,
-                    color: Color.fromARGB(255, 255, 255, 255),
+                    color: const Color.fromARGB(255, 255, 255, 255),
                   ),
                 ),
               ),
@@ -276,7 +276,7 @@ class _SignupPageOneState extends State<SignupPageOne> {
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => LoginPage()),
+                      MaterialPageRoute(builder: (context) => const LoginPage()),
                     );
                   },
                   child: Text(
@@ -284,7 +284,7 @@ class _SignupPageOneState extends State<SignupPageOne> {
                     style: TextStyle(
                       fontSize: screenSize.height * 0.03,
                       fontWeight: FontWeight.bold,
-                      color: Color.fromARGB(255, 98, 255, 0),
+                      color: const Color.fromARGB(255, 98, 255, 0),
                     ),
                   ),
                 ),

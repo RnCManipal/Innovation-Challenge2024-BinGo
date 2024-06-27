@@ -25,7 +25,7 @@ class ViewPage extends StatelessWidget {
             child: Text(
               "Reports",
               style: TextStyle(
-                color: Color(0xffF79839),
+                color: const Color(0xffF79839),
                 fontSize: screenWidth * 0.12,
                 fontFamily: 'Jost',
                 fontWeight: FontWeight.bold,
@@ -63,7 +63,7 @@ class ViewPage extends StatelessWidget {
               height: screenHeight * 0.6,
               padding: EdgeInsets.all(screenWidth * 0.05),
               decoration: BoxDecoration(
-                color: Color(0xffE0FFFF),
+                color: const Color(0xffE0FFFF),
                 borderRadius: BorderRadius.circular(screenWidth * 0.02),
                 boxShadow: [
                   BoxShadow(
@@ -116,7 +116,7 @@ class ViewPage extends StatelessWidget {
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           foregroundColor: Colors.white,
-                          backgroundColor: Color(0xFFF79839),
+                          backgroundColor: const Color(0xFFF79839),
                           shape: RoundedRectangleBorder(
                             borderRadius:
                                 BorderRadius.circular(screenWidth * 0.02),

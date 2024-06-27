@@ -44,7 +44,7 @@ class _ReportTabState extends State<ReportTab> {
   @override
   Widget build(BuildContext context) {
     if (accountType.isEmpty) {
-      return Center(
+      return const Center(
         child:
             CircularProgressIndicator(), // Show a loading indicator while fetching accountType
       );
@@ -52,12 +52,12 @@ class _ReportTabState extends State<ReportTab> {
       // Conditional rendering based on accountType
       return Center(
         child: accountType == 'User'
-            ? UserReportTab()
+            ? const UserReportTab()
             : accountType == 'Driver'
-                ? DriverReportTab()
+                ? const DriverReportTab()
                 : Text(
                     'Unknown account type: $accountType',
-                    style: TextStyle(fontSize: 18),
+                    style: const TextStyle(fontSize: 18),
                   ),
       );
     }

@@ -29,7 +29,7 @@ class _SignupPageState extends State<SignupPage> {
       WidgetsBinding.instance!.addPostFrameCallback((_) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => HomePage()),
+          MaterialPageRoute(builder: (context) => const HomePage()),
         );
       });
     }
@@ -45,11 +45,11 @@ void _navigateToSignupPageOne() {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("Error"),
-          content: Text("Please fill in all fields"),
+          title: const Text("Error"),
+          content: const Text("Please fill in all fields"),
           actions: <Widget>[
             TextButton(
-              child: Text("OK"),
+              child: const Text("OK"),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -67,11 +67,11 @@ void _navigateToSignupPageOne() {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("Error"),
-          content: Text("Passwords do not match"),
+          title: const Text("Error"),
+          content: const Text("Passwords do not match"),
           actions: <Widget>[
             TextButton(
-              child: Text("OK"),
+              child: const Text("OK"),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -208,7 +208,7 @@ void _navigateToSignupPageOne() {
                       borderRadius: BorderRadius.circular(screenSize.width * 0.02),
                       boxShadow: [
                         BoxShadow(
-                          color: Color.fromARGB(120, 0, 0, 0).withOpacity(0.5),
+                          color: const Color.fromARGB(120, 0, 0, 0).withOpacity(0.5),
                           spreadRadius: screenSize.width * 0.005,
                           blurRadius: screenSize.width * 0.02,
                           offset: Offset(0, screenSize.height * 0.01),
@@ -379,7 +379,7 @@ void _navigateToSignupPageOne() {
                             child: TextButton(
                               onPressed: _navigateToSignupPageOne,
                               style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.all(Color(0xFF0092D1)),
+                                backgroundColor: MaterialStateProperty.all(const Color(0xFF0092D1)),
                                 foregroundColor: MaterialStateProperty.all(Colors.white),
                                 padding: MaterialStateProperty.all(
                                   EdgeInsets.symmetric(vertical: screenSize.height * 0.015),
@@ -416,7 +416,7 @@ void _navigateToSignupPageOne() {
                     fontFamily: 'Jost',
                     fontWeight: FontWeight.normal,
                     fontSize: screenSize.width * 0.04,
-                    color: Color.fromARGB(255, 255, 255, 255),
+                    color: const Color.fromARGB(255, 255, 255, 255),
                   ),
                 ),
               ),
@@ -427,7 +427,7 @@ void _navigateToSignupPageOne() {
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => LoginPage()),
+                      MaterialPageRoute(builder: (context) => const LoginPage()),
                     );
                   },
                   child: Text(
@@ -435,7 +435,7 @@ void _navigateToSignupPageOne() {
                     style: TextStyle(
                       fontSize: screenSize.height * 0.03,
                       fontWeight: FontWeight.bold,
-                      color: Color.fromARGB(255, 98, 255, 0),
+                      color: const Color.fromARGB(255, 98, 255, 0),
                     ),
                   ),
                 ),

@@ -55,7 +55,7 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      backgroundColor: Color(0xffFFFFFF),
+      backgroundColor: const Color(0xffFFFFFF),
       body: Stack(
         children: [
           Center(
@@ -93,15 +93,15 @@ class _HomePageState extends State<HomePage> {
                           children: [
                             Text(
                               'Name: ${userDoc['name']}',
-                              style: TextStyle(fontSize: 18),
+                              style: const TextStyle(fontSize: 18),
                             ),
                             Text(
                               'Email: ${userDoc['email']}',
-                              style: TextStyle(fontSize: 18),
+                              style: const TextStyle(fontSize: 18),
                             ),
                             Text(
                               'Account Type: ${getAccountType()}',
-                              style: TextStyle(fontSize: 18),
+                              style: const TextStyle(fontSize: 18),
                             ),
                           ],
                         ),
@@ -113,10 +113,10 @@ class _HomePageState extends State<HomePage> {
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => SignupPage()),
+                                  builder: (context) => const SignupPage()),
                             );
                           },
-                          child: Text('Logout'),
+                          child: const Text('Logout'),
                         ),
                       ),
                     ],
@@ -130,11 +130,11 @@ class _HomePageState extends State<HomePage> {
             child: Container(
               height: screenSize.height * 0.08, // Adjust container height
               width: screenSize.width,
-              decoration: BoxDecoration(color: Color(0xffAFFF89)),
+              decoration: const BoxDecoration(color: Color(0xffAFFF89)),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  SizedBox(width: 0.4),
+                  const SizedBox(width: 0.4),
                   _buildImageWithSelectableBackground(
                     'Images/Home.png',
                     0,
@@ -142,7 +142,7 @@ class _HomePageState extends State<HomePage> {
                     screenSize.width * 0.12,
                     screenSize.height * 0.12,
                   ),
-                  SizedBox(width: 0.4),
+                  const SizedBox(width: 0.4),
                   _buildImageWithSelectableBackground(
                     'Images/Location.png',
                     1,
@@ -150,7 +150,7 @@ class _HomePageState extends State<HomePage> {
                     screenSize.width * 0.12,
                     screenSize.height * 0.12,
                   ),
-                  SizedBox(width: 0.4),
+                  const SizedBox(width: 0.4),
                   _buildImageWithSelectableBackground(
                     'Images/Megaphone.png',
                     2,
@@ -158,7 +158,7 @@ class _HomePageState extends State<HomePage> {
                     screenSize.width * 0.12,
                     screenSize.height * 0.12,
                   ),
-                  SizedBox(width: 0.4),
+                  const SizedBox(width: 0.4),
                   _buildImageWithSelectableBackground(
                     'Images/Qr Code.png',
                     3,
@@ -166,7 +166,7 @@ class _HomePageState extends State<HomePage> {
                     screenSize.width * 0.12,
                     screenSize.height * 0.12,
                   ),
-                  SizedBox(width: 0.4),
+                  const SizedBox(width: 0.4),
                   _buildImageWithSelectableBackground(
                     'Images/Discount.png',
                     4,
@@ -174,7 +174,7 @@ class _HomePageState extends State<HomePage> {
                     screenSize.width * 0.12,
                     screenSize.height * 0.12,
                   ),
-                  SizedBox(width: 0.4),
+                  const SizedBox(width: 0.4),
                   _buildImageWithSelectableBackground(
                     'Images/User.png',
                     5,
@@ -182,7 +182,7 @@ class _HomePageState extends State<HomePage> {
                     screenSize.width * 0.12,
                     screenSize.height * 0.12,
                   ),
-                  SizedBox(width: 0.4),
+                  const SizedBox(width: 0.4),
                 ],
               ),
             ),
@@ -205,12 +205,12 @@ class _HomePageState extends State<HomePage> {
         print(selectedImageIndex);
       },
       child: Container(
-        margin: EdgeInsets.all(8.0), // Adjust margin as needed
+        margin: const EdgeInsets.all(8.0), // Adjust margin as needed
         width: width,
         height: height,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: isSelected ? Color(0xffE0FFFF) : Colors.transparent,
+          color: isSelected ? const Color(0xffE0FFFF) : Colors.transparent,
         ),
         child: Image.asset(
           imagePath,
