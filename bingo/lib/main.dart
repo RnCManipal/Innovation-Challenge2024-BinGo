@@ -31,10 +31,10 @@ class MyApp extends StatelessWidget {
           } else {
             if (snapshot.hasData && snapshot.data != null) {
               // User is authenticated, navigate to HomePage
-              return HomePage();
+              return const HomePage();
             } else {
               // No user authenticated, navigate to SignupPage or LoginPage
-              return SignupPage(); // You can replace this with LoginPage or any other widget
+              return const SignupPage(); // You can replace this with LoginPage or any other widget
             }
           }
         },

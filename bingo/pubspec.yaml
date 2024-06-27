@@ -94,6 +94,8 @@ flutter:
     - Images/BackButton.png
     - Images/Upload.png
     - Images/Camera.png
+    - Images/TruckPhoto.png
+    - Images/Community.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

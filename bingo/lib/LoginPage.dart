@@ -104,7 +104,7 @@ class _LoginPageState extends State<LoginPage> {
                           MaterialPageRoute(builder: (context) =>const SignupPage()),
                         );
                       },
-                      child: Image(
+                      child: const Image(
                         image: AssetImage('Images/BackButton.png'),
                       ))),
               Positioned(
@@ -319,7 +319,7 @@ class _LoginPageState extends State<LoginPage> {
                                     Navigator.pushReplacement(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) => HomePage()),
+                                          builder: (context) => const HomePage()),
                                     );
                                   } else {
                                     // Handle sign-in failure if needed
@@ -334,11 +334,11 @@ class _LoginPageState extends State<LoginPage> {
                                     context: context,
                                     builder: (BuildContext context) {
                                       return AlertDialog(
-                                        title: Text("Login Failed"),
+                                        title: const Text("Login Failed"),
                                         content: Text(e.toString()),
                                         actions: <Widget>[
                                           TextButton(
-                                            child: Text("OK"),
+                                            child: const Text("OK"),
                                             onPressed: () {
                                               Navigator.of(context).pop();
                                             },
@@ -351,7 +351,7 @@ class _LoginPageState extends State<LoginPage> {
                               },
                               style: ButtonStyle(
                                 backgroundColor: MaterialStateProperty.all(
-                                    Color(0xFF0092D1)),
+                                    const Color(0xFF0092D1)),
                                 foregroundColor:
                                     MaterialStateProperty.all(Colors.white),
                                 padding: MaterialStateProperty.all(

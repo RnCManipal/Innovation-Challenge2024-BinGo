@@ -22,7 +22,7 @@ class _BinMapState extends State<BinMap> {
 
   final List<Marker> _markers = [];
 
-  CameraPosition _initialCameraPosition = CameraPosition(
+  CameraPosition _initialCameraPosition = const CameraPosition(
     target: LatLng(22.7273, 75.8977),
     zoom: 15,
   );
@@ -114,7 +114,7 @@ class _BinMapState extends State<BinMap> {
   }
 
   Future<void> _loadMap() async {
-    await Future.delayed(Duration(seconds: 2)); // Simulate a delay for loading
+    await Future.delayed(const Duration(seconds: 2)); // Simulate a delay for loading
   }
 
   Future<void> _getCurrentLocation() async {
@@ -181,7 +181,7 @@ class _BinMapState extends State<BinMap> {
         future: _mapFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(
+            return const Center(
               child:
                   CircularProgressIndicator(), // Show loading indicator while waiting
             );
@@ -196,7 +196,7 @@ class _BinMapState extends State<BinMap> {
               markers: Set<Marker>.of(_markers),
             ); // Show map once it's loaded
           } else {
-            return Center(
+            return const Center(
               child: Text(
                   'Error loading map'), // Handle error or other states if needed
             );

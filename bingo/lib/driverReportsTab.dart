@@ -36,7 +36,7 @@ class _DriverReportTabState extends State<DriverReportTab> {
                   child: Text(
                     "Reports",
                     style: TextStyle(
-                      color: Color(0xffF79839),
+                      color: const Color(0xffF79839),
                       fontSize: screenWidth * 0.12,
                       fontFamily: 'Jost',
                       fontWeight: FontWeight.bold,
@@ -64,7 +64,7 @@ class _DriverReportTabState extends State<DriverReportTab> {
                     height: screenHeight * 0.6,
                     padding: EdgeInsets.all(screenWidth * 0.05),
                     decoration: BoxDecoration(
-                      color: Color(0xffE0FFFF),
+                      color: const Color(0xffE0FFFF),
                       borderRadius: BorderRadius.circular(screenWidth * 0.02),
                       boxShadow: [
                         BoxShadow(
@@ -81,7 +81,7 @@ class _DriverReportTabState extends State<DriverReportTab> {
                           .snapshots(),
                       builder: (context, snapshot) {
                         if (!snapshot.hasData) {
-                          return Center(child: CircularProgressIndicator());
+                          return const Center(child: CircularProgressIndicator());
                         }
                         var reports = snapshot.data!.docs;
 
@@ -91,7 +91,7 @@ class _DriverReportTabState extends State<DriverReportTab> {
 
                         return ListView.builder(
                           shrinkWrap: true,
-                          physics: NeverScrollableScrollPhysics(),
+                          physics: const NeverScrollableScrollPhysics(),
                           itemCount: reports.length,
                           itemBuilder: (context, index) {
                             var report = reports[index];
@@ -114,7 +114,7 @@ class _DriverReportTabState extends State<DriverReportTab> {
                                 },
                                 child: Container(
                                   decoration: BoxDecoration(
-                                    color: Color(0xffE0FFFF),
+                                    color: const Color(0xffE0FFFF),
                                     borderRadius: BorderRadius.circular(
                                         screenWidth * 0.02),
                                     boxShadow: [
@@ -148,7 +148,7 @@ class _DriverReportTabState extends State<DriverReportTab> {
                                           child: ElevatedButton(
                                             style: ElevatedButton.styleFrom(
                                               backgroundColor:
-                                                  Color(0xFFFBBC05),
+                                                  const Color(0xFFFBBC05),
                                               shape: RoundedRectangleBorder(
                                                 borderRadius:
                                                     BorderRadius.circular(
