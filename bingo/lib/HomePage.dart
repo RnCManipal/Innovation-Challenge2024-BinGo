@@ -85,7 +85,8 @@ class _HomePageState extends State<HomePage> {
           Center(
             child: selectedImageIndex ==
                     5 // Assuming selectedImageIndex 5 is for "User.png"
-                ? Column(
+                ? SingleChildScrollView(child:
+                Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       // Profile information
@@ -120,7 +121,7 @@ class _HomePageState extends State<HomePage> {
                               ),
                             ),
                       CustomContainer(
-                        height:screenSize.height*0.33,
+                        height:screenSize.height*0.4,
                         screenSize: screenSize,
                         children: [
                         if (userDoc != null)
@@ -330,6 +331,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ],
                   )
+          )
                 : Container(), // Empty container if selectedImageIndex is not 5
           ),
         
