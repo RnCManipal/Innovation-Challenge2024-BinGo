@@ -58,6 +58,7 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: const Color(0xffFFFFFF),
       body: Stack(
         children: [
+
           Center(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -88,23 +89,231 @@ class _HomePageState extends State<HomePage> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       // Profile information
-                      if (userDoc != null)
-                        Column(
-                          children: [
-                            Text(
-                              'Name: ${userDoc['name']}',
-                              style: const TextStyle(fontSize: 18),
+                      Padding(
+                              padding: EdgeInsets.only(top: screenSize.height * 0.05,),
+                              child: SizedBox(
+                                  width: screenSize.width * 0.3,
+                                  child: Text(
+                                  "BinGo",
+                                  style: TextStyle(
+                                    fontFamily: 'Jost',
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: screenSize.width *0.1, // Responsive font size
+                                    color: Colors.orange,
+                                  ),
+                                ),
+                              ),
                             ),
-                            Text(
-                              'Email: ${userDoc['email']}',
-                              style: const TextStyle(fontSize: 18),
+                      Padding(
+                              padding: EdgeInsets.symmetric(vertical: screenSize.height * 0.02,horizontal: screenSize.width*0.39),
+                                  child: SizedBox(
+                                  width: screenSize.width * 0.32,
+                                  child: Text(
+                                  "Profile",
+                                  style: TextStyle(
+                                    fontFamily: 'Jost',
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: screenSize.width *0.07, // Responsive font size
+                                 
+                                  ),
+                                ),
+                              ),
                             ),
-                            Text(
-                              'Account Type: ${getAccountType()}',
-                              style: const TextStyle(fontSize: 18),
+                      CustomContainer(
+                        height:screenSize.height*0.33,
+                        screenSize: screenSize,
+                        children: [
+                        if (userDoc != null)
+                          Padding(
+                              padding: EdgeInsets.only(top: screenSize.height * 0.02,left:screenSize.height * 0.045),
+                              child: SizedBox(
+                                  width: screenSize.width * 0.4,
+                                  child: Text(
+                                  "Username:",
+                                  style: TextStyle(
+                                    fontFamily: 'Jost',
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: screenSize.width *0.06, // Responsive font size
+                                 
+                                  ),
+                                ),
+                              ),
                             ),
-                          ],
+                          Padding(
+                              padding: EdgeInsets.only(top: screenSize.height * 0,left:screenSize.height * 0.045),
+                              child: SizedBox(
+                                  width: screenSize.width * 0.4,
+                                  child: Text(
+                                  "${userDoc['name']}",
+                                  style: TextStyle(
+                                    fontFamily: 'Jost',
+                                    fontWeight: FontWeight.normal,
+                                    fontSize: screenSize.width *0.06, // Responsive font size
+                                 
+                                  ),
+                                ),
+                              ),
+                            ),
+                          Padding(
+                              padding: EdgeInsets.only(top: screenSize.height * 0.016,left:screenSize.height * 0.045),
+                              child: SizedBox(
+                                  width: screenSize.width * 0.4,
+                                  child: Text(
+                                  "Email:",
+                                  style: TextStyle(
+                                    fontFamily: 'Jost',
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: screenSize.width *0.06, // Responsive font size
+                                 
+                                  ),
+                                ),
+                              ),
+                            ),
+                          Padding(
+                              padding: EdgeInsets.only(top: screenSize.height * 0,left:screenSize.height * 0.045),
+                              child: SizedBox(
+                                  width: screenSize.width * 0.6,
+                                  child: Text(
+                                  "${userDoc['email']}",
+                                  style: TextStyle(
+                                    fontFamily: 'Jost',
+                                    fontWeight: FontWeight.normal,
+                                    fontSize: screenSize.width *0.04, // Responsive font size
+                                 
+                                  ),
+                                ),
+                              ),
+                            ),
+                          Padding(
+                              padding: EdgeInsets.only(top: screenSize.height * 0.016,left:screenSize.height * 0.045),
+                              child: SizedBox(
+                                  width: screenSize.width * 0.6,
+                                  child: Text(
+                                  "No of Reports:",
+                                  style: TextStyle(
+                                    fontFamily: 'Jost',
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: screenSize.width *0.06, // Responsive font size
+                                 
+                                  ),
+                                ),
+                              ),
+                            ),
+                          Padding(
+                              padding: EdgeInsets.only(top: screenSize.height * 0,left:screenSize.height * 0.045),
+                              child: SizedBox(
+                                  width: screenSize.width * 0.4,
+                                  child: Text(
+                                  "${getAccountType()}",
+                                  style: TextStyle(
+                                    fontFamily: 'Jost',
+                                    fontWeight: FontWeight.normal,
+                                    fontSize: screenSize.width *0.04, // Responsive font size
+                                 
+                                  ),
+                                ),
+                              ),
+                            ),
+                  
+
+                        ]
+                      ),
+                      const SizedBox(height: 20),
+                      CustomContainer(
+                height: screenSize.height*0.3,
+                screenSize: screenSize,
+                children: [
+                  Padding(
+                          padding: EdgeInsets.only(top: screenSize.height * 0.03, left: screenSize.width * 0.1),
+                          child: Text(
+                            "1500",
+                            style: TextStyle(
+                              fontFamily: 'Roboto',
+                              fontSize: screenSize.width * 0.1,
+                              fontWeight: FontWeight.bold,
+                              color: const Color.fromARGB(255, 15, 191, 38),
+                            ),
+                          ),
                         ),
+                  Padding(
+                          padding: EdgeInsets.only(top: screenSize.height *0, left: screenSize.width * 0.57),
+                          child: Text(
+                            "points",
+                            style: TextStyle(
+                              fontFamily: 'Roboto',
+                              fontSize: screenSize.width * 0.04,
+                              fontWeight: FontWeight.bold,
+                              color: const Color.fromARGB(255, 0, 0, 0),
+                            ),
+                          ),
+                        ),
+                  const SizedBox(height: 5),
+                  Padding(
+                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.15),
+                          child: SizedBox(
+                            width: screenSize.width * 0.6,
+                            height: screenSize.height *0.06,
+                            child: TextButton(
+                              onPressed: (){print("button pressed");},
+                              style: ButtonStyle(
+                                backgroundColor: WidgetStateProperty.all(const Color.fromARGB(255, 255, 153, 1)),
+                                foregroundColor: WidgetStateProperty.all(Colors.white),
+                                padding: WidgetStateProperty.all(
+                                  EdgeInsets.symmetric(vertical: screenSize.height * 0.015),
+                                ),
+                                shape: WidgetStateProperty.all(
+                                  RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(screenSize.width * 0.02),
+                                  ),
+                                ),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  "View Offers",
+                                  style: TextStyle(
+                                    fontSize: screenSize.width * 0.049,
+                                    fontWeight: FontWeight.normal,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                  const SizedBox(height: 10),
+                  Padding(
+                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.15),
+                          child: SizedBox(
+                            width: screenSize.width * 0.6,
+                            height: screenSize.height *0.06,
+                            child: TextButton(
+                              onPressed: (){print("button pressed");},
+                              style: ButtonStyle(
+                                backgroundColor: WidgetStateProperty.all(const Color.fromARGB(255, 255, 153, 1)),
+                                foregroundColor: WidgetStateProperty.all(Colors.white),
+                                padding: WidgetStateProperty.all(
+                                  EdgeInsets.symmetric(vertical: screenSize.height * 0.015),
+                                ),
+                                shape: WidgetStateProperty.all(
+                                  RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(screenSize.width * 0.02),
+                                  ),
+                                ),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  "Earn More",
+                                  style: TextStyle(
+                                    fontSize: screenSize.width * 0.049,
+                                    fontWeight: FontWeight.normal,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ]
+                    ),
+                      
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: ElevatedButton(
@@ -123,6 +332,8 @@ class _HomePageState extends State<HomePage> {
                   )
                 : Container(), // Empty container if selectedImageIndex is not 5
           ),
+        
+
           Positioned(
             bottom: 0,
             left: 0,
@@ -187,7 +398,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
-        ],
+      ],
       ),
     );
   }
