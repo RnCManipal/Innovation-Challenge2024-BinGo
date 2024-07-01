@@ -221,7 +221,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                       const SizedBox(height: 20),
                       CustomContainer(
-                height: screenSize.height*0.3,
+                height: screenSize.height*0.35,
                 screenSize: screenSize,
                 children: [
                   Padding(
@@ -314,8 +314,202 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ]
                     ),
-                      
-                      Padding(
+                    SizedBox(height: 20,),
+                    Padding(
+                              padding: EdgeInsets.only(top: screenSize.height * 0.01,left: screenSize.width*0.18),
+                                  child: SizedBox(
+                                  width: screenSize.width * 0.4,
+                                  child: Text(
+                                  "Settings",
+                                  style: TextStyle(
+                                    fontFamily: 'Jost',
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: screenSize.width *0.06, // Responsive font size
+                                 
+                                  ),
+                                ),
+                              ),
+                            ),
+                    SizedBox(height: 20,),
+                    Padding(
+                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.15),
+                          child: Container(
+                            width: screenSize.width * 0.8,
+                            height: screenSize.height *0.06,
+                            decoration: BoxDecoration(
+                              boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.3),
+                                spreadRadius: 3,
+                                blurRadius: 2,
+                                offset: Offset(0, 2), // changes position of shadow
+                            ),
+                          ],
+                        ),
+                            child: TextButton(
+                              onPressed: (){print("button pressed");},
+                              style: ButtonStyle(
+                                backgroundColor: WidgetStateProperty.all(Color(0xffAFFF89)),
+                                foregroundColor: WidgetStateProperty.all(Colors.white),
+                                padding: WidgetStateProperty.all(
+                                  EdgeInsets.symmetric(vertical: screenSize.height * 0.015),
+                                ),
+                                shape: WidgetStateProperty.all(
+                                  RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(screenSize.width * 0.02),
+                                  ),
+                                ),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  "Update Profile",
+                                  style: TextStyle(
+                                    fontSize: screenSize.width * 0.04,
+                                    fontWeight: FontWeight.normal,
+                                    color: Color.fromARGB(255, 147, 15, 1),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                    SizedBox(height: 10,),
+                    Padding(
+                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.15),
+                          child: Container(
+                            width: screenSize.width * 0.8,
+                            height: screenSize.height *0.06,
+                            decoration: BoxDecoration(
+                              boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.3),
+                                spreadRadius: 3,
+                                blurRadius: 2,
+                                offset: Offset(0, 3), // changes position of shadow
+                            ),
+                          ],
+                        ),
+                            child: TextButton(
+                              onPressed: (){print("button pressed");},
+                              style: ButtonStyle(
+                                backgroundColor: WidgetStateProperty.all(Color(0xffAFFF89)),
+                                foregroundColor: WidgetStateProperty.all(Colors.white),
+                                padding: WidgetStateProperty.all(
+                                  EdgeInsets.symmetric(vertical: screenSize.height * 0.015),
+                                ),
+                                shape: WidgetStateProperty.all(
+                                  RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(screenSize.width * 0.02),
+                                  ),
+                                ),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  "Change Role",
+                                  style: TextStyle(
+                                    fontSize: screenSize.width * 0.04,
+                                    fontWeight: FontWeight.normal,
+                                    color: Color.fromARGB(255, 147, 15, 1),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                    SizedBox(height: 10,),
+                    Padding(
+                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.15),
+                          child: Container(
+                            width: screenSize.width * 0.8,
+                            height: screenSize.height *0.06,
+                            decoration: BoxDecoration(
+                              boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.3),
+                                spreadRadius: 3,
+                                blurRadius: 2,
+                                offset: Offset(0, 3,) // changes position of shadow
+                            ),
+                          ],
+                        ),
+                            child: TextButton(
+                              onPressed: (){print("button pressed");},
+                              style: ButtonStyle(
+                                backgroundColor: WidgetStateProperty.all(Color(0xffAFFF89)),
+                                foregroundColor: WidgetStateProperty.all(Colors.white),
+                                padding: WidgetStateProperty.all(
+                                  EdgeInsets.symmetric(vertical: screenSize.height * 0.015),
+                                ),
+                                shape: WidgetStateProperty.all(
+                                  RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(screenSize.width * 0.02),
+                                  ),
+                                ),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  "Change Theme",
+                                  style: TextStyle(
+                                    fontSize: screenSize.width * 0.04,
+                                    fontWeight: FontWeight.normal,
+                                    color: Color.fromARGB(255, 147, 15, 1),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ), 
+                    SizedBox(height: 10,),  
+                    Padding(
+                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.15),
+                          child: Container(
+                            width: screenSize.width * 0.8,
+                            height: screenSize.height *0.06,
+                            decoration: BoxDecoration(
+                              boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.3),
+                                spreadRadius: 3,
+                                blurRadius: 2,
+                                offset: Offset(0, 3,) // changes position of shadow
+                            ),
+                          ],
+                        ),
+                            child: TextButton(
+                              onPressed: () async {
+                                await FirebaseAuth.instance.signOut();
+                                Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const SignupPage()),
+                            );
+                          },
+                              style: ButtonStyle(
+                                backgroundColor: WidgetStateProperty.all(Color(0xffAFFF89)),
+                                foregroundColor: WidgetStateProperty.all(Colors.white),
+                                padding: WidgetStateProperty.all(
+                                  EdgeInsets.symmetric(vertical: screenSize.height * 0.015),
+                                ),
+                                shape: WidgetStateProperty.all(
+                                  RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(screenSize.width * 0.02),
+                                  ),
+                                ),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  "Sign out",
+                                  style: TextStyle(
+                                    fontSize: screenSize.width * 0.04,
+                                    fontWeight: FontWeight.normal,
+                                    color: Color.fromARGB(255, 147, 15, 1),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                    Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: ElevatedButton(
                           onPressed: () async {
