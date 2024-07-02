@@ -150,7 +150,7 @@ class _HomePageState extends State<HomePage> {
                           Padding(
                               padding: EdgeInsets.only(top: screenSize.height * 0,left:screenSize.height * 0.045),
                               child: SizedBox(
-                                  width: screenSize.width * 0.4,
+                                  width: screenSize.width * 0.8,
                                   child: Text(
                                   "${userDoc['name']}",
                                   style: TextStyle(

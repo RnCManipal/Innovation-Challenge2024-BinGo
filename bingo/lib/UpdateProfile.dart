@@ -1,263 +1,344 @@
 import 'package:flutter/material.dart';
-import 'HomeTab.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class UpdateProfile extends StatelessWidget {
+class UpdateProfile extends StatefulWidget {
+  final Size screenSize;
+
   UpdateProfile({Key? key, required this.screenSize}) : super(key: key);
+
+  @override
+  _UpdateProfileState createState() => _UpdateProfileState();
+}
+
+class _UpdateProfileState extends State<UpdateProfile> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
-  final Size screenSize;
-  
+
+  Future<void> _updateUserInfo(BuildContext context) async {
+  try {
+    final User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      String uid = user.uid;
+      String name = _nameController.text;
+      String username = _usernameController.text;
+      String password = _passwordController.text;
+      String confirmPassword = _confirmPasswordController.text;
+
+      if (password == confirmPassword) {
+        // Update Firestore
+        await FirebaseFirestore.instance.collection('users').doc(uid).update({
+          'name': name,
+          'email': username,
+        });
+        // Update Firebase Authentication password
+        await user.updatePassword(password);
+
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("User info updated successfully"),
+        ));
+
+        // Clear the input fields
+        _nameController.clear();
+        _usernameController.clear();
+        _passwordController.clear();
+        _confirmPasswordController.clear();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("Passwords do not match"),
+        ));
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("You are not logged in"),
+      ));
+    }
+  } catch (error) {
+    print("Error: $error");
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text("Error updating info"),
+    ));
+  }
+}
+
   @override
   Widget build(BuildContext context) {
-    double textLeftPadding = screenSize.width * 0.1;
-    double textWidth = screenSize.width * 0.8;
-
-    return Expanded(
-      child: SingleChildScrollView(
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SingleChildScrollView(
         child: Container(
           child: Column(
             children: [
               Padding(
-                              padding: EdgeInsets.only(top: screenSize.height * 0.02,),
-                              child: SizedBox(
-                                  width: screenSize.width * 0.3,
-                                  child: Text(
-                                  "BinGo",
-                                  style: TextStyle(
-                                    fontFamily: 'Jost',
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: screenSize.width *0.1, // Responsive font size
-                                    color: Colors.orange,
-                                  ),
-                                ),
-                              ),
-                            ),
-              Padding(
-                              padding: EdgeInsets.symmetric(vertical: screenSize.height * 0.02,horizontal: screenSize.width*0.23),
-                                  child: SizedBox(
-                                  width: screenSize.width * 0.8,
-                                  child: Text(
-                                  "Update Profile",
-                                  style: TextStyle(
-                                    fontFamily: 'Jost',
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: screenSize.width *0.07, // Responsive font size
-                                 
-                                  ),
-                                ),
-                              ),
-                            ),
-              Positioned(
-                top: screenSize.height * 0.33,
-                left: screenSize.width * 0.05,
-                child: GestureDetector(
-                  child: Container(
-                    width: screenSize.width * 0.9,
-                    height: screenSize.height *0.6,
-                    decoration: BoxDecoration(
-                      color: const Color(0xffE0FFFF),
-                      borderRadius: BorderRadius.circular(10),
-                      boxShadow: [BoxShadow(
-                      color: Color.fromARGB(255, 152, 152, 152),
-                      spreadRadius: 3,
-                      blurRadius: 4,
-                      offset: Offset(0, 3), // changes position of shadow
-                      ),]
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        SizedBox(height: screenSize.height * 0.015),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
-                          child: Text(
-                            "Name:",
-                            style: TextStyle(
-                              fontFamily: 'Roboto',
-                              fontSize: screenSize.width * 0.04,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: screenSize.height * 0.01),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
-                          child: SizedBox(
-                            height: screenSize.height * 0.068,
-                            width: screenSize.width * 0.85,
-                            child: TextField(
-                              controller: _nameController,
-                              obscureText: false,
-                              decoration: InputDecoration(
-                                filled: true,
-                                fillColor: const Color(0xFFF0F0F0),
-                                border: InputBorder.none,
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(screenSize.width * 0.02),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(screenSize.width * 0.1),
-                                ),
-                                hintText: 'Enter your name',
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: screenSize.height * 0.015),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
-                          child: Text(
-                            "Username:",
-                            style: TextStyle(
-                              fontFamily: 'Roboto',
-                              fontSize: screenSize.width * 0.04,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: screenSize.height * 0.01),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
-                          child: SizedBox(
-                            height: screenSize.height * 0.068,
-                            width: screenSize.width * 0.85,
-                            child: TextField(
-                              controller: _usernameController,
-                              obscureText: false,
-                              decoration: InputDecoration(
-                                filled: true,
-                                fillColor: const Color(0xFFF0F0F0),
-                                border: InputBorder.none,
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(screenSize.width * 0.02),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(screenSize.width * 0.1),
-                                ),
-                                hintText: 'Enter your username',
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: screenSize.height * 0.015),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
-                          child: Text(
-                            "Password:",
-                            style: TextStyle(
-                              fontFamily: 'Roboto',
-                              fontSize: screenSize.width * 0.04,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: screenSize.height * 0.01),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
-                          child: SizedBox(
-                            height: screenSize.height * 0.068,
-                            width: screenSize.width * 0.85,
-                            child: TextField(
-                              controller: _passwordController,
-                              obscureText: true,
-                              decoration: InputDecoration(
-                                filled: true,
-                                fillColor: const Color(0xFFF0F0F0),
-                                border: InputBorder.none,
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(screenSize.width * 0.02),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(screenSize.width * 0.1),
-                                ),
-                                hintText: 'Enter your Password',
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: screenSize.height * 0.015),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
-                          child: Text(
-                            "Confirm Password:",
-                            style: TextStyle(
-                              fontFamily: 'Roboto',
-                              fontSize: screenSize.width * 0.04,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: screenSize.height * 0.01),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
-                          child: SizedBox(
-                            height: screenSize.height * 0.068,
-                            width: screenSize.width * 0.85,
-                            child: TextField(
-                              controller: _confirmPasswordController,
-                              obscureText: true,
-                              decoration: InputDecoration(
-                                filled: true,
-                                fillColor: const Color(0xFFF0F0F0),
-                                border: InputBorder.none,
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(screenSize.width * 0.02),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(screenSize.width * 0.1),
-                                ),
-                                hintText: 'Enter Password Again',
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: screenSize.height * 0.02),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.3),
-                          child: SizedBox(
-                            width: screenSize.width * 0.3,
-                            height: screenSize.height*0.06,
-                            child: TextButton(
-                              onPressed: (){print("button pressed");},
-                              style: ButtonStyle(
-                                backgroundColor: WidgetStateProperty.all(Color.fromARGB(255, 255, 153, 1)),
-                                foregroundColor: WidgetStateProperty.all(Colors.white),
-                                padding: WidgetStateProperty.all(
-                                  EdgeInsets.symmetric(vertical: screenSize.height * 0.015),
-                                ),
-                                shape: MaterialStateProperty.all(
-                                  RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(screenSize.width * 0.02),
-                                  ),
-                                ),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  "Update",
-                                  style: TextStyle(
-                                    fontSize: screenSize.width * 0.042,
-                                    fontWeight: FontWeight.normal,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
+                padding: EdgeInsets.only(
+                  top: widget.screenSize.height * 0.04,
+                ),
+                child: SizedBox(
+                  width: widget.screenSize.width * 0.3,
+                  child: Text(
+                    "BinGo",
+                    style: TextStyle(
+                      fontFamily: 'Jost',
+                      fontWeight: FontWeight.bold,
+                      fontSize: widget.screenSize.width * 0.1,
+                      color: Colors.orange,
                     ),
                   ),
                 ),
-              )
+              ),
+              Padding(
+                padding: EdgeInsets.only(
+                  top: widget.screenSize.height * 0.02,
+                  left: widget.screenSize.width * 0.25,
+                ),
+                child: SizedBox(
+                  width: widget.screenSize.width * 0.8,
+                  child: Text(
+                    "Update Profile",
+                    style: TextStyle(
+                      fontFamily: 'Jost',
+                      fontWeight: FontWeight.bold,
+                      fontSize: widget.screenSize.width * 0.07,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: widget.screenSize.height*0.01,),
+              Container(
+                width: widget.screenSize.width * 0.9,
+                height: widget.screenSize.height * 0.6,
+                decoration: BoxDecoration(
+                  color: const Color(0xffE0FFFF),
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Color.fromARGB(255, 152, 152, 152),
+                      spreadRadius: 3,
+                      blurRadius: 4,
+                      offset: Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    SizedBox(height: widget.screenSize.height * 0.015),
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: widget.screenSize.width * 0.05,
+                      ),
+                      child: Text(
+                        "Name:",
+                        style: TextStyle(
+                          fontFamily: 'Roboto',
+                          fontSize: widget.screenSize.width * 0.04,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: widget.screenSize.height * 0.01),
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: widget.screenSize.width * 0.05,
+                      ),
+                      child: SizedBox(
+                        height: widget.screenSize.height * 0.068,
+                        width: widget.screenSize.width * 0.85,
+                        child: TextField(
+                          controller: _nameController,
+                          obscureText: false,
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: const Color(0xFFF0F0F0),
+                            border: InputBorder.none,
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide.none,
+                              borderRadius: BorderRadius.circular(widget.screenSize.width * 0.02),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide.none,
+                              borderRadius: BorderRadius.circular(widget.screenSize.width * 0.1),
+                            ),
+                            hintText: 'Enter your name',
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: widget.screenSize.height * 0.015),
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: widget.screenSize.width * 0.05,
+                      ),
+                      child: Text(
+                        "Username:",
+                        style: TextStyle(
+                          fontFamily: 'Roboto',
+                          fontSize: widget.screenSize.width * 0.04,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: widget.screenSize.height * 0.01),
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: widget.screenSize.width * 0.05,
+                      ),
+                      child: SizedBox(
+                        height: widget.screenSize.height * 0.068,
+                        width: widget.screenSize.width * 0.85,
+                        child: TextField(
+                          controller: _usernameController,
+                          obscureText: false,
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: const Color(0xFFF0F0F0),
+                            border: InputBorder.none,
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide.none,
+                              borderRadius: BorderRadius.circular(widget.screenSize.width * 0.02),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide.none,
+                              borderRadius: BorderRadius.circular(widget.screenSize.width * 0.1),
+                            ),
+                            hintText: 'Enter your username',
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: widget.screenSize.height * 0.015),
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: widget.screenSize.width * 0.05,
+                      ),
+                      child: Text(
+                        "Password:",
+                        style: TextStyle(
+                          fontFamily: 'Roboto',
+                          fontSize: widget.screenSize.width * 0.04,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: widget.screenSize.height * 0.01),
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: widget.screenSize.width * 0.05,
+                      ),
+                      child: SizedBox(
+                        height: widget.screenSize.height * 0.068,
+                        width: widget.screenSize.width * 0.85,
+                        child: TextField(
+                          controller: _passwordController,
+                          obscureText: true,
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: const Color(0xFFF0F0F0),
+                            border: InputBorder.none,
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide.none,
+                              borderRadius: BorderRadius.circular(widget.screenSize.width * 0.02),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide.none,
+                              borderRadius: BorderRadius.circular(widget.screenSize.width * 0.1),
+                            ),
+                            hintText: 'Enter your Password',
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: widget.screenSize.height * 0.015),
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: widget.screenSize.width * 0.05,
+                      ),
+                      child: Text(
+                        "Confirm Password:",
+                        style: TextStyle(
+                          fontFamily: 'Roboto',
+                          fontSize: widget.screenSize.width * 0.04,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: widget.screenSize.height * 0.01),
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: widget.screenSize.width * 0.05,
+                      ),
+                      child: SizedBox(
+                        height: widget.screenSize.height * 0.068,
+                        width: widget.screenSize.width * 0.85,
+                        child: TextField(
+                          controller: _confirmPasswordController,
+                          obscureText: true,
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: const Color(0xFFF0F0F0),
+                            border: InputBorder.none,
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide.none,
+                              borderRadius: BorderRadius.circular(widget.screenSize.width * 0.02),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide.none,
+                              borderRadius: BorderRadius.circular(widget.screenSize.width * 0.1),
+                            ),
+                            hintText: 'Enter Password Again',
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: widget.screenSize.height * 0.02),
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: widget.screenSize.width * 0.3,
+                      ),
+                      child: SizedBox(
+                        width: widget.screenSize.width * 0.3,
+                        height: widget.screenSize.height * 0.06,
+                        child: TextButton(
+                          onPressed: () {
+                            _updateUserInfo(context);
+                          },
+                          style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all(
+                              Color.fromARGB(255, 255, 153, 1),
+                            ),
+                            foregroundColor: MaterialStateProperty.all(
+                              Colors.white,
+                            ),
+                            padding: MaterialStateProperty.all(
+                              EdgeInsets.symmetric(
+                                vertical: widget.screenSize.height * 0.015,
+                              ),
+                            ),
+                            shape: MaterialStateProperty.all(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                  widget.screenSize.width * 0.02,
+                                ),
+                              ),
+                            ),
+                          ),
+                          child: Center(
+                            child: Text(
+                              "Update",
+                              style: TextStyle(
+                                fontSize: widget.screenSize.width * 0.042,
+                                fontWeight: FontWeight.normal,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
