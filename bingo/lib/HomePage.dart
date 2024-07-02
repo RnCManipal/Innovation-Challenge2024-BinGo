@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'SignupPage.dart'; // Import your SignupPage.dart file
+import 'UpdateProfile.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -80,6 +81,12 @@ class _HomePageState extends State<HomePage> {
             child: selectedImageIndex ==
                     2 // Assuming selectedImageIndex 5 is for "User.png"
                 ? const ReportTab()
+                : Container(), // Empty container if selectedImageIndex is not 5
+          ),
+          Center(
+            child: selectedImageIndex ==
+                    6 // Assuming selectedImageIndex 5 is for "User.png"
+                ? UpdateProfile(screenSize: screenSize,)
                 : Container(), // Empty container if selectedImageIndex is not 5
           ),
           Center(
@@ -347,7 +354,9 @@ class _HomePageState extends State<HomePage> {
                           ],
                         ),
                             child: TextButton(
-                              onPressed: (){print("button pressed");},
+                              onPressed: (){setState(() {
+                                selectedImageIndex = 6; // Assuming 5 is the index for Update Profile tab
+                              });},
                               style: ButtonStyle(
                                 backgroundColor: WidgetStateProperty.all(Color(0xffAFFF89)),
                                 foregroundColor: WidgetStateProperty.all(Colors.white),
