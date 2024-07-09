@@ -346,16 +346,16 @@ class _HomePageState extends State<HomePage> {
                             decoration: BoxDecoration(
                               boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.3),
+                                color: Color.fromARGB(255, 152, 152, 152),
                                 spreadRadius: 3,
-                                blurRadius: 2,
-                                offset: Offset(0, 2), // changes position of shadow
+                                blurRadius: 4,
+                                offset: Offset(0, 3), // changes position of shadow
                             ),
                           ],
                         ),
                             child: TextButton(
                               onPressed: (){setState(() {
-                                selectedImageIndex = 6; // Assuming 5 is the index for Update Profile tab
+                                selectedImageIndex = 6; // Assuming 6 is the index for Update Profile tab
                               });},
                               style: ButtonStyle(
                                 backgroundColor: WidgetStateProperty.all(Color(0xffAFFF89)),
@@ -391,9 +391,9 @@ class _HomePageState extends State<HomePage> {
                             decoration: BoxDecoration(
                               boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.3),
+                                color: Color.fromARGB(255, 152, 152, 152),
                                 spreadRadius: 3,
-                                blurRadius: 2,
+                                blurRadius: 4,
                                 offset: Offset(0, 3), // changes position of shadow
                             ),
                           ],
@@ -434,10 +434,10 @@ class _HomePageState extends State<HomePage> {
                             decoration: BoxDecoration(
                               boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.3),
+                                color: Color.fromARGB(255, 152, 152, 152),
                                 spreadRadius: 3,
-                                blurRadius: 2,
-                                offset: Offset(0, 3,) // changes position of shadow
+                                blurRadius: 4,
+                                offset: Offset(0, 3), // changes position of shadow
                             ),
                           ],
                         ),
@@ -477,10 +477,10 @@ class _HomePageState extends State<HomePage> {
                             decoration: BoxDecoration(
                               boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.3),
+                                color: Color.fromARGB(255, 152, 152, 152),
                                 spreadRadius: 3,
-                                blurRadius: 2,
-                                offset: Offset(0, 3,) // changes position of shadow
+                                blurRadius: 4,
+                                offset: Offset(0, 3), // changes position of shadow
                             ),
                           ],
                         ),
@@ -532,6 +532,7 @@ class _HomePageState extends State<HomePage> {
                           child: const Text('Logout'),
                         ),
                       ),
+                    SizedBox(height:20)
                     ],
                   )
           )

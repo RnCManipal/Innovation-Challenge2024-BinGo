@@ -120,9 +120,10 @@ void _navigateToSignupPageOne() {
               Positioned.fill(
                 child: Image.asset(
                   'Images/Bg.png',
-                  fit: BoxFit.fill,
+                  fit: BoxFit.cover,
                 ),
               ),
+              
               Positioned(
                 top: screenSize.height * 0.1,
                 left: screenSize.width * 0.1,
@@ -135,10 +136,13 @@ void _navigateToSignupPageOne() {
                   ),
                 ),
               ),
+              
               Positioned(
-                top: screenSize.height * 0.225,
-                left: screenSize.width * 0.05,
-                child: InkWell(
+                top: screenSize.height * 0.217,
+                left: screenSize.width * 0.02,
+                child: TextButton(
+                  onPressed: (){},
+                  child: InkWell(
                   onTap: () {
                     // Implement Google sign-in here if needed
                   },
@@ -151,9 +155,9 @@ void _navigateToSignupPageOne() {
                       boxShadow: [
                         BoxShadow(
                           color: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.5),
-                          spreadRadius: screenSize.width * 0.005,
-                          blurRadius: screenSize.width * 0.02,
-                          offset: Offset(0, screenSize.width * 0.01),
+                          spreadRadius: screenSize.width * 0.003,
+                          blurRadius: screenSize.width * 0.01,
+                          offset: Offset(0, screenSize.width * 0.007),
                         ),
                       ],
                     ),
@@ -179,8 +183,9 @@ void _navigateToSignupPageOne() {
                   ),
                 ),
               ),
+              ),
               Positioned(
-                top: screenSize.height * 0.29,
+                top: screenSize.height * 0.292,
                 left: screenSize.width * 0.15,
                 child: SizedBox(
                   width: screenSize.width * 0.9,
