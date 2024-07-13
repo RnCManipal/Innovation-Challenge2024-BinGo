@@ -1,11 +1,12 @@
+import 'dart:convert';
 import 'dart:io';
-
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:geocoding/geocoding.dart' as geocode;
+import 'package:http/http.dart' as http;
 
 class UserReportTab extends StatefulWidget {
   const UserReportTab({Key? key}) : super(key: key);
@@ -20,61 +21,15 @@ class _UserReportTabState extends State<UserReportTab> {
   final TextEditingController locationController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   String severity = "Medium"; // Default severity value
-  String city = "Indore";
-  String area = ""; // Default area value
-  List<String> areaList = []; // List to hold areas for the selected city
   bool uploading = false; // Flag to track image upload state
-
-  @override
-  void initState() {
-    super.initState();
-    // Fetch areas for the default city on initialization
-    fetchAreas();
-  }
-
-  Future<void> fetchAreas() async {
-  try {
-    // Access Firestore collection based on selected city name
-    DocumentSnapshot snapshot = await FirebaseFirestore.instance
-        .collection('city-wise-zones')
-        .doc(city)
-        .get();
-
-    if (snapshot.exists) {
-      // Extract areas from the document data
-      Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
-      List<String> newAreaList = List<String>.from(data['zones']);
-      
-      setState(() {
-        areaList = newAreaList;
-        if (!areaList.contains(area)) {
-          area = areaList.isNotEmpty ? areaList[0] : '';
-        }
-      });
-    } else {
-      setState(() {
-        areaList = [];
-        area = '';
-      });
-      print('Document does not exist');
-    }
-  } catch (e) {
-    setState(() {
-      areaList = [];
-      area = '';
-    });
-    print('Error fetching areas: $e');
-  }
-}
-
+  String? zipCode; // To store retrieved zip code
 
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
-    bool isButtonDisabled =
-        image == null; // Disable button if no image is selected
+    bool isButtonDisabled = image == null; // Disable button if no image is selected
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -158,8 +113,7 @@ class _UserReportTabState extends State<UserReportTab> {
                         fillColor: Colors.white,
                         hintText: 'Enter title',
                         border: OutlineInputBorder(
-                          borderRadius:
-                              BorderRadius.circular(screenWidth * 0.02),
+                          borderRadius: BorderRadius.circular(screenWidth * 0.02),
                           borderSide: BorderSide.none,
                         ),
                       ),
@@ -182,8 +136,7 @@ class _UserReportTabState extends State<UserReportTab> {
                         fillColor: Colors.white,
                         hintText: 'Enter description',
                         border: OutlineInputBorder(
-                          borderRadius:
-                              BorderRadius.circular(screenWidth * 0.02),
+                          borderRadius: BorderRadius.circular(screenWidth * 0.02),
                           borderSide: BorderSide.none,
                         ),
                       ),
@@ -215,8 +168,7 @@ class _UserReportTabState extends State<UserReportTab> {
                         filled: true,
                         fillColor: Colors.white,
                         border: OutlineInputBorder(
-                          borderRadius:
-                              BorderRadius.circular(screenWidth * 0.02),
+                          borderRadius: BorderRadius.circular(screenWidth * 0.02),
                           borderSide: BorderSide.none,
                         ),
                       ),
@@ -238,50 +190,11 @@ class _UserReportTabState extends State<UserReportTab> {
                         fillColor: Colors.white,
                         hintText: 'Enter location',
                         border: OutlineInputBorder(
-                          borderRadius:
-                              BorderRadius.circular(screenWidth * 0.02),
+                          borderRadius: BorderRadius.circular(screenWidth * 0.02),
                           borderSide: BorderSide.none,
                         ),
                       ),
                     ),
-                    SizedBox(height: screenWidth * 0.04),
-                    Text(
-                      "City",
-                      style: TextStyle(
-                        fontSize: screenWidth * 0.04,
-                        fontFamily: 'Roboto',
-                        fontWeight: FontWeight.normal,
-                      ),
-                    ),
-                    SizedBox(height: screenWidth * 0.02),
-                    DropdownButtonFormField<String>(
-                      value: city,
-                      items:
-                          ["Indore", "Delhi", "Hyderabad"].map((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                      onChanged: (newValue) {
-                        setState(() {
-                          city = newValue!;
-                          // Fetch areas for the selected city
-                          fetchAreas();
-                        });
-                      },
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                          borderRadius:
-                              BorderRadius.circular(screenWidth * 0.02),
-                          borderSide: BorderSide.none,
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: screenWidth * 0.04),
-                    _buildAreaDropdown(screenWidth),
                     SizedBox(height: screenWidth * 0.04),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -290,13 +203,11 @@ class _UserReportTabState extends State<UserReportTab> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Color(0xFFFBBC05),
                             shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.circular(screenWidth * 0.02),
+                              borderRadius: BorderRadius.circular(screenWidth * 0.02),
                             ),
                           ),
                           onPressed: () async {
-                            final picture = await ImagePicker()
-                                .pickImage(source: ImageSource.camera);
+                            final picture = await ImagePicker().pickImage(source: ImageSource.camera);
                             if (picture != null) {
                               image = File(picture.path);
                               setState(() {});
@@ -312,13 +223,11 @@ class _UserReportTabState extends State<UserReportTab> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Color(0xFFFBBC05),
                             shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.circular(screenWidth * 0.02),
+                              borderRadius: BorderRadius.circular(screenWidth * 0.02),
                             ),
                           ),
                           onPressed: () async {
-                            final picture = await ImagePicker()
-                                .pickImage(source: ImageSource.gallery);
+                            final picture = await ImagePicker().pickImage(source: ImageSource.gallery);
                             if (picture != null) {
                               image = File(picture.path);
                               setState(() {});
@@ -340,13 +249,10 @@ class _UserReportTabState extends State<UserReportTab> {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Color(0xffF79839),
                                 shape: RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.circular(screenWidth * 0.02),
+                                  borderRadius: BorderRadius.circular(screenWidth * 0.02),
                                 ),
                               ),
-                              onPressed: isButtonDisabled
-                                  ? null
-                                  : saveReportToFirestore,
+                              onPressed: isButtonDisabled ? null : saveReportToFirestore,
                               child: Text(
                                 'File a Report',
                                 style: TextStyle(
@@ -368,62 +274,12 @@ class _UserReportTabState extends State<UserReportTab> {
     );
   }
 
-  Widget _buildAreaDropdown(double screenWidth) {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text(
-        "Area",
-        style: TextStyle(
-          fontSize: screenWidth * 0.04,
-          fontFamily: 'Roboto',
-          fontWeight: FontWeight.normal,
-        ),
-      ),
-      SizedBox(height: screenWidth * 0.02),
-      ConstrainedBox(
-        constraints: BoxConstraints(
-          maxHeight: screenWidth * 0.3, // Adjust maxHeight as needed
-        ),
-        child: DropdownButtonFormField<String>(
-          value: area,
-          items: areaList.map((String value) {
-            return DropdownMenuItem<String>(
-              value: value,
-              child: Text(value),
-            );
-          }).toList(),
-          onChanged: (newValue) {
-            setState(() {
-              area = newValue!;
-            });
-          },
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: Colors.white,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(screenWidth * 0.02),
-              borderSide: BorderSide.none,
-            ),
-          ),
-        ),
-      ),
-    ],
-  );
-}
-
-
   Future<void> saveReportToFirestore() async {
     String title = titleController.text.trim();
     String location = locationController.text.trim();
     String description = descriptionController.text.trim();
 
-    if (title.isEmpty ||
-        location.isEmpty ||
-        description.isEmpty ||
-        severity.isEmpty ||
-        city.isEmpty ||
-        area.isEmpty) {
+    if (title.isEmpty || location.isEmpty || description.isEmpty || severity.isEmpty) {
       // Show an error dialog if any of the fields are empty
       showDialog(
         context: context,
@@ -445,6 +301,7 @@ class _UserReportTabState extends State<UserReportTab> {
       return;
     }
 
+   
     setState(() {
       uploading = true; // Start showing loader while uploading
     });
@@ -459,6 +316,9 @@ class _UserReportTabState extends State<UserReportTab> {
       double latitude = locations.first.latitude;
       double longitude = locations.first.longitude;
 
+      // Call API to get the Zip Code using latitude and longitude
+      zipCode = await fetchZipCode(latitude, longitude);
+
       // Access Firestore instance and collection
       FirebaseFirestore firestore = FirebaseFirestore.instance;
       CollectionReference reports = firestore.collection('reports');
@@ -470,10 +330,9 @@ class _UserReportTabState extends State<UserReportTab> {
         'longitude': longitude,
         'description': description,
         'severity': severity,
-        'isResolved': "False",
+        'isResolved': false,
         'location': location,
-        'city': city,
-        'area': area,
+        'zipCode': zipCode, // Store retrieved zip code in Firestore
       });
 
       // Upload image if available
@@ -494,8 +353,8 @@ class _UserReportTabState extends State<UserReportTab> {
       locationController.clear();
       descriptionController.clear();
       severity = "Medium"; // Reset severity to default
-      city = "Indore"; // Reset city to default
       image = null;
+      zipCode = null; // Reset zip code
 
       // Show success message
       showDialog(
@@ -540,4 +399,20 @@ class _UserReportTabState extends State<UserReportTab> {
       });
     }
   }
+
+  Future<String?> fetchZipCode(double latitude, double longitude) async {
+  final String apiUrl = 'http://192.168.1.54:5000/get_zip_code'; // Replace with your actual API URL
+  final response = await http.get(Uri.parse('$apiUrl?lat=$latitude&lng=$longitude'));
+
+  print('Response status: ${response.statusCode}');
+  print('Response body: ${response.body}');
+
+  if (response.statusCode == 200) {
+    final data = json.decode(response.body);
+    return data['zipCode'];
+  } else {
+    throw Exception('Failed to fetch zip code');
+  }
+}
+
 }

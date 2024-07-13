@@ -18,50 +18,50 @@ class _UpdateProfileState extends State<UpdateProfile> {
   final TextEditingController _confirmPasswordController = TextEditingController();
 
   Future<void> _updateUserInfo(BuildContext context) async {
-  try {
-    final User? user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      String uid = user.uid;
-      String name = _nameController.text;
-      String username = _usernameController.text;
-      String password = _passwordController.text;
-      String confirmPassword = _confirmPasswordController.text;
+    try {
+      final User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        String uid = user.uid;
+        String name = _nameController.text;
+        String username = _usernameController.text;
+        String password = _passwordController.text;
+        String confirmPassword = _confirmPasswordController.text;
 
-      if (password == confirmPassword) {
-        // Update Firestore
-        await FirebaseFirestore.instance.collection('users').doc(uid).update({
-          'name': name,
-          'email': username,
-        });
-        // Update Firebase Authentication password
-        await user.updatePassword(password);
+        if (password == confirmPassword) {
+          // Update Firestore
+          await FirebaseFirestore.instance.collection('users').doc(uid).update({
+            'name': name,
+            'email': username,
+          });
+          // Update Firebase Authentication password
+          await user.updatePassword(password);
 
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text("User info updated successfully"),
-        ));
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text("User info updated successfully"),
+          ));
 
-        // Clear the input fields
-        _nameController.clear();
-        _usernameController.clear();
-        _passwordController.clear();
-        _confirmPasswordController.clear();
+          // Clear the input fields
+          _nameController.clear();
+          _usernameController.clear();
+          _passwordController.clear();
+          _confirmPasswordController.clear();
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text("Passwords do not match"),
+          ));
+        }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text("Passwords do not match"),
+          content: Text("You are not logged in"),
         ));
       }
-    } else {
+    } catch (error) {
+      print("Error: $error");
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text("You are not logged in"),
+        content: Text("Error updating info"),
       ));
     }
-  } catch (error) {
-    print("Error: $error");
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text("Error updating info"),
-    ));
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +73,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
             children: [
               Padding(
                 padding: EdgeInsets.only(
-                  top: widget.screenSize.height * 0.04,
+                  top: widget.screenSize.height * 0.09,
                 ),
                 child: SizedBox(
                   width: widget.screenSize.width * 0.3,
@@ -105,10 +105,10 @@ class _UpdateProfileState extends State<UpdateProfile> {
                   ),
                 ),
               ),
-              SizedBox(height: widget.screenSize.height*0.01,),
+              SizedBox(height: widget.screenSize.height * 0.01,),
               Container(
                 width: widget.screenSize.width * 0.9,
-                height: widget.screenSize.height * 0.6,
+                height: widget.screenSize.height*0.59,
                 decoration: BoxDecoration(
                   color: const Color(0xffE0FFFF),
                   borderRadius: BorderRadius.circular(10),
@@ -336,6 +336,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                         ),
                       ),
                     ),
+                    // Removed SizedBox here
                   ],
                 ),
               ),

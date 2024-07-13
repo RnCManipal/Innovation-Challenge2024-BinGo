@@ -202,7 +202,7 @@ class Home extends StatelessWidget {
       
                   ]
                 ),
-              const SizedBox(height: 200),
+              const SizedBox(height: 100),
  // Example spacing
             ],
           ),

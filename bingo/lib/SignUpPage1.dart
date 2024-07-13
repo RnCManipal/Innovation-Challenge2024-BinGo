@@ -1,9 +1,9 @@
-import 'package:bingo/SignupPage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'HomePage.dart';
 import 'LoginPage.dart';
+import 'SignupPage.dart';
 
 class SignupPageOne extends StatefulWidget {
   final String name;
@@ -19,6 +19,9 @@ class SignupPageOne extends StatefulWidget {
 class _SignupPageOneState extends State<SignupPageOne> {
   String? _selectedAccountType;
   final List<String> _accountTypes = ['User', 'Driver'];
+  final TextEditingController _registrationNumberController = TextEditingController();
+  final TextEditingController _zipCodeController = TextEditingController();
+  bool isDriverSelected = false;
 
   Future<void> _createAccount() async {
     if (_selectedAccountType == null) {
@@ -42,17 +45,45 @@ class _SignupPageOneState extends State<SignupPageOne> {
       return;
     }
 
+    if (isDriverSelected && (_registrationNumberController.text.isEmpty || _zipCodeController.text.isEmpty)) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text("Error"),
+            content: const Text("Please fill in all fields"),
+            actions: <Widget>[
+              TextButton(
+                child: const Text("OK"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
+
     try {
       UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: widget.email,
         password: widget.password,
       );
 
-      await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).set({
+      Map<String, dynamic> userData = {
         'name': widget.name,
         'email': widget.email,
         'accountType': _selectedAccountType,
-      });
+      };
+
+      if (isDriverSelected) {
+        userData['registrationNumber'] = _registrationNumberController.text;
+        userData['zipCode'] = _zipCodeController.text;
+      }
+
+      await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).set(userData);
 
       if (!mounted) return;
 
@@ -96,6 +127,8 @@ class _SignupPageOneState extends State<SignupPageOne> {
       minButtonHeight = screenSize.height * 0.045;
     }
 
+    double containerHeight = isDriverSelected ? minHeight + screenSize.height * 0.23 : minHeight;
+
     return Scaffold(
       backgroundColor: const Color(0xFFE0FFFF),
       resizeToAvoidBottomInset: false,
@@ -135,25 +168,27 @@ class _SignupPageOneState extends State<SignupPageOne> {
                 ),
               ),
               Positioned(
-                  top: screenSize.height * 0.22,
-                  left: screenSize.width * 0.08,
-                  child: GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) =>const SignupPage()),
-                        );
-                      },
-                      child: const Image(
-                        image: AssetImage('Images/BackButton.png'),
-                      ))),
+                top: screenSize.height * 0.22,
+                left: screenSize.width * 0.08,
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const SignupPage()),
+                    );
+                  },
+                  child: const Image(
+                    image: AssetImage('Images/BackButton.png'),
+                  ),
+                ),
+              ),
               Positioned(
                 top: screenSize.height * 0.33,
                 left: screenSize.width * 0.05,
                 child: GestureDetector(
                   child: Container(
                     width: screenSize.width * 0.9,
-                    height: minHeight,
+                    height: containerHeight,
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(screenSize.width * 0.02),
@@ -189,7 +224,7 @@ class _SignupPageOneState extends State<SignupPageOne> {
                             width: screenSize.width * 0.85,
                             padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.02),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFF0F0F0), // Background color
+                              color: const Color(0xFFF0F0F0),
                               borderRadius: BorderRadius.circular(screenSize.width * 0.02),
                             ),
                             child: DropdownButtonHideUnderline(
@@ -212,13 +247,79 @@ class _SignupPageOneState extends State<SignupPageOne> {
                                 onChanged: (String? newValue) {
                                   setState(() {
                                     _selectedAccountType = newValue;
+                                    isDriverSelected = newValue == 'Driver';
                                   });
                                 },
                               ),
                             ),
                           ),
                         ),
-                        SizedBox(height: screenSize.height * 0.015),
+                        if (isDriverSelected) ...[
+                          SizedBox(height: screenSize.height * 0.015),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
+                            child: Text(
+                              "Registration Number:",
+                              style: TextStyle(
+                                fontFamily: 'Roboto',
+                                fontSize: screenSize.width * 0.04,
+                                fontWeight: FontWeight.normal,
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: screenSize.height * 0.01),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
+                            child: Container(
+                              height: screenSize.height * 0.068,
+                              width: screenSize.width * 0.85,
+                              padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.02),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF0F0F0),
+                                borderRadius: BorderRadius.circular(screenSize.width * 0.02),
+                              ),
+                              child: TextField(
+                                controller: _registrationNumberController,
+                                decoration: const InputDecoration(
+                                  border: InputBorder.none,
+                                  hintText: 'Enter your registration number',
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: screenSize.height * 0.015),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
+                            child: Text(
+                              "Zip Code:",
+                              style: TextStyle(
+                                fontFamily: 'Roboto',
+                                fontSize: screenSize.width * 0.04,
+                                fontWeight: FontWeight.normal,
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: screenSize.height * 0.01),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
+                            child: Container(
+                              height: screenSize.height * 0.068,
+                              width: screenSize.width * 0.85,
+                              padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.02),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF0F0F0),
+                                borderRadius: BorderRadius.circular(screenSize.width * 0.02),
+                              ),
+                              child: TextField(
+                                controller: _zipCodeController,
+                                decoration: const InputDecoration(
+                                  border: InputBorder.none,
+                                  hintText: 'Enter your zip code',
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                         SizedBox(height: screenSize.height * 0.02),
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.3),
@@ -296,3 +397,4 @@ class _SignupPageOneState extends State<SignupPageOne> {
     );
   }
 }
+
