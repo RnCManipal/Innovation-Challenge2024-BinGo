@@ -1,7 +1,8 @@
+import 'package:bingo/ViewReportsPage.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart'; // Import Firebase Auth
-import 'ViewReportsPage.dart'; // Import your ViewPage implementation
+import 'ViewPageResolved.dart'; // Import your ViewPageResolved implementation
 
 class DriverReportTab extends StatefulWidget {
   const DriverReportTab({Key? key}) : super(key: key);
@@ -42,14 +43,34 @@ class _DriverReportTabState extends State<DriverReportTab> {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return selectedReport != null
-        ? ViewPage(
-            report: selectedReport!,
-            onClose: () {
-              setState(() {
-                selectedReport = null;
-              });
-            },
-          )
+        ? selectedReport!['isResolved']
+            ? ViewPageResolved(
+                report: selectedReport!,
+                onClose: () {
+                  setState(() {
+                    selectedReport = null;
+                  });
+                },
+              )
+            : ViewPage(
+                report: selectedReport!,
+                onClose: () {
+                  setState(() {
+                    selectedReport = null;
+                  });
+                },
+                onResolve: () async {
+                  if (selectedReport != null) {
+                    await FirebaseFirestore.instance
+                        .collection('reports')
+                        .doc(selectedReport!['id'])
+                        .update({'isResolved': true});
+                    setState(() {
+                      selectedReport = null; // Clear selected report after resolving
+                    });
+                  }
+                },
+              )
         : Scaffold(
             backgroundColor: Colors.white,
             body: Stack(
@@ -105,6 +126,7 @@ class _DriverReportTabState extends State<DriverReportTab> {
                             stream: FirebaseFirestore.instance
                                 .collection('reports')
                                 .where('zipCode', isEqualTo: driverZipCode)
+                                .where('isResolved', isEqualTo: false) // Fetch unresolved reports
                                 .snapshots(),
                             builder: (context, snapshot) {
                               if (!snapshot.hasData) {
@@ -132,6 +154,7 @@ class _DriverReportTabState extends State<DriverReportTab> {
                                               'severity': report['severity'],
                                               'imageUrl': report['imageUrl'],
                                               'location': report['location'],
+                                              'isResolved': report['isResolved'],
                                             };
                                           });
                                         },
@@ -184,6 +207,7 @@ class _DriverReportTabState extends State<DriverReportTab> {
                                                           'severity': report['severity'],
                                                           'imageUrl': report['imageUrl'],
                                                           'location': report['location'],
+                                                          'isResolved': report['isResolved'],
                                                         };
                                                       });
                                                     },
@@ -281,6 +305,7 @@ class _DriverReportTabState extends State<DriverReportTab> {
                                         'severity': report['severity'],
                                         'imageUrl': report['imageUrl'],
                                         'location': report['location'],
+                                        'isResolved': report['isResolved'],
                                       };
                                     });
                                   },
@@ -300,7 +325,7 @@ class _DriverReportTabState extends State<DriverReportTab> {
                                       ],
                                     ),
                                     child: Padding(
-                                      padding: EdgeInsets.all(screenWidth * 0.04),
+                                      padding:                                      EdgeInsets.all(screenWidth * 0.04),
                                       child: Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
@@ -333,6 +358,7 @@ class _DriverReportTabState extends State<DriverReportTab> {
                                                     'severity': report['severity'],
                                                     'imageUrl': report['imageUrl'],
                                                     'location': report['location'],
+                                                    'isResolved': report['isResolved'],
                                                   };
                                                 });
                                               },
