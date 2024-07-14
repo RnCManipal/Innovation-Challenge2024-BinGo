@@ -4,6 +4,7 @@ import 'package:bingo/ReportTab.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'MapTabDriver.dart';
 import 'SignupPage.dart'; // Import your SignupPage.dart file
 import 'UpdateProfile.dart';
 
@@ -74,7 +75,7 @@ class _HomePageState extends State<HomePage> {
           Center(
             child: selectedImageIndex ==
                     1 // Assuming selectedImageIndex 5 is for "User.png"
-                ? const BinMap()
+                ? const MapView()
                 : Container(), // Empty container if selectedImageIndex is not 5
           ),
           Center(
