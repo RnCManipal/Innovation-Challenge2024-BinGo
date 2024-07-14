@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 class ViewPage extends StatelessWidget {
   final Map<String, dynamic> report;
   final VoidCallback onClose;
+  final VoidCallback onResolve; // New callback for resolving the report
 
   const ViewPage({
     required this.report,
     required this.onClose,
+    required this.onResolve, // Add this parameter
     Key? key,
   }) : super(key: key);
 
@@ -38,11 +40,10 @@ class ViewPage extends StatelessWidget {
             child: Row(
               children: [
                 GestureDetector(
-                  child: Image.asset(
-                      'Images/BackButton.png'), // Adjusted for asset loading
+                  child: Image.asset('Images/BackButton.png'),
                   onTap: onClose,
                 ),
-                SizedBox(width: screenWidth * 0.02), // Adjust spacing as needed
+                SizedBox(width: screenWidth * 0.02),
                 Text(
                   report['title'],
                   style: TextStyle(
@@ -85,9 +86,7 @@ class ViewPage extends StatelessWidget {
                         fontSize: screenHeight * 0.025,
                       ),
                     ),
-                    SizedBox(
-                      height: screenHeight * 0.05,
-                    ),
+                    SizedBox(height: screenHeight * 0.05),
                     Text(
                       'Description:\n${report['description']}',
                       style: TextStyle(
@@ -95,9 +94,7 @@ class ViewPage extends StatelessWidget {
                         fontSize: screenHeight * 0.025,
                       ),
                     ),
-                    SizedBox(
-                      height: screenHeight * 0.05,
-                    ),
+                    SizedBox(height: screenHeight * 0.05),
                     Text(
                       'Severity:\n${report['severity']}',
                       style: TextStyle(
@@ -105,29 +102,23 @@ class ViewPage extends StatelessWidget {
                         fontSize: screenHeight * 0.025,
                       ),
                     ),
-                    SizedBox(
-                      height: screenHeight * 0.05,
-                    ),
+                    SizedBox(height: screenHeight * 0.05),
                     Image(image: NetworkImage('${report['imageUrl']}')),
-                    SizedBox(
-                      height: screenHeight * 0.05,
-                    ),
+                    SizedBox(height: screenHeight * 0.05),
                     Center(
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           foregroundColor: Colors.white,
                           backgroundColor: const Color(0xFFF79839),
                           shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(screenWidth * 0.02),
+                            borderRadius: BorderRadius.circular(screenWidth * 0.02),
                           ),
                         ),
                         onPressed: () {
-                          // Handle "Marked as Resolver" action
+                          onResolve(); // Call the resolve callback
                         },
                         child: Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: screenWidth * 0.02),
+                          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.02),
                           child: Text(
                             'Marked as Resolved',
                             style: TextStyle(
