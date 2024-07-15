@@ -1,16 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ViewPage extends StatelessWidget {
   final Map<String, dynamic> report;
   final VoidCallback onClose;
-  final VoidCallback onResolve; // New callback for resolving the report
+  final VoidCallback onResolve;
 
   const ViewPage({
     required this.report,
     required this.onClose,
-    required this.onResolve, // Add this parameter
+    required this.onResolve,
     Key? key,
   }) : super(key: key);
+
+  Future<void> _launchMap() async {
+    final location = report['location']; // Assuming this is a string like "City, State"
+    final url = 'https://www.google.com/maps/search/?api=1&query=$location';
+    
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -107,7 +119,7 @@ class ViewPage extends StatelessWidget {
                     SizedBox(height: screenHeight * 0.05),
                     Center(
                       child: SizedBox(
-                        width: screenWidth*0.53,
+                        width: screenWidth * 0.53,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             foregroundColor: Colors.white,
@@ -116,9 +128,7 @@ class ViewPage extends StatelessWidget {
                               borderRadius: BorderRadius.circular(screenWidth * 0.02),
                             ),
                           ),
-                          onPressed: () {
-                             // Call the resolve callback
-                          },
+                          onPressed: _launchMap, // Call the navigation function
                           child: Padding(
                             padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.02),
                             child: Text(
@@ -134,7 +144,7 @@ class ViewPage extends StatelessWidget {
                     SizedBox(height: screenHeight * 0.01),
                     Center(
                       child: SizedBox(
-                        width: screenWidth*0.53,
+                        width: screenWidth * 0.53,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             foregroundColor: Colors.white,
@@ -143,9 +153,7 @@ class ViewPage extends StatelessWidget {
                               borderRadius: BorderRadius.circular(screenWidth * 0.02),
                             ),
                           ),
-                          onPressed: () {
-                            onResolve(); // Call the resolve callback
-                          },
+                          onPressed: onResolve, // Call the resolve callback
                           child: Padding(
                             padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.02),
                             child: Text(
@@ -157,7 +165,7 @@ class ViewPage extends StatelessWidget {
                           ),
                         ),
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),
