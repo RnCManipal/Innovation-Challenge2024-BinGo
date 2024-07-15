@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
@@ -11,6 +10,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' as html_parser;
+import 'package:url_launcher/url_launcher.dart';
 
 class BinMap extends StatefulWidget {
   const BinMap({Key? key}) : super(key: key);
@@ -24,11 +24,6 @@ class _BinMapState extends State<BinMap> {
   final Completer<GoogleMapController> _controller = Completer();
   final List<Marker> _markers = [];
   final Set<Polyline> _polylines = {};
-  List<Step> _steps = [];
-  int _currentStep = 0;
-  bool _isNavigating = false;
-  bool _followUserLocation = false;
-
   CameraPosition _initialCameraPosition = const CameraPosition(
     target: LatLng(22.7273, 75.8977),
     zoom: 15,
@@ -138,19 +133,13 @@ class _BinMapState extends State<BinMap> {
       setState(() {
         _currentLocation = currentLocation;
         _updateCameraPosition();
-        if (_followUserLocation) {
-          _updateCameraPosition();
-        }
-        if (_isNavigating) {
-          _updateCurrentStep();
-        }
       });
     });
   }
 
   Future<void> _updateCameraPosition() async {
     final GoogleMapController controller = await _controller.future;
-    if (_currentLocation != null && _followUserLocation) {
+    if (_currentLocation != null) {
       controller.animateCamera(
         CameraUpdate.newCameraPosition(
           CameraPosition(
@@ -184,151 +173,27 @@ class _BinMapState extends State<BinMap> {
         waypoints.add(LatLng(lat, lng));
       }
 
-      _getDirections(origin, destination, waypoints);
-    });
-
-    setState(() {
-      _isNavigating = true;
-      _followUserLocation = true;
+      _launchGoogleMaps(origin, destination, waypoints);
     });
   }
 
-  Future<void> _getDirections(
+  Future<void> _launchGoogleMaps(
       LatLng origin, LatLng destination, List<LatLng> waypoints) async {
+    String originString = '${origin.latitude},${origin.longitude}';
+    String destinationString =
+        '${destination.latitude},${destination.longitude}';
     String waypointsString = waypoints
         .map((waypoint) => '${waypoint.latitude},${waypoint.longitude}')
         .join('|');
 
-    String url = 'https://maps.googleapis.com/maps/api/directions/json?'
-        'origin=${origin.latitude},${origin.longitude}&'
-        'destination=${destination.latitude},${destination.longitude}&'
-        'waypoints=$waypointsString&'
-        'key=AIzaSyBnZeMv7ivrYEy4kMR7ewMoWcuabfr06Hs'; // Replace with your Google Maps API key
+    String url =
+        'https://www.google.com/maps/dir/?api=1&origin=$originString&destination=$destinationString&waypoints=$waypointsString&travelmode=driving';
 
-    final response = await http.get(Uri.parse(url));
-
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-
-      _steps.clear();
-      for (var leg in data['routes'][0]['legs']) {
-        for (var step in leg['steps']) {
-          _steps.add(Step(
-            instructions: _parseHtmlString(step['html_instructions']),
-            location: LatLng(
-              step['end_location']['lat'],
-              step['end_location']['lng'],
-            ),
-          ));
-        }
-      }
-
-      setState(() {
-        _currentStep = 0;
-        _polylines.clear();
-        _polylines.add(
-          Polyline(
-            polylineId: PolylineId('route'),
-            points: _decodePolyline(
-                data['routes'][0]['overview_polyline']['points']),
-            color: Colors.blue,
-            width: 5,
-          ),
-        );
-
-        _markers.add(
-          Marker(
-            markerId: MarkerId('origin'),
-            position: origin,
-            icon:
-                BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
-          ),
-        );
-        _markers.add(
-          Marker(
-            markerId: MarkerId('destination'),
-            position: destination,
-            icon:
-                BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
-          ),
-        );
-      });
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
     }
-  }
-
-  String _parseHtmlString(String htmlString) {
-    final document = html_parser.parse(htmlString);
-    return document.body!.text;
-  }
-
-  List<LatLng> _decodePolyline(String encoded) {
-    List<LatLng> points = [];
-    int index = 0, len = encoded.length;
-    int lat = 0, lng = 0;
-
-    while (index < len) {
-      int b, shift = 0, result = 0;
-      do {
-        b = encoded.codeUnitAt(index++) - 63;
-        result |= (b & 0x1f) << shift;
-        shift += 5;
-      } while (b >= 0x20);
-      int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
-      lat += dlat;
-
-      shift = 0;
-      result = 0;
-      do {
-        b = encoded.codeUnitAt(index++) - 63;
-        result |= (b & 0x1f) << shift;
-        shift += 5;
-      } while (b >= 0x20);
-      int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
-      lng += dlng;
-
-      points.add(LatLng(lat / 1e5, lng / 1e5));
-    }
-
-    return points;
-  }
-
-  void _updateCurrentStep() {
-    if (_currentLocation == null || _steps.isEmpty) return;
-
-    LatLng currentLocation = LatLng(
-      _currentLocation!.latitude!,
-      _currentLocation!.longitude!,
-    );
-
-    double distanceToNextStep = _calculateDistance(
-      currentLocation,
-      _steps[_currentStep].location,
-    );
-
-    if (distanceToNextStep < 20) {
-      setState(() {
-        if (_currentStep < _steps.length - 1) {
-          _currentStep++;
-        }
-      });
-    }
-  }
-
-  double _calculateDistance(LatLng start, LatLng end) {
-    const double earthRadius = 6371000;
-    double dLat = _degreeToRadian(end.latitude - start.latitude);
-    double dLng = _degreeToRadian(end.longitude - start.longitude);
-    double a = sin(dLat / 2) * sin(dLat / 2) +
-        cos(_degreeToRadian(start.latitude)) *
-            cos(_degreeToRadian(end.latitude)) *
-            sin(dLng / 2) *
-            sin(dLng / 2);
-    double c = 2 * atan2(sqrt(a), sqrt(1 - a));
-    return earthRadius * c;
-  }
-
-  double _degreeToRadian(double degree) {
-    return degree * pi / 180;
   }
 
   @override
@@ -354,61 +219,6 @@ class _BinMapState extends State<BinMap> {
                   polylines: _polylines,
                   myLocationButtonEnabled: false,
                 ),
-                if (_isNavigating && _steps.isNotEmpty)
-                  Positioned(
-                    top: 50,
-                    left: 20,
-                    right: 20,
-                    child: Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Step ${_currentStep + 1}/${_steps.length}',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              _steps[_currentStep].instructions,
-                              style: const TextStyle(fontSize: 16),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                if (_isNavigating)
-                  Positioned(
-                    bottom: 100,
-                    left: 20,
-                    child: Row(
-                      children: [
-                        FloatingActionButton(
-                          onPressed: _previousStep,
-                          child: const Icon(Icons.arrow_back),
-                        ),
-                        const SizedBox(width: 10),
-                        FloatingActionButton(
-                          onPressed: _nextStep,
-                          child: const Icon(Icons.arrow_forward),
-                        ),
-                      ],
-                    ),
-                  ),
-                if (_currentLocation != null && _isNavigating)
-                  Positioned(
-                    bottom: 150,
-                    right: 20,
-                    child: const Icon(
-                      Icons.person_pin_circle,
-                      size: 40,
-                      color: Colors.blue,
-                    ),
-                  ),
                 Positioned(
                   bottom: 80,
                   right: 20,
@@ -428,27 +238,4 @@ class _BinMapState extends State<BinMap> {
       ),
     );
   }
-
-  void _previousStep() {
-    setState(() {
-      if (_currentStep > 0) {
-        _currentStep--;
-      }
-    });
-  }
-
-  void _nextStep() {
-    setState(() {
-      if (_currentStep < _steps.length - 1) {
-        _currentStep++;
-      }
-    });
-  }
-}
-
-class Step {
-  final String instructions;
-  final LatLng location;
-
-  Step({required this.instructions, required this.location});
 }
