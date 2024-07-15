@@ -16,40 +16,29 @@ class BinMap extends StatefulWidget {
 }
 
 class _BinMapState extends State<BinMap> {
-  late Future<void> _mapFuture =
-      Future.value(); // Initialize with a completed future
+  late Future<void> _mapFuture = Future.value();
   final Completer<GoogleMapController> _controller = Completer();
-
   final List<Marker> _markers = [];
 
-  CameraPosition _initialCameraPosition = const CameraPosition(
-    target: LatLng(22.7273, 75.8977),
-    zoom: 15,
-  );
+  CameraPosition? _initialCameraPosition; // Make this nullable
 
   LocationData? _currentLocation;
   final Location _location = Location();
 
   Future<void> _loadMarkersFromFirestore() async {
-    // Initialize Firebase if not already initialized
     await Firebase.initializeApp();
 
-    // Fetch bin data from Firestore
     FirebaseFirestore.instance
         .collection('bin_data')
         .snapshots()
         .listen((snapshot) {
-      // Clear existing markers
       _markers.clear();
 
-      // Process each document in the snapshot
       for (var doc in snapshot.docs) {
-        // Extract data from Firestore document
         double lat = doc['latitude'];
         double lng = doc['longitude'];
         int fillPercent = doc['fill_percent'];
 
-        // Determine marker icon based on fill percent
         String markerImage;
         if (fillPercent <= 40) {
           markerImage = 'Images/GreenMarker.png';
@@ -59,14 +48,11 @@ class _BinMapState extends State<BinMap> {
           markerImage = 'Images/RedMarker.png';
         }
 
-        // Load marker icon from assets
         getBytesFromAssets(markerImage, calculateMarkerWidth(fillPercent))
             .then((markerIconBytes) {
-          // Create BitmapDescriptor for the marker
           final BitmapDescriptor markerIcon =
               BitmapDescriptor.fromBytes(markerIconBytes);
 
-          // Create marker and add to _markers list
           final marker = Marker(
             markerId: MarkerId(doc.id),
             position: LatLng(lat, lng),
@@ -74,7 +60,6 @@ class _BinMapState extends State<BinMap> {
           );
           _markers.add(marker);
 
-          // Update the map with new markers
           setState(() {});
         });
       }
@@ -82,14 +67,7 @@ class _BinMapState extends State<BinMap> {
   }
 
   int calculateMarkerWidth(int fillPercent) {
-    // Adjust marker width based on fill percent
-    if (fillPercent <= 40) {
-      return 50;
-    } else if (fillPercent <= 60) {
-      return 50;
-    } else {
-      return 50;
-    }
+    return 50; // Return a fixed width; adjust if needed
   }
 
   Future<Uint8List> getBytesFromAssets(String path, int width) async {
@@ -114,7 +92,7 @@ class _BinMapState extends State<BinMap> {
   }
 
   Future<void> _loadMap() async {
-    await Future.delayed(const Duration(seconds: 2)); // Simulate a delay for loading
+    await Future.delayed(const Duration(seconds: 2));
   }
 
   Future<void> _getCurrentLocation() async {
@@ -141,8 +119,8 @@ class _BinMapState extends State<BinMap> {
     if (_currentLocation != null) {
       setState(() {
         _initialCameraPosition = CameraPosition(
-          target:
-              LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
+          target: LatLng(
+              _currentLocation!.latitude!, _currentLocation!.longitude!),
           zoom: 15,
         );
       });
@@ -182,23 +160,22 @@ class _BinMapState extends State<BinMap> {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
-              child:
-                  CircularProgressIndicator(), // Show loading indicator while waiting
+              child: CircularProgressIndicator(),
             );
           } else if (snapshot.connectionState == ConnectionState.done) {
             return GoogleMap(
-              initialCameraPosition: _initialCameraPosition,
+              initialCameraPosition: _initialCameraPosition ??
+                  const CameraPosition(target: LatLng(22.7273, 75.8977), zoom: 15), // Fallback
               onMapCreated: (GoogleMapController controller) {
                 _controller.complete(controller);
                 _updateCameraPosition();
               },
               myLocationEnabled: true,
               markers: Set<Marker>.of(_markers),
-            ); // Show map once it's loaded
+            );
           } else {
             return const Center(
-              child: Text(
-                  'Error loading map'), // Handle error or other states if needed
+              child: Text('Error loading map'),
             );
           }
         },
