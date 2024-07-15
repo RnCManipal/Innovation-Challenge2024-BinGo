@@ -155,25 +155,18 @@ class _BinMapState extends State<BinMap> {
       body: FutureBuilder<void>(
         future: _mapFuture,
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
+          if (_currentLocation == null) {
             return const Center(
-              child: CircularProgressIndicator(),
+              child: CircularProgressIndicator(), // Loading until location is available
             );
-          } else if (snapshot.connectionState == ConnectionState.done) {
+          } else {
             return GoogleMap(
-              initialCameraPosition: _initialCameraPosition ?? CameraPosition(
-                target: LatLng(0, 0), // Default to 0,0 until user location is available
-                zoom: 15,
-              ),
+              initialCameraPosition: _initialCameraPosition!,
               onMapCreated: (GoogleMapController controller) {
                 _controller.complete(controller);
               },
               myLocationEnabled: true,
               markers: Set<Marker>.of(_markers),
-            );
-          } else {
-            return const Center(
-              child: Text('Error loading map'),
             );
           }
         },
