@@ -401,7 +401,7 @@ class _UserReportTabState extends State<UserReportTab> {
   }
 
   Future<String?> fetchZipCode(double latitude, double longitude) async {
-  final String apiUrl = 'http://192.168.1.54:5000/get_zip_code'; // Replace with your actual API URL
+  final String apiUrl = 'https://bingo-server-gnanasais-projects.vercel.app/get_zip_code'; // Replace with your actual API URL
   final response = await http.get(Uri.parse('$apiUrl?lat=$latitude&lng=$longitude'));
 
   print('Response status: ${response.statusCode}');

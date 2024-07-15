@@ -26,7 +26,7 @@ class _BinMapDriverState extends State<BinMapDriver> {
   final List<Marker> _markers = [];
   final Set<Polyline> _polylines = {};
   CameraPosition _initialCameraPosition = const CameraPosition(
-    target: LatLng(22.7273, 75.8977),
+    target: LatLng(0, 0), // Default value, will be updated later
     zoom: 15,
   );
 
@@ -37,15 +37,16 @@ class _BinMapDriverState extends State<BinMapDriver> {
   @override
   void initState() {
     super.initState();
-    _getCurrentLocation().then((_) {
-      _mapFuture = _loadMap();
-      _loadMarkersFromFirestore();
-    });
+    _mapFuture = _initialize();
+  }
+
+  Future<void> _initialize() async {
+    await _getCurrentLocation();
+    await Firebase.initializeApp();
+    _loadMarkersFromFirestore();
   }
 
   Future<void> _loadMarkersFromFirestore() async {
-    await Firebase.initializeApp();
-
     // Retrieve driver's ZIP code
     _driverZipCode = await _getDriverZipCode();
     if (_driverZipCode == null) {
@@ -186,10 +187,6 @@ class _BinMapDriverState extends State<BinMapDriver> {
         ),
       );
     }
-  }
-
-  Future<void> _loadMap() async {
-    await Future.delayed(const Duration(seconds: 2));
   }
 
   Future<void> _startNavigation() async {
