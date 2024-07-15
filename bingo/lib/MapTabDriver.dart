@@ -8,18 +8,19 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' as html_parser;
 import 'package:url_launcher/url_launcher.dart';
 
-class BinMap extends StatefulWidget {
-  const BinMap({Key? key}) : super(key: key);
+class BinMapDriver extends StatefulWidget {
+  const BinMapDriver({Key? key}) : super(key: key);
 
   @override
-  State<BinMap> createState() => _BinMapState();
+  State<BinMapDriver> createState() => _BinMapDriverState();
 }
 
-class _BinMapState extends State<BinMap> {
+class _BinMapDriverState extends State<BinMapDriver> {
   late Future<void> _mapFuture = Future.value();
   final Completer<GoogleMapController> _controller = Completer();
   final List<Marker> _markers = [];
@@ -31,6 +32,7 @@ class _BinMapState extends State<BinMap> {
 
   LocationData? _currentLocation;
   final Location _location = Location();
+  String? _driverZipCode;
 
   @override
   void initState() {
@@ -44,8 +46,17 @@ class _BinMapState extends State<BinMap> {
   Future<void> _loadMarkersFromFirestore() async {
     await Firebase.initializeApp();
 
+    // Retrieve driver's ZIP code
+    _driverZipCode = await _getDriverZipCode();
+    if (_driverZipCode == null) {
+      print('Failed to retrieve driver ZIP code');
+      return;
+    }
+    print('Driver ZIP Code: $_driverZipCode');
+
     FirebaseFirestore.instance
         .collection('bin_data')
+        .where('zipCode', isEqualTo: _driverZipCode)
         .snapshots()
         .listen((snapshot) {
       _markers.clear();
@@ -80,6 +91,29 @@ class _BinMapState extends State<BinMap> {
         });
       }
     });
+  }
+
+  Future<String?> _getDriverZipCode() async {
+    try {
+      // Get the current logged-in user's ID
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        print('No user logged in');
+        return null;
+      }
+      String userId = user.uid;
+
+      // Fetch the user's document from Firestore
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .get();
+
+      return userDoc['zipCode'];
+    } catch (e) {
+      print('Error retrieving driver ZIP code: $e');
+      return null;
+    }
   }
 
   int calculateMarkerWidth(int fillPercent) {
@@ -166,7 +200,11 @@ class _BinMapState extends State<BinMap> {
     LatLng destination = origin;
 
     List<LatLng> waypoints = [];
-    FirebaseFirestore.instance.collection('bin_data').get().then((snapshot) {
+    FirebaseFirestore.instance
+        .collection('bin_data')
+        .where('zipCode', isEqualTo: _driverZipCode)
+        .get()
+        .then((snapshot) {
       for (var doc in snapshot.docs) {
         double lat = doc['latitude'];
         double lng = doc['longitude'];
