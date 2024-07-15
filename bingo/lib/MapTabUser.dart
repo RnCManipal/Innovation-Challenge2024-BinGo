@@ -20,8 +20,7 @@ class _BinMapState extends State<BinMap> {
   final Completer<GoogleMapController> _controller = Completer();
   final List<Marker> _markers = [];
 
-  CameraPosition? _initialCameraPosition; // Make this nullable
-
+  CameraPosition? _initialCameraPosition;
   LocationData? _currentLocation;
   final Location _location = Location();
 
@@ -59,7 +58,6 @@ class _BinMapState extends State<BinMap> {
             icon: markerIcon,
           );
           _markers.add(marker);
-
           setState(() {});
         });
       }
@@ -67,7 +65,7 @@ class _BinMapState extends State<BinMap> {
   }
 
   int calculateMarkerWidth(int fillPercent) {
-    return 50; // Return a fixed width; adjust if needed
+    return 50; // Fixed width; adjust if needed
   }
 
   Future<Uint8List> getBytesFromAssets(String path, int width) async {
@@ -117,13 +115,12 @@ class _BinMapState extends State<BinMap> {
 
     _currentLocation = await _location.getLocation();
     if (_currentLocation != null) {
-      setState(() {
-        _initialCameraPosition = CameraPosition(
-          target: LatLng(
-              _currentLocation!.latitude!, _currentLocation!.longitude!),
-          zoom: 15,
-        );
-      });
+      _initialCameraPosition = CameraPosition(
+        target: LatLng(
+            _currentLocation!.latitude!, _currentLocation!.longitude!),
+        zoom: 15,
+      );
+      _updateCameraPosition();
     }
 
     _location.onLocationChanged.listen((LocationData currentLocation) {
@@ -164,11 +161,12 @@ class _BinMapState extends State<BinMap> {
             );
           } else if (snapshot.connectionState == ConnectionState.done) {
             return GoogleMap(
-              initialCameraPosition: _initialCameraPosition ??
-                  const CameraPosition(target: LatLng(22.7273, 75.8977), zoom: 15), // Fallback
+              initialCameraPosition: _initialCameraPosition ?? CameraPosition(
+                target: LatLng(0, 0), // Default to 0,0 until user location is available
+                zoom: 15,
+              ),
               onMapCreated: (GoogleMapController controller) {
                 _controller.complete(controller);
-                _updateCameraPosition();
               },
               myLocationEnabled: true,
               markers: Set<Marker>.of(_markers),
