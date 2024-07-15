@@ -7,6 +7,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class BinMap extends StatefulWidget {
   const BinMap({Key? key}) : super(key: key);
@@ -56,6 +57,13 @@ class _BinMapState extends State<BinMap> {
             markerId: MarkerId(doc.id),
             position: LatLng(lat, lng),
             icon: markerIcon,
+            infoWindow: InfoWindow(
+              title: 'Fill Percentage: $fillPercent%',
+              snippet: 'Tap to navigate',
+              onTap: () {
+                _navigateToMarker(LatLng(lat, lng));
+              },
+            ),
           );
           _markers.add(marker);
           setState(() {});
@@ -116,8 +124,8 @@ class _BinMapState extends State<BinMap> {
     _currentLocation = await _location.getLocation();
     if (_currentLocation != null) {
       _initialCameraPosition = CameraPosition(
-        target: LatLng(
-            _currentLocation!.latitude!, _currentLocation!.longitude!),
+        target:
+            LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
         zoom: 15,
       );
       _updateCameraPosition();
@@ -148,6 +156,20 @@ class _BinMapState extends State<BinMap> {
     }
   }
 
+  Future<void> _navigateToMarker(LatLng markerPosition) async {
+    if (_currentLocation != null) {
+      final Uri googleMapsUrl = Uri.parse(
+        'https://www.google.com/maps/dir/?api=1&origin=${_currentLocation!.latitude},${_currentLocation!.longitude}&destination=${markerPosition.latitude},${markerPosition.longitude}&travelmode=driving',
+      );
+
+      if (await canLaunch(googleMapsUrl.toString())) {
+        await launch(googleMapsUrl.toString());
+      } else {
+        throw 'Could not launch $googleMapsUrl';
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -157,7 +179,8 @@ class _BinMapState extends State<BinMap> {
         builder: (context, snapshot) {
           if (_currentLocation == null) {
             return const Center(
-              child: CircularProgressIndicator(), // Loading until location is available
+              child:
+                  CircularProgressIndicator(), // Loading until location is available
             );
           } else {
             return GoogleMap(
@@ -167,10 +190,18 @@ class _BinMapState extends State<BinMap> {
               },
               myLocationEnabled: true,
               markers: Set<Marker>.of(_markers),
+              onTap: (_) {
+                _closeInfoWindow();
+              },
             );
           }
         },
       ),
     );
+  }
+
+  Future<void> _closeInfoWindow() async {
+    final GoogleMapController controller = await _controller.future;
+    controller.hideMarkerInfoWindow(MarkerId(''));
   }
 }
