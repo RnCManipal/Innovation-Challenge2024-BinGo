@@ -106,23 +106,53 @@ class ViewPage extends StatelessWidget {
                     Image(image: NetworkImage('${report['imageUrl']}')),
                     SizedBox(height: screenHeight * 0.05),
                     Center(
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          foregroundColor: Colors.white,
-                          backgroundColor: const Color(0xFFF79839),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(screenWidth * 0.02),
+                      child: SizedBox(
+                        width: screenWidth*0.53,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            backgroundColor: const Color(0xFFF79839),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(screenWidth * 0.02),
+                            ),
+                          ),
+                          onPressed: () {
+                             // Call the resolve callback
+                          },
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.02),
+                            child: Text(
+                              'Navigate',
+                              style: TextStyle(
+                                fontSize: screenWidth * 0.04,
+                              ),
+                            ),
                           ),
                         ),
-                        onPressed: () {
-                          onResolve(); // Call the resolve callback
-                        },
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.02),
-                          child: Text(
-                            'Marked as Resolved',
-                            style: TextStyle(
-                              fontSize: screenWidth * 0.04,
+                      ),
+                    ),
+                    SizedBox(height: screenHeight * 0.01),
+                    Center(
+                      child: SizedBox(
+                        width: screenWidth*0.53,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            backgroundColor: const Color(0xFFF79839),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(screenWidth * 0.02),
+                            ),
+                          ),
+                          onPressed: () {
+                            onResolve(); // Call the resolve callback
+                          },
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.02),
+                            child: Text(
+                              'Marked as Resolved',
+                              style: TextStyle(
+                                fontSize: screenWidth * 0.04,
+                              ),
                             ),
                           ),
                         ),
