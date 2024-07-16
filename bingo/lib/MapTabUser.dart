@@ -20,6 +20,7 @@ class _BinMapState extends State<BinMap> {
   late Future<void> _mapFuture = Future.value();
   final Completer<GoogleMapController> _controller = Completer();
   final List<Marker> _markers = [];
+  bool _cameraUpdateAllowed = true;
 
   CameraPosition? _initialCameraPosition;
   LocationData? _currentLocation;
@@ -134,7 +135,9 @@ class _BinMapState extends State<BinMap> {
     _location.onLocationChanged.listen((LocationData currentLocation) {
       setState(() {
         _currentLocation = currentLocation;
-        _updateCameraPosition();
+        if (_cameraUpdateAllowed) {
+          _updateCameraPosition();
+        }
       });
     });
   }
@@ -153,6 +156,8 @@ class _BinMapState extends State<BinMap> {
           ),
         ),
       );
+      // Allow camera update only once unless user navigates to a different position
+      _cameraUpdateAllowed = false;
     }
   }
 

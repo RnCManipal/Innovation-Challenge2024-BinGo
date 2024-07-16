@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
@@ -9,8 +8,6 @@ import 'package:location/location.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:http/http.dart' as http;
-import 'package:html/parser.dart' as html_parser;
 import 'package:url_launcher/url_launcher.dart';
 
 class BinMapDriver extends StatefulWidget {
@@ -24,7 +21,7 @@ class _BinMapDriverState extends State<BinMapDriver> {
   late Future<void> _mapFuture = Future.value();
   final Completer<GoogleMapController> _controller = Completer();
   final List<Marker> _markers = [];
-  final Set<Polyline> _polylines = {};
+  final List<LatLng> _waypoints = [];
   CameraPosition _initialCameraPosition = const CameraPosition(
     target: LatLng(0, 0), // Default value, will be updated later
     zoom: 15,
@@ -33,6 +30,7 @@ class _BinMapDriverState extends State<BinMapDriver> {
   LocationData? _currentLocation;
   final Location _location = Location();
   String? _driverZipCode;
+  bool _firstLocationUpdate = true;
 
   @override
   void initState() {
@@ -47,7 +45,6 @@ class _BinMapDriverState extends State<BinMapDriver> {
   }
 
   Future<void> _loadMarkersFromFirestore() async {
-    // Retrieve driver's ZIP code
     _driverZipCode = await _getDriverZipCode();
     if (_driverZipCode == null) {
       print('Failed to retrieve driver ZIP code');
@@ -61,11 +58,16 @@ class _BinMapDriverState extends State<BinMapDriver> {
         .snapshots()
         .listen((snapshot) {
       _markers.clear();
+      _waypoints.clear();
 
       for (var doc in snapshot.docs) {
         double lat = doc['latitude'];
         double lng = doc['longitude'];
         int fillPercent = doc['fill_percent'];
+
+        if (fillPercent > 40) {
+          _waypoints.add(LatLng(lat, lng));
+        }
 
         String markerImage;
         if (fillPercent <= 40) {
@@ -96,7 +98,6 @@ class _BinMapDriverState extends State<BinMapDriver> {
 
   Future<String?> _getDriverZipCode() async {
     try {
-      // Get the current logged-in user's ID
       User? user = FirebaseAuth.instance.currentUser;
       if (user == null) {
         print('No user logged in');
@@ -104,7 +105,6 @@ class _BinMapDriverState extends State<BinMapDriver> {
       }
       String userId = user.uid;
 
-      // Fetch the user's document from Firestore
       DocumentSnapshot userDoc = await FirebaseFirestore.instance
           .collection('users')
           .doc(userId)
@@ -174,7 +174,7 @@ class _BinMapDriverState extends State<BinMapDriver> {
 
   Future<void> _updateCameraPosition() async {
     final GoogleMapController controller = await _controller.future;
-    if (_currentLocation != null) {
+    if (_currentLocation != null && _firstLocationUpdate) {
       controller.animateCamera(
         CameraUpdate.newCameraPosition(
           CameraPosition(
@@ -186,30 +186,18 @@ class _BinMapDriverState extends State<BinMapDriver> {
           ),
         ),
       );
+      _firstLocationUpdate = false;
     }
   }
 
   Future<void> _startNavigation() async {
-    if (_currentLocation == null) return;
+    if (_currentLocation == null || _waypoints.isEmpty) return;
 
     LatLng origin =
         LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!);
     LatLng destination = origin;
 
-    List<LatLng> waypoints = [];
-    FirebaseFirestore.instance
-        .collection('bin_data')
-        .where('zipCode', isEqualTo: _driverZipCode)
-        .get()
-        .then((snapshot) {
-      for (var doc in snapshot.docs) {
-        double lat = doc['latitude'];
-        double lng = doc['longitude'];
-        waypoints.add(LatLng(lat, lng));
-      }
-
-      _launchGoogleMaps(origin, destination, waypoints);
-    });
+    _launchGoogleMaps(origin, destination, _waypoints);
   }
 
   Future<void> _launchGoogleMaps(
@@ -251,7 +239,6 @@ class _BinMapDriverState extends State<BinMapDriver> {
                   },
                   myLocationEnabled: true,
                   markers: Set<Marker>.of(_markers),
-                  polylines: _polylines,
                   myLocationButtonEnabled: false,
                 ),
                 Positioned(
