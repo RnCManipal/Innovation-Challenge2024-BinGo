@@ -2,7 +2,6 @@ import 'package:bingo/SignupPage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'HomePage.dart'; // Import your HomePage
-import 'auth.dart'; // Import your auth.dart file
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -70,7 +69,6 @@ class _LoginPageState extends State<LoginPage> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFE0FFFF),
-      resizeToAvoidBottomInset: false,
       body: SingleChildScrollView(
         child: SizedBox(
           height: screenSize.height,

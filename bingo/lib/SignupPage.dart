@@ -1,7 +1,6 @@
 import 'package:bingo/SignUpPage1.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'HomePage.dart'; // Replace with your home page import
 import 'LoginPage.dart'; // Replace with your login page import
 
@@ -111,7 +110,6 @@ void _navigateToSignupPageOne() {
 
     return Scaffold(
       backgroundColor: const Color(0xFFE0FFFF),
-      resizeToAvoidBottomInset: false,
       body: SingleChildScrollView(
         child: SizedBox(
           height: screenSize.height,
