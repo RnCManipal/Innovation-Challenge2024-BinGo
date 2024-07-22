@@ -50,11 +50,11 @@ class Home extends StatelessWidget {
               ),
               const SizedBox(height: 20), // Example spacing
               CustomContainer(
-                height: screenSize.height*0.32,
+                height: screenSize.height*0.22,
                 screenSize: screenSize,
                 children: [
                   Padding(
-                          padding: EdgeInsets.only(top: screenSize.height * 0.04, left: screenSize.width * 0.1),
+                          padding: EdgeInsets.only(top: screenSize.height * 0.03, left: screenSize.width * 0.1),
                           child: Text(
                             "1500",
                             style: TextStyle(
@@ -66,12 +66,12 @@ class Home extends StatelessWidget {
                           ),
                         ),
                   Padding(
-                          padding: EdgeInsets.only(top: screenSize.height *0, left: screenSize.width * 0.57),
+                          padding: EdgeInsets.only(bottom: screenSize.height *0.0, left: screenSize.width * 0.52),
                           child: Text(
                             "points",
                             style: TextStyle(
                               fontFamily: 'Roboto',
-                              fontSize: screenSize.width * 0.04,
+                              fontSize: screenSize.width * 0.06,
                               fontWeight: FontWeight.bold,
                               color: const Color.fromARGB(255, 0, 0, 0),
                             ),
@@ -109,40 +109,8 @@ class Home extends StatelessWidget {
                             ),
                           ),
                         ),
-                  const SizedBox(height: 10),
-                  Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.15),
-                          child: SizedBox(
-                            width: screenSize.width * 0.6,
-                            height: screenSize.height *0.06,
-                            child: TextButton(
-                              onPressed: (){print("button pressed");},
-                              style: ButtonStyle(
-                                backgroundColor: WidgetStateProperty.all(const Color.fromARGB(255, 255, 153, 1)),
-                                foregroundColor: WidgetStateProperty.all(Colors.white),
-                                padding: WidgetStateProperty.all(
-                                  EdgeInsets.symmetric(vertical: screenSize.height * 0.015),
-                                ),
-                                shape: WidgetStateProperty.all(
-                                  RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(screenSize.width * 0.02),
-                                  ),
-                                ),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  "Earn More",
-                                  style: TextStyle(
-                                    fontSize: screenSize.width * 0.049,
-                                    fontWeight: FontWeight.normal,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                ]
-              ),
+                      ]
+                    ),
               const SizedBox(height: 20), // Example spacing
               CustomContainer(
               height:screenSize.height*0.5,
@@ -189,7 +157,7 @@ class Home extends StatelessWidget {
                 Padding(
                           padding: EdgeInsets.only(top: screenSize.height *0, ),
                           child: Text(
-                            "Support you community's health by reporting any spills and also earn reward points",
+                            "Support your community's health by reporting any spills and also earn reward points",
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontFamily: 'Jost',

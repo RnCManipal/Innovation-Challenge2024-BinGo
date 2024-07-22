@@ -66,6 +66,22 @@ class _SignupPageOneState extends State<SignupPageOne> {
       return;
     }
 
+    showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (BuildContext context) {
+      return const AlertDialog(
+        content: Row(
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(width: 20),
+            Text("Creating account"),
+          ],
+        ),
+      );
+    },
+  );
+
     try {
       UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: widget.email,
@@ -86,6 +102,7 @@ class _SignupPageOneState extends State<SignupPageOne> {
       await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).set(userData);
 
       if (!mounted) return;
+       Navigator.of(context).pop();
 
       Navigator.pushReplacement(
         context,
@@ -94,7 +111,24 @@ class _SignupPageOneState extends State<SignupPageOne> {
     } catch (e) {
       print('Error creating account: $e');
 
-      if (!mounted) return;
+      if (!mounted){
+        showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (BuildContext context) {
+      return const AlertDialog(
+        content: Row(
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(width: 20),
+            Text("Creating account..."),
+          ],
+        ),
+      );
+    },
+  );
+
+      };
 
       showDialog(
         context: context,

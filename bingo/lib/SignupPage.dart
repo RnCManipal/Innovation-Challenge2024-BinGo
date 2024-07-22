@@ -33,6 +33,9 @@ class _SignupPageState extends State<SignupPage> {
       });
     }
   }
+  bool isEmailValid(String email) {
+    return RegExp(r'^[\w-\.]+@[a-zA-Z]+\.[a-zA-Z]{2,}$').hasMatch(email);
+  }
 
 void _navigateToSignupPageOne() {
   // Check if any field is empty
@@ -46,6 +49,25 @@ void _navigateToSignupPageOne() {
         return AlertDialog(
           title: const Text("Error"),
           content: const Text("Please fill in all fields"),
+          actions: <Widget>[
+            TextButton(
+              child: const Text("OK"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+    }
+    if(isEmailValid(_usernameController.text)==false){
+      showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Error"),
+          content: const Text("Please enter a valid email"),
           actions: <Widget>[
             TextButton(
               child: const Text("OK"),
@@ -315,7 +337,7 @@ void _navigateToSignupPageOne() {
                           child: SizedBox(
                             height: screenSize.height * 0.068,
                             width: screenSize.width * 0.85,
-                            child: TextField(
+                            child: TextFormField(
                               controller: _passwordController,
                               obscureText: true,
                               decoration: InputDecoration(

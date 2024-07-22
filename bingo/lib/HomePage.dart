@@ -230,8 +230,8 @@ class _HomePageState extends State<HomePage> {
                         ]
                       ),
                       const SizedBox(height: 20),
-                      CustomContainer(
-                height: screenSize.height*0.35,
+                CustomContainer(
+                height: screenSize.height*0.22,
                 screenSize: screenSize,
                 children: [
                   Padding(
@@ -247,12 +247,12 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                   Padding(
-                          padding: EdgeInsets.only(top: screenSize.height *0, left: screenSize.width * 0.57),
+                          padding: EdgeInsets.only(bottom: screenSize.height *0.0, left: screenSize.width * 0.52),
                           child: Text(
                             "points",
                             style: TextStyle(
                               fontFamily: 'Roboto',
-                              fontSize: screenSize.width * 0.04,
+                              fontSize: screenSize.width * 0.06,
                               fontWeight: FontWeight.bold,
                               color: const Color.fromARGB(255, 0, 0, 0),
                             ),
@@ -281,38 +281,6 @@ class _HomePageState extends State<HomePage> {
                               child: Center(
                                 child: Text(
                                   "View Offers",
-                                  style: TextStyle(
-                                    fontSize: screenSize.width * 0.049,
-                                    fontWeight: FontWeight.normal,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                  const SizedBox(height: 10),
-                  Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.15),
-                          child: SizedBox(
-                            width: screenSize.width * 0.6,
-                            height: screenSize.height *0.06,
-                            child: TextButton(
-                              onPressed: (){print("button pressed");},
-                              style: ButtonStyle(
-                                backgroundColor: WidgetStateProperty.all(const Color.fromARGB(255, 255, 153, 1)),
-                                foregroundColor: WidgetStateProperty.all(Colors.white),
-                                padding: WidgetStateProperty.all(
-                                  EdgeInsets.symmetric(vertical: screenSize.height * 0.015),
-                                ),
-                                shape: WidgetStateProperty.all(
-                                  RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(screenSize.width * 0.02),
-                                  ),
-                                ),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  "Earn More",
                                   style: TextStyle(
                                     fontSize: screenSize.width * 0.049,
                                     fontWeight: FontWeight.normal,
@@ -385,49 +353,7 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                         ),
-                    SizedBox(height: 10,),
-                    Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.15),
-                          child: Container(
-                            width: screenSize.width * 0.8,
-                            height: screenSize.height *0.06,
-                            decoration: BoxDecoration(
-                              boxShadow: [
-                              BoxShadow(
-                                color: Color.fromARGB(255, 152, 152, 152),
-                                spreadRadius: 3,
-                                blurRadius: 4,
-                                offset: Offset(0, 3), // changes position of shadow
-                            ),
-                          ],
-                        ),
-                            child: TextButton(
-                              onPressed: (){print("button pressed");},
-                              style: ButtonStyle(
-                                backgroundColor: WidgetStateProperty.all(Color(0xffAFFF89)),
-                                foregroundColor: WidgetStateProperty.all(Colors.white),
-                                padding: WidgetStateProperty.all(
-                                  EdgeInsets.symmetric(vertical: screenSize.height * 0.015),
-                                ),
-                                shape: WidgetStateProperty.all(
-                                  RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(screenSize.width * 0.02),
-                                  ),
-                                ),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  "Change Role",
-                                  style: TextStyle(
-                                    fontSize: screenSize.width * 0.04,
-                                    fontWeight: FontWeight.normal,
-                                    color: Color.fromARGB(255, 147, 15, 1),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
+                    
                     SizedBox(height: 10,),
                     Padding(
                           padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.15),
@@ -554,7 +480,7 @@ class _HomePageState extends State<HomePage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  const SizedBox(width: 0.4),
+                  SizedBox(width: screenSize.width*0.02),
                   _buildImageWithSelectableBackground(
                     'Images/Home.png',
                     0,
@@ -562,7 +488,7 @@ class _HomePageState extends State<HomePage> {
                     screenSize.width * 0.12,
                     screenSize.height * 0.12,
                   ),
-                  const SizedBox(width: 0.4),
+                  SizedBox(width: screenSize.width*0.03),
                   _buildImageWithSelectableBackground(
                     'Images/Location.png',
                     1,
@@ -570,7 +496,7 @@ class _HomePageState extends State<HomePage> {
                     screenSize.width * 0.12,
                     screenSize.height * 0.12,
                   ),
-                  const SizedBox(width: 0.4),
+                  SizedBox(width: screenSize.width*0.03),
                   _buildImageWithSelectableBackground(
                     'Images/Megaphone.png',
                     2,
@@ -578,15 +504,7 @@ class _HomePageState extends State<HomePage> {
                     screenSize.width * 0.12,
                     screenSize.height * 0.12,
                   ),
-                  const SizedBox(width: 0.4),
-                  _buildImageWithSelectableBackground(
-                    'Images/Qr Code.png',
-                    3,
-                    screenSize.height * 0.12,
-                    screenSize.width * 0.12,
-                    screenSize.height * 0.12,
-                  ),
-                  const SizedBox(width: 0.4),
+                  SizedBox(width: screenSize.width*0.03),
                   _buildImageWithSelectableBackground(
                     'Images/Discount.png',
                     4,
@@ -594,7 +512,7 @@ class _HomePageState extends State<HomePage> {
                     screenSize.width * 0.12,
                     screenSize.height * 0.12,
                   ),
-                  const SizedBox(width: 0.4),
+                  SizedBox(width: screenSize.width*0.03),
                   _buildImageWithSelectableBackground(
                     'Images/User.png',
                     5,
@@ -602,7 +520,7 @@ class _HomePageState extends State<HomePage> {
                     screenSize.width * 0.12,
                     screenSize.height * 0.12,
                   ),
-                  const SizedBox(width: 0.4),
+                  SizedBox(width: screenSize.width*0.02),
                 ],
               ),
             ),
