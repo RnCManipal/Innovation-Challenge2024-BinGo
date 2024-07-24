@@ -2,6 +2,7 @@ import 'package:bingo/SignupPage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'HomePage.dart'; // Import your HomePage
+import 'ResetPasswordPage.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -182,7 +183,10 @@ class _LoginPageState extends State<LoginPage> {
                 left: screenSize.width * 0.05,
                 child: GestureDetector(
                   onTap: () {
-                    print("Forgot password clicked!");
+                    Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) =>ForgotPasswordPage()),
+                        );
                   },
                   child: Container(
                     width: screenSize.width * 0.9,

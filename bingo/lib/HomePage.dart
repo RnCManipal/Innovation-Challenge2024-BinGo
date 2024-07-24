@@ -354,49 +354,6 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                     
-                    SizedBox(height: 10,),
-                    Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.15),
-                          child: Container(
-                            width: screenSize.width * 0.8,
-                            height: screenSize.height *0.06,
-                            decoration: BoxDecoration(
-                              boxShadow: [
-                              BoxShadow(
-                                color: Color.fromARGB(255, 152, 152, 152),
-                                spreadRadius: 3,
-                                blurRadius: 4,
-                                offset: Offset(0, 3), // changes position of shadow
-                            ),
-                          ],
-                        ),
-                            child: TextButton(
-                              onPressed: (){print("button pressed");},
-                              style: ButtonStyle(
-                                backgroundColor: WidgetStateProperty.all(Color(0xffAFFF89)),
-                                foregroundColor: WidgetStateProperty.all(Colors.white),
-                                padding: WidgetStateProperty.all(
-                                  EdgeInsets.symmetric(vertical: screenSize.height * 0.015),
-                                ),
-                                shape: WidgetStateProperty.all(
-                                  RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(screenSize.width * 0.02),
-                                  ),
-                                ),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  "Change Theme",
-                                  style: TextStyle(
-                                    fontSize: screenSize.width * 0.04,
-                                    fontWeight: FontWeight.normal,
-                                    color: Color.fromARGB(255, 147, 15, 1),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ), 
                     SizedBox(height: 10,),  
                     Padding(
                           padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.15),

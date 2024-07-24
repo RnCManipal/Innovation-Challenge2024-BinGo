@@ -17,13 +17,13 @@ class Home extends StatelessWidget {
           child: Column(
             children: [
               Padding(
-                padding: EdgeInsets.only(left: textLeftPadding),
+                padding: EdgeInsets.only(left: screenSize.width*0.224),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     SizedBox(
                       width: textWidth,
-                      child: Text(
+                      child:Text(
                         "Welcome to",
                         style: TextStyle(
                           fontFamily: 'Jost',
@@ -33,6 +33,9 @@ class Home extends StatelessWidget {
                         ),
                       ),
                     ),
+                    Padding(
+                      padding: EdgeInsets.only(left: screenSize.width*0.135),
+                      child:
                     SizedBox(
                       width: textWidth,
                       child: Text(
@@ -44,6 +47,7 @@ class Home extends StatelessWidget {
                               screenSize.width * 0.1, // Responsive font size
                         ),
                       ),
+                    ),
                     ),
                   ],
                 ),
