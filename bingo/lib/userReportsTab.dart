@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:geocoding/geocoding.dart' as geocode;
@@ -28,13 +27,16 @@ class _UserReportTabState extends State<UserReportTab> {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
-
+    final Size screenSize = MediaQuery.of(context).size;
     bool isButtonDisabled = image == null; // Disable button if no image is selected
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Stack(
-        children: [
+      body: SingleChildScrollView(
+        child: SizedBox(
+          height: screenSize.height*1.2,
+          child: Stack(
+        children: <Widget>[
           Positioned(
             top: screenHeight * 0.08,
             left: screenWidth * 0.05,
@@ -79,7 +81,7 @@ class _UserReportTabState extends State<UserReportTab> {
             left: screenWidth * 0.025,
             child: Container(
               width: screenWidth * 0.95,
-              height: screenHeight * 0.6, // Adjust height to fit the screen
+              height: screenHeight * 0.8, // Adjust height to fit the screen
               padding: EdgeInsets.all(screenWidth * 0.05),
               decoration: BoxDecoration(
                 color: Color(0xffE0FFFF),
@@ -93,7 +95,6 @@ class _UserReportTabState extends State<UserReportTab> {
                   ),
                 ],
               ),
-              child: SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -268,9 +269,10 @@ class _UserReportTabState extends State<UserReportTab> {
                 ),
               ),
             ),
-          ),
         ],
       ),
+    )
+    )
     );
   }
 

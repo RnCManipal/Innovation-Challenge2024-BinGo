@@ -1,0 +1,188 @@
+import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+class ForgotPasswordPage extends StatefulWidget {
+  @override
+  _ForgotPasswordPageState createState() => _ForgotPasswordPageState();
+}
+
+class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
+  final _formKey = GlobalKey<FormState>();
+  final _auth = FirebaseAuth.instance;
+  String _email = '';
+  bool _isLoading = false;
+  
+
+  Future<void> _submitForm() async {
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+
+      try {
+        await _auth.sendPasswordResetEmail(email: _email);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Password reset email sent')),
+        );
+      } on FirebaseAuthException catch (e) {
+        String message = 'An error occurred. Please try again later.';
+        if (e.code == 'user-not-found') {
+          message = 'No user found for that email.';
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message)),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('An error occurred. Please try again later.')),
+        );
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final Size screenSize = MediaQuery.of(context).size;
+    return Scaffold(
+      backgroundColor: const Color(0xFFE0FFFF),
+      appBar: AppBar(
+        title: Text('Forgot Password'),
+      ),
+      body: SingleChildScrollView(
+      child: Padding(
+        padding: EdgeInsets.only(top:screenSize.height*0.2,left: screenSize.width*0.1),
+        child: Container(
+                    width: screenSize.width * 0.8,
+                    height: screenSize.height*0.5,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius:
+                          BorderRadius.circular(screenSize.width * 0.02),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          spreadRadius: screenSize.width * 0.005,
+                          blurRadius: screenSize.width * 0.02,
+                          offset: Offset(0, screenSize.width * 0.01),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+          Form(
+          key: _formKey,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              SizedBox(height: screenSize.height*0.04,),
+              SizedBox(
+                height: screenSize.width*0.3,
+                width: screenSize.height*0.18,
+                child: Image.asset(
+                            'Images/ForgotPassword2.png',
+                            height: screenSize.height*0.25,
+                            fit: BoxFit.fill,
+                          ),
+              ),
+              SizedBox(height: screenSize.height*0.03,),
+              Padding(
+                    padding: EdgeInsets.only(top:screenSize.height*0,left: screenSize.width*0),
+                    child:
+                    SizedBox(
+                      width: screenSize.width*0.7,
+                      child: Text(
+                        "Forgot Password",
+                        style: TextStyle(
+                          fontFamily: 'Jost',
+                          fontWeight: FontWeight.bold,
+                          fontSize:
+                              screenSize.width * 0.07, // Responsive font size
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    ),
+              Padding(
+                      padding: EdgeInsets.only(top:screenSize.height*0.0,left: screenSize.width*0),
+                      child:
+                    SizedBox(
+                      width: screenSize.width*0.7,
+                      child: Text(
+                        "Enter your email and we'll send a link to reset your password",
+                        style: TextStyle(
+                          fontFamily: 'Jost',
+                          fontWeight: FontWeight.normal,
+                          fontSize:
+                              screenSize.width * 0.03, // Responsive font size
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    ),
+              SizedBox(height: 10,),
+              SizedBox(
+                height: screenSize.height*0.09,
+                width: screenSize.width*0.7,
+                child: 
+              TextFormField(
+                decoration: InputDecoration(
+                  labelText: 'Email',
+                  filled: true,
+                  fillColor: const Color(0xFFF0F0F0),
+                  border: InputBorder.none,
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide.none,
+                                  borderRadius: BorderRadius.circular(
+                                      screenSize.width * 0.02),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide.none,
+                                  borderRadius: BorderRadius.circular(
+                                      screenSize.width * 0.1),
+                                ),
+                                hintText: 'Enter your username',
+                ),
+                keyboardType: TextInputType.emailAddress,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your email';
+                  }
+                  if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                    return 'Please enter a valid email';
+                  }
+                  return null;
+                },
+                onSaved: (value) {
+                  _email = value!;
+                },
+              ),
+              ),
+              SizedBox(height: screenSize.height*0),
+              ElevatedButton(
+                onPressed: _isLoading ? null : () {
+                  if (_formKey.currentState!.validate()) {
+                    _formKey.currentState!.save();
+                    _submitForm();
+                  }
+                },
+                child: _isLoading
+                    ? CircularProgressIndicator(color: Colors.white)
+                    : Text('Reset Password'),
+              ),
+            ],
+          ),
+        ),
+                      ]
+      ),
+        )
+      
+    )
+    )
+    );
+  }
+}

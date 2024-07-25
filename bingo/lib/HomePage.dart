@@ -3,6 +3,7 @@ import 'package:bingo/MapTab.dart';
 import 'package:bingo/MapTabUser.dart';
 import 'package:bingo/MapTabDriver.dart';
 import 'package:bingo/ReportTab.dart';
+import 'package:bingo/offers_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -62,7 +63,6 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: const Color(0xffFFFFFF),
       body: Stack(
         children: [
-
           Center(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -89,439 +89,377 @@ class _HomePageState extends State<HomePage> {
           Center(
             child: selectedImageIndex ==
                     6 // Assuming selectedImageIndex 5 is for "User.png"
-                ? UpdateProfile(screenSize: screenSize,)
+                ? UpdateProfile(
+                    screenSize: screenSize,
+                  )
+                : Container(), // Empty container if selectedImageIndex is not 5
+          ),
+          Center(
+            child: selectedImageIndex ==
+                    4 // Assuming selectedImageIndex 5 is for "User.png"
+                ? OffersPage()
                 : Container(), // Empty container if selectedImageIndex is not 5
           ),
           Center(
             child: selectedImageIndex ==
                     5 // Assuming selectedImageIndex 5 is for "User.png"
-                ? SingleChildScrollView(child:
-                Column(
+                ? SingleChildScrollView(
+                    child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       // Profile information
                       Padding(
-                              padding: EdgeInsets.only(top: screenSize.height * 0.05,),
-                              child: SizedBox(
-                                  width: screenSize.width * 0.3,
-                                  child: Text(
-                                  "BinGo",
-                                  style: TextStyle(
-                                    fontFamily: 'Jost',
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: screenSize.width *0.1, // Responsive font size
-                                    color: Colors.orange,
-                                  ),
-                                ),
-                              ),
+                        padding: EdgeInsets.only(
+                          top: screenSize.height * 0.05,
+                        ),
+                        child: SizedBox(
+                          width: screenSize.width * 0.3,
+                          child: Text(
+                            "BinGo",
+                            style: TextStyle(
+                              fontFamily: 'Jost',
+                              fontWeight: FontWeight.bold,
+                              fontSize: screenSize.width *
+                                  0.1, // Responsive font size
+                              color: Colors.orange,
                             ),
+                          ),
+                        ),
+                      ),
                       Padding(
-                              padding: EdgeInsets.symmetric(vertical: screenSize.height * 0.02,horizontal: screenSize.width*0.39),
-                                  child: SizedBox(
-                                  width: screenSize.width * 0.32,
-                                  child: Text(
-                                  "Profile",
-                                  style: TextStyle(
-                                    fontFamily: 'Jost',
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: screenSize.width *0.07, // Responsive font size
-                                 
-                                  ),
-                                ),
-                              ),
+                        padding: EdgeInsets.symmetric(
+                            vertical: screenSize.height * 0.02,
+                            horizontal: screenSize.width * 0.39),
+                        child: SizedBox(
+                          width: screenSize.width * 0.32,
+                          child: Text(
+                            "Profile",
+                            style: TextStyle(
+                              fontFamily: 'Jost',
+                              fontWeight: FontWeight.bold,
+                              fontSize: screenSize.width *
+                                  0.07, // Responsive font size
                             ),
+                          ),
+                        ),
+                      ),
                       CustomContainer(
-                        height:screenSize.height*0.4,
-                        screenSize: screenSize,
-                        children: [
-                        if (userDoc != null)
-                          Padding(
-                              padding: EdgeInsets.only(top: screenSize.height * 0.02,left:screenSize.height * 0.045),
-                              child: SizedBox(
+                          height: screenSize.height * 0.4,
+                          screenSize: screenSize,
+                          children: [
+                            if (userDoc != null)
+                              Padding(
+                                padding: EdgeInsets.only(
+                                    top: screenSize.height * 0.02,
+                                    left: screenSize.height * 0.045),
+                                child: SizedBox(
                                   width: screenSize.width * 0.4,
                                   child: Text(
-                                  "Username:",
-                                  style: TextStyle(
-                                    fontFamily: 'Jost',
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: screenSize.width *0.06, // Responsive font size
-                                 
+                                    "Username:",
+                                    style: TextStyle(
+                                      fontFamily: 'Jost',
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: screenSize.width *
+                                          0.06, // Responsive font size
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                          Padding(
-                              padding: EdgeInsets.only(top: screenSize.height * 0,left:screenSize.height * 0.045),
+                            Padding(
+                              padding: EdgeInsets.only(
+                                  top: screenSize.height * 0,
+                                  left: screenSize.height * 0.045),
                               child: SizedBox(
-                                  width: screenSize.width * 0.8,
-                                  child: Text(
+                                width: screenSize.width * 0.8,
+                                child: Text(
                                   "${userDoc['name']}",
                                   style: TextStyle(
                                     fontFamily: 'Jost',
                                     fontWeight: FontWeight.normal,
-                                    fontSize: screenSize.width *0.06, // Responsive font size
-                                 
+                                    fontSize: screenSize.width *
+                                        0.06, // Responsive font size
                                   ),
                                 ),
                               ),
                             ),
-                          Padding(
-                              padding: EdgeInsets.only(top: screenSize.height * 0.016,left:screenSize.height * 0.045),
+                            Padding(
+                              padding: EdgeInsets.only(
+                                  top: screenSize.height * 0.016,
+                                  left: screenSize.height * 0.045),
                               child: SizedBox(
-                                  width: screenSize.width * 0.4,
-                                  child: Text(
+                                width: screenSize.width * 0.4,
+                                child: Text(
                                   "Email:",
                                   style: TextStyle(
                                     fontFamily: 'Jost',
                                     fontWeight: FontWeight.bold,
-                                    fontSize: screenSize.width *0.06, // Responsive font size
-                                 
+                                    fontSize: screenSize.width *
+                                        0.06, // Responsive font size
                                   ),
                                 ),
                               ),
                             ),
-                          Padding(
-                              padding: EdgeInsets.only(top: screenSize.height * 0,left:screenSize.height * 0.045),
+                            Padding(
+                              padding: EdgeInsets.only(
+                                  top: screenSize.height * 0,
+                                  left: screenSize.height * 0.045),
                               child: SizedBox(
-                                  width: screenSize.width * 0.6,
-                                  child: Text(
+                                width: screenSize.width * 0.6,
+                                child: Text(
                                   "${userDoc['email']}",
                                   style: TextStyle(
                                     fontFamily: 'Jost',
                                     fontWeight: FontWeight.normal,
-                                    fontSize: screenSize.width *0.04, // Responsive font size
-                                 
+                                    fontSize: screenSize.width *
+                                        0.04, // Responsive font size
                                   ),
                                 ),
                               ),
                             ),
-                          Padding(
-                              padding: EdgeInsets.only(top: screenSize.height * 0.016,left:screenSize.height * 0.045),
+                            Padding(
+                              padding: EdgeInsets.only(
+                                  top: screenSize.height * 0.016,
+                                  left: screenSize.height * 0.045),
                               child: SizedBox(
-                                  width: screenSize.width * 0.6,
-                                  child: Text(
+                                width: screenSize.width * 0.6,
+                                child: Text(
                                   "No of Reports:",
                                   style: TextStyle(
                                     fontFamily: 'Jost',
                                     fontWeight: FontWeight.bold,
-                                    fontSize: screenSize.width *0.06, // Responsive font size
-                                 
+                                    fontSize: screenSize.width *
+                                        0.06, // Responsive font size
                                   ),
                                 ),
                               ),
                             ),
-                          Padding(
-                              padding: EdgeInsets.only(top: screenSize.height * 0,left:screenSize.height * 0.045),
+                            Padding(
+                              padding: EdgeInsets.only(
+                                  top: screenSize.height * 0,
+                                  left: screenSize.height * 0.045),
                               child: SizedBox(
-                                  width: screenSize.width * 0.4,
-                                  child: Text(
+                                width: screenSize.width * 0.4,
+                                child: Text(
                                   "${getAccountType()}",
                                   style: TextStyle(
                                     fontFamily: 'Jost',
                                     fontWeight: FontWeight.normal,
-                                    fontSize: screenSize.width *0.04, // Responsive font size
-                                 
+                                    fontSize: screenSize.width *
+                                        0.04, // Responsive font size
                                   ),
                                 ),
                               ),
                             ),
-                  
-
-                        ]
-                      ),
+                          ]),
                       const SizedBox(height: 20),
                       CustomContainer(
-                height: screenSize.height*0.35,
-                screenSize: screenSize,
-                children: [
-                  Padding(
-                          padding: EdgeInsets.only(top: screenSize.height * 0.03, left: screenSize.width * 0.1),
+                          height: screenSize.height * 0.22,
+                          screenSize: screenSize,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.only(
+                                  top: screenSize.height * 0.03,
+                                  left: screenSize.width * 0.1),
+                              child: Text(
+                                "1500",
+                                style: TextStyle(
+                                  fontFamily: 'Roboto',
+                                  fontSize: screenSize.width * 0.1,
+                                  fontWeight: FontWeight.bold,
+                                  color: const Color.fromARGB(255, 15, 191, 38),
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(
+                                  bottom: screenSize.height * 0.0,
+                                  left: screenSize.width * 0.52),
+                              child: Text(
+                                "points",
+                                style: TextStyle(
+                                  fontFamily: 'Roboto',
+                                  fontSize: screenSize.width * 0.06,
+                                  fontWeight: FontWeight.bold,
+                                  color: const Color.fromARGB(255, 0, 0, 0),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 5),
+                            Padding(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: screenSize.width * 0.15),
+                              child: SizedBox(
+                                width: screenSize.width * 0.6,
+                                height: screenSize.height * 0.06,
+                                child: TextButton(
+                                  onPressed: () {
+                                    print("button pressed");
+                                  },
+                                  style: ButtonStyle(
+                                    backgroundColor: WidgetStateProperty.all(
+                                        const Color.fromARGB(255, 255, 153, 1)),
+                                    foregroundColor:
+                                        WidgetStateProperty.all(Colors.white),
+                                    padding: WidgetStateProperty.all(
+                                      EdgeInsets.symmetric(
+                                          vertical: screenSize.height * 0.015),
+                                    ),
+                                    shape: WidgetStateProperty.all(
+                                      RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                            screenSize.width * 0.02),
+                                      ),
+                                    ),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      "View Offers",
+                                      style: TextStyle(
+                                        fontSize: screenSize.width * 0.049,
+                                        fontWeight: FontWeight.normal,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ]),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(
+                            top: screenSize.height * 0.01,
+                            left: screenSize.width * 0.18),
+                        child: SizedBox(
+                          width: screenSize.width * 0.4,
                           child: Text(
-                            "1500",
+                            "Settings",
                             style: TextStyle(
-                              fontFamily: 'Roboto',
-                              fontSize: screenSize.width * 0.1,
+                              fontFamily: 'Jost',
                               fontWeight: FontWeight.bold,
-                              color: const Color.fromARGB(255, 15, 191, 38),
+                              fontSize: screenSize.width *
+                                  0.06, // Responsive font size
                             ),
                           ),
                         ),
-                  Padding(
-                          padding: EdgeInsets.only(top: screenSize.height *0, left: screenSize.width * 0.57),
-                          child: Text(
-                            "points",
-                            style: TextStyle(
-                              fontFamily: 'Roboto',
-                              fontSize: screenSize.width * 0.04,
-                              fontWeight: FontWeight.bold,
-                              color: const Color.fromARGB(255, 0, 0, 0),
-                            ),
-                          ),
-                        ),
-                  const SizedBox(height: 5),
-                  Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.15),
-                          child: SizedBox(
-                            width: screenSize.width * 0.6,
-                            height: screenSize.height *0.06,
-                            child: TextButton(
-                              onPressed: (){print("button pressed");},
-                              style: ButtonStyle(
-                                backgroundColor: WidgetStateProperty.all(const Color.fromARGB(255, 255, 153, 1)),
-                                foregroundColor: WidgetStateProperty.all(Colors.white),
-                                padding: WidgetStateProperty.all(
-                                  EdgeInsets.symmetric(vertical: screenSize.height * 0.015),
-                                ),
-                                shape: WidgetStateProperty.all(
-                                  RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(screenSize.width * 0.02),
-                                  ),
-                                ),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  "View Offers",
-                                  style: TextStyle(
-                                    fontSize: screenSize.width * 0.049,
-                                    fontWeight: FontWeight.normal,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                  const SizedBox(height: 10),
-                  Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.15),
-                          child: SizedBox(
-                            width: screenSize.width * 0.6,
-                            height: screenSize.height *0.06,
-                            child: TextButton(
-                              onPressed: (){print("button pressed");},
-                              style: ButtonStyle(
-                                backgroundColor: WidgetStateProperty.all(const Color.fromARGB(255, 255, 153, 1)),
-                                foregroundColor: WidgetStateProperty.all(Colors.white),
-                                padding: WidgetStateProperty.all(
-                                  EdgeInsets.symmetric(vertical: screenSize.height * 0.015),
-                                ),
-                                shape: WidgetStateProperty.all(
-                                  RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(screenSize.width * 0.02),
-                                  ),
-                                ),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  "Earn More",
-                                  style: TextStyle(
-                                    fontSize: screenSize.width * 0.049,
-                                    fontWeight: FontWeight.normal,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ]
-                    ),
-                    SizedBox(height: 20,),
-                    Padding(
-                              padding: EdgeInsets.only(top: screenSize.height * 0.01,left: screenSize.width*0.18),
-                                  child: SizedBox(
-                                  width: screenSize.width * 0.4,
-                                  child: Text(
-                                  "Settings",
-                                  style: TextStyle(
-                                    fontFamily: 'Jost',
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: screenSize.width *0.06, // Responsive font size
-                                 
-                                  ),
-                                ),
-                              ),
-                            ),
-                    SizedBox(height: 20,),
-                    Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.15),
-                          child: Container(
-                            width: screenSize.width * 0.8,
-                            height: screenSize.height *0.06,
-                            decoration: BoxDecoration(
-                              boxShadow: [
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: screenSize.width * 0.15),
+                        child: Container(
+                          width: screenSize.width * 0.8,
+                          height: screenSize.height * 0.06,
+                          decoration: BoxDecoration(
+                            boxShadow: [
                               BoxShadow(
                                 color: Color.fromARGB(255, 152, 152, 152),
                                 spreadRadius: 3,
                                 blurRadius: 4,
-                                offset: Offset(0, 3), // changes position of shadow
-                            ),
-                          ],
-                        ),
-                            child: TextButton(
-                              onPressed: (){setState(() {
-                                selectedImageIndex = 6; // Assuming 6 is the index for Update Profile tab
-                              });},
-                              style: ButtonStyle(
-                                backgroundColor: WidgetStateProperty.all(Color(0xffAFFF89)),
-                                foregroundColor: WidgetStateProperty.all(Colors.white),
-                                padding: WidgetStateProperty.all(
-                                  EdgeInsets.symmetric(vertical: screenSize.height * 0.015),
-                                ),
-                                shape: WidgetStateProperty.all(
-                                  RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(screenSize.width * 0.02),
-                                  ),
+                                offset:
+                                    Offset(0, 3), // changes position of shadow
+                              ),
+                            ],
+                          ),
+                          child: TextButton(
+                            onPressed: () {
+                              setState(() {
+                                selectedImageIndex =
+                                    6; // Assuming 6 is the index for Update Profile tab
+                              });
+                            },
+                            style: ButtonStyle(
+                              backgroundColor:
+                                  WidgetStateProperty.all(Color(0xffAFFF89)),
+                              foregroundColor:
+                                  WidgetStateProperty.all(Colors.white),
+                              padding: WidgetStateProperty.all(
+                                EdgeInsets.symmetric(
+                                    vertical: screenSize.height * 0.015),
+                              ),
+                              shape: WidgetStateProperty.all(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(
+                                      screenSize.width * 0.02),
                                 ),
                               ),
-                              child: Center(
-                                child: Text(
-                                  "Update Profile",
-                                  style: TextStyle(
-                                    fontSize: screenSize.width * 0.04,
-                                    fontWeight: FontWeight.normal,
-                                    color: Color.fromARGB(255, 147, 15, 1),
-                                  ),
+                            ),
+                            child: Center(
+                              child: Text(
+                                "Update Profile",
+                                style: TextStyle(
+                                  fontSize: screenSize.width * 0.04,
+                                  fontWeight: FontWeight.normal,
+                                  color: Color.fromARGB(255, 147, 15, 1),
                                 ),
                               ),
                             ),
                           ),
                         ),
-                    SizedBox(height: 10,),
-                    Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.15),
-                          child: Container(
-                            width: screenSize.width * 0.8,
-                            height: screenSize.height *0.06,
-                            decoration: BoxDecoration(
-                              boxShadow: [
+                      ),
+
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: screenSize.width * 0.15),
+                        child: Container(
+                          width: screenSize.width * 0.8,
+                          height: screenSize.height * 0.06,
+                          decoration: BoxDecoration(
+                            boxShadow: [
                               BoxShadow(
                                 color: Color.fromARGB(255, 152, 152, 152),
                                 spreadRadius: 3,
                                 blurRadius: 4,
-                                offset: Offset(0, 3), // changes position of shadow
-                            ),
-                          ],
-                        ),
-                            child: TextButton(
-                              onPressed: (){print("button pressed");},
-                              style: ButtonStyle(
-                                backgroundColor: WidgetStateProperty.all(Color(0xffAFFF89)),
-                                foregroundColor: WidgetStateProperty.all(Colors.white),
-                                padding: WidgetStateProperty.all(
-                                  EdgeInsets.symmetric(vertical: screenSize.height * 0.015),
-                                ),
-                                shape: WidgetStateProperty.all(
-                                  RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(screenSize.width * 0.02),
-                                  ),
-                                ),
+                                offset:
+                                    Offset(0, 3), // changes position of shadow
                               ),
-                              child: Center(
-                                child: Text(
-                                  "Change Role",
-                                  style: TextStyle(
-                                    fontSize: screenSize.width * 0.04,
-                                    fontWeight: FontWeight.normal,
-                                    color: Color.fromARGB(255, 147, 15, 1),
-                                  ),
-                                ),
-                              ),
-                            ),
+                            ],
                           ),
-                        ),
-                    SizedBox(height: 10,),
-                    Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.15),
-                          child: Container(
-                            width: screenSize.width * 0.8,
-                            height: screenSize.height *0.06,
-                            decoration: BoxDecoration(
-                              boxShadow: [
-                              BoxShadow(
-                                color: Color.fromARGB(255, 152, 152, 152),
-                                spreadRadius: 3,
-                                blurRadius: 4,
-                                offset: Offset(0, 3), // changes position of shadow
-                            ),
-                          ],
-                        ),
-                            child: TextButton(
-                              onPressed: (){print("button pressed");},
-                              style: ButtonStyle(
-                                backgroundColor: WidgetStateProperty.all(Color(0xffAFFF89)),
-                                foregroundColor: WidgetStateProperty.all(Colors.white),
-                                padding: WidgetStateProperty.all(
-                                  EdgeInsets.symmetric(vertical: screenSize.height * 0.015),
-                                ),
-                                shape: WidgetStateProperty.all(
-                                  RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(screenSize.width * 0.02),
-                                  ),
-                                ),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  "Change Theme",
-                                  style: TextStyle(
-                                    fontSize: screenSize.width * 0.04,
-                                    fontWeight: FontWeight.normal,
-                                    color: Color.fromARGB(255, 147, 15, 1),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ), 
-                    SizedBox(height: 10,),  
-                    Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.15),
-                          child: Container(
-                            width: screenSize.width * 0.8,
-                            height: screenSize.height *0.06,
-                            decoration: BoxDecoration(
-                              boxShadow: [
-                              BoxShadow(
-                                color: Color.fromARGB(255, 152, 152, 152),
-                                spreadRadius: 3,
-                                blurRadius: 4,
-                                offset: Offset(0, 3), // changes position of shadow
-                            ),
-                          ],
-                        ),
-                            child: TextButton(
-                              onPressed: () async {
-                                await FirebaseAuth.instance.signOut();
-                                Navigator.pushReplacement(
+                          child: TextButton(
+                            onPressed: () async {
+                              await FirebaseAuth.instance.signOut();
+                              Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => const SignupPage()),
-                            );
-                          },
-                              style: ButtonStyle(
-                                backgroundColor: WidgetStateProperty.all(Color(0xffAFFF89)),
-                                foregroundColor: WidgetStateProperty.all(Colors.white),
-                                padding: WidgetStateProperty.all(
-                                  EdgeInsets.symmetric(vertical: screenSize.height * 0.015),
-                                ),
-                                shape: WidgetStateProperty.all(
-                                  RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(screenSize.width * 0.02),
-                                  ),
+                                    builder: (context) => const SignupPage()),
+                              );
+                            },
+                            style: ButtonStyle(
+                              backgroundColor:
+                                  WidgetStateProperty.all(Color(0xffAFFF89)),
+                              foregroundColor:
+                                  WidgetStateProperty.all(Colors.white),
+                              padding: WidgetStateProperty.all(
+                                EdgeInsets.symmetric(
+                                    vertical: screenSize.height * 0.015),
+                              ),
+                              shape: WidgetStateProperty.all(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(
+                                      screenSize.width * 0.02),
                                 ),
                               ),
-                              child: Center(
-                                child: Text(
-                                  "Sign out",
-                                  style: TextStyle(
-                                    fontSize: screenSize.width * 0.04,
-                                    fontWeight: FontWeight.normal,
-                                    color: Color.fromARGB(255, 147, 15, 1),
-                                  ),
+                            ),
+                            child: Center(
+                              child: Text(
+                                "Sign out",
+                                style: TextStyle(
+                                  fontSize: screenSize.width * 0.04,
+                                  fontWeight: FontWeight.normal,
+                                  color: Color.fromARGB(255, 147, 15, 1),
                                 ),
                               ),
                             ),
                           ),
                         ),
-                    Padding(
+                      ),
+                      Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: ElevatedButton(
                           onPressed: () async {
@@ -535,14 +473,11 @@ class _HomePageState extends State<HomePage> {
                           child: const Text('Logout'),
                         ),
                       ),
-                    SizedBox(height:20)
+                      SizedBox(height: 20)
                     ],
-                  )
-          )
+                  ))
                 : Container(), // Empty container if selectedImageIndex is not 5
           ),
-        
-
           Positioned(
             bottom: 0,
             left: 0,
@@ -554,7 +489,7 @@ class _HomePageState extends State<HomePage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  const SizedBox(width: 0.4),
+                  SizedBox(width: screenSize.width * 0.02),
                   _buildImageWithSelectableBackground(
                     'Images/Home.png',
                     0,
@@ -562,7 +497,7 @@ class _HomePageState extends State<HomePage> {
                     screenSize.width * 0.12,
                     screenSize.height * 0.12,
                   ),
-                  const SizedBox(width: 0.4),
+                  SizedBox(width: screenSize.width * 0.03),
                   _buildImageWithSelectableBackground(
                     'Images/Location.png',
                     1,
@@ -570,7 +505,7 @@ class _HomePageState extends State<HomePage> {
                     screenSize.width * 0.12,
                     screenSize.height * 0.12,
                   ),
-                  const SizedBox(width: 0.4),
+                  SizedBox(width: screenSize.width * 0.03),
                   _buildImageWithSelectableBackground(
                     'Images/Megaphone.png',
                     2,
@@ -578,15 +513,7 @@ class _HomePageState extends State<HomePage> {
                     screenSize.width * 0.12,
                     screenSize.height * 0.12,
                   ),
-                  const SizedBox(width: 0.4),
-                  _buildImageWithSelectableBackground(
-                    'Images/Qr Code.png',
-                    3,
-                    screenSize.height * 0.12,
-                    screenSize.width * 0.12,
-                    screenSize.height * 0.12,
-                  ),
-                  const SizedBox(width: 0.4),
+                  SizedBox(width: screenSize.width * 0.03),
                   _buildImageWithSelectableBackground(
                     'Images/Discount.png',
                     4,
@@ -594,7 +521,7 @@ class _HomePageState extends State<HomePage> {
                     screenSize.width * 0.12,
                     screenSize.height * 0.12,
                   ),
-                  const SizedBox(width: 0.4),
+                  SizedBox(width: screenSize.width * 0.03),
                   _buildImageWithSelectableBackground(
                     'Images/User.png',
                     5,
@@ -602,12 +529,12 @@ class _HomePageState extends State<HomePage> {
                     screenSize.width * 0.12,
                     screenSize.height * 0.12,
                   ),
-                  const SizedBox(width: 0.4),
+                  SizedBox(width: screenSize.width * 0.02),
                 ],
               ),
             ),
           ),
-      ],
+        ],
       ),
     );
   }

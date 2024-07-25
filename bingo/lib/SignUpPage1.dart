@@ -66,6 +66,22 @@ class _SignupPageOneState extends State<SignupPageOne> {
       return;
     }
 
+    showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (BuildContext context) {
+      return const AlertDialog(
+        content: Row(
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(width: 20),
+            Text("Creating account"),
+          ],
+        ),
+      );
+    },
+  );
+
     try {
       UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: widget.email,
@@ -86,6 +102,7 @@ class _SignupPageOneState extends State<SignupPageOne> {
       await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).set(userData);
 
       if (!mounted) return;
+       Navigator.of(context).pop();
 
       Navigator.pushReplacement(
         context,
@@ -94,7 +111,24 @@ class _SignupPageOneState extends State<SignupPageOne> {
     } catch (e) {
       print('Error creating account: $e');
 
-      if (!mounted) return;
+      if (!mounted){
+        showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (BuildContext context) {
+      return const AlertDialog(
+        content: Row(
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(width: 20),
+            Text("Creating account..."),
+          ],
+        ),
+      );
+    },
+  );
+
+      };
 
       showDialog(
         context: context,
@@ -358,7 +392,7 @@ class _SignupPageOneState extends State<SignupPageOne> {
                 ),
               ),
               Positioned(
-                top: screenSize.height * 0.946,
+                top: screenSize.height * 0.926,
                 left: screenSize.width * 0.15,
                 child: Text(
                   "Already have an account?",
@@ -371,7 +405,7 @@ class _SignupPageOneState extends State<SignupPageOne> {
                 ),
               ),
               Positioned(
-                top: screenSize.height * 0.94,
+                top: screenSize.height * 0.92,
                 left: screenSize.width * 0.63,
                 child: GestureDetector(
                   onTap: () {
@@ -385,7 +419,7 @@ class _SignupPageOneState extends State<SignupPageOne> {
                     style: TextStyle(
                       fontSize: screenSize.height * 0.03,
                       fontWeight: FontWeight.bold,
-                      color: const Color.fromARGB(255, 98, 255, 0),
+                      color: Color.fromARGB(255, 10, 16, 6),
                     ),
                   ),
                 ),
