@@ -1,3 +1,4 @@
+import 'package:bingo/offers_page.dart';
 import 'package:flutter/material.dart';
 
 
@@ -58,7 +59,7 @@ class Home extends StatelessWidget {
                 screenSize: screenSize,
                 children: [
                   Padding(
-                          padding: EdgeInsets.only(top: screenSize.height * 0.03, left: screenSize.width * 0.1),
+                          padding: EdgeInsets.only(top: screenSize.height * 0.02, left: screenSize.width * 0.1),
                           child: Text(
                             "1500",
                             style: TextStyle(
@@ -70,7 +71,7 @@ class Home extends StatelessWidget {
                           ),
                         ),
                   Padding(
-                          padding: EdgeInsets.only(bottom: screenSize.height *0.0, left: screenSize.width * 0.52),
+                          padding: EdgeInsets.only(top: screenSize.height * 0.01, left: screenSize.width * 0.52),
                           child: Text(
                             "points",
                             style: TextStyle(
@@ -83,22 +84,23 @@ class Home extends StatelessWidget {
                         ),
                   const SizedBox(height: 5),
                   Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.15),
-                          child: SizedBox(
-                            width: screenSize.width * 0.6,
-                            height: screenSize.height *0.06,
-                            child: TextButton(
-                              onPressed: (){print("button pressed");},
-                              style: ButtonStyle(
-                                backgroundColor: WidgetStateProperty.all(const Color.fromARGB(255, 255, 153, 1)),
-                                foregroundColor: WidgetStateProperty.all(Colors.white),
-                                padding: WidgetStateProperty.all(
-                                  EdgeInsets.symmetric(vertical: screenSize.height * 0.015),
-                                ),
-                                shape: WidgetStateProperty.all(
-                                  RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(screenSize.width * 0.02),
-                                  ),
+                              padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.15),
+                              child: SizedBox(
+                              width: screenSize.width * 0.6,
+                              height: screenSize.height * 0.06,
+                              child: ElevatedButton( // Use ElevatedButton for Material 3 styling
+                              onPressed: () {
+                                Navigator.push(
+                                context,
+                              MaterialPageRoute(builder: (context) => OffersPage()),
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color.fromARGB(255, 255, 153, 1), // Custom color
+                                foregroundColor: Colors.white,
+                                padding: EdgeInsets.symmetric(vertical: screenSize.height * 0.015),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(screenSize.width * 0.02),
                                 ),
                               ),
                               child: Center(

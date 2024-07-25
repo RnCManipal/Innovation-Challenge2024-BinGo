@@ -392,7 +392,7 @@ class _SignupPageOneState extends State<SignupPageOne> {
                 ),
               ),
               Positioned(
-                top: screenSize.height * 0.946,
+                top: screenSize.height * 0.926,
                 left: screenSize.width * 0.15,
                 child: Text(
                   "Already have an account?",
@@ -405,7 +405,7 @@ class _SignupPageOneState extends State<SignupPageOne> {
                 ),
               ),
               Positioned(
-                top: screenSize.height * 0.94,
+                top: screenSize.height * 0.92,
                 left: screenSize.width * 0.63,
                 child: GestureDetector(
                   onTap: () {
@@ -419,7 +419,7 @@ class _SignupPageOneState extends State<SignupPageOne> {
                     style: TextStyle(
                       fontSize: screenSize.height * 0.03,
                       fontWeight: FontWeight.bold,
-                      color: const Color.fromARGB(255, 98, 255, 0),
+                      color: Color.fromARGB(255, 10, 16, 6),
                     ),
                   ),
                 ),
