@@ -16,7 +16,8 @@ class _SignupPageState extends State<SignupPage> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
   @override
   void initState() {
@@ -33,91 +34,90 @@ class _SignupPageState extends State<SignupPage> {
       });
     }
   }
+
   bool isEmailValid(String email) {
     return RegExp(r'^[\w-\.]+@[a-zA-Z]+\.[a-zA-Z]{2,}$').hasMatch(email);
   }
 
-void _navigateToSignupPageOne() {
-  // Check if any field is empty
-  if (_nameController.text.isEmpty ||
-      _usernameController.text.isEmpty ||
-      _passwordController.text.isEmpty ||
-      _confirmPasswordController.text.isEmpty) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text("Error"),
-          content: const Text("Please fill in all fields"),
-          actions: <Widget>[
-            TextButton(
-              child: const Text("OK"),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-    }
-    if(isEmailValid(_usernameController.text)==false){
+  void _navigateToSignupPageOne() {
+    // Check if any field is empty
+    if (_nameController.text.isEmpty ||
+        _usernameController.text.isEmpty ||
+        _passwordController.text.isEmpty ||
+        _confirmPasswordController.text.isEmpty) {
       showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text("Error"),
-          content: const Text("Please enter a valid email"),
-          actions: <Widget>[
-            TextButton(
-              child: const Text("OK"),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-    return;
-  }
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text("Error"),
+            content: const Text("Please fill in all fields"),
+            actions: <Widget>[
+              TextButton(
+                child: const Text("OK"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+    if (isEmailValid(_usernameController.text) == false) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text("Error"),
+            content: const Text("Please enter a valid email"),
+            actions: <Widget>[
+              TextButton(
+                child: const Text("OK"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
 
-  // Check if passwords match
-  if (_passwordController.text != _confirmPasswordController.text) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text("Error"),
-          content: const Text("Passwords do not match"),
-          actions: <Widget>[
-            TextButton(
-              child: const Text("OK"),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-    return;
-  }
+    // Check if passwords match
+    if (_passwordController.text != _confirmPasswordController.text) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text("Error"),
+            content: const Text("Passwords do not match"),
+            actions: <Widget>[
+              TextButton(
+                child: const Text("OK"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
 
-  // Proceed to next step
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => SignupPageOne(
-        name: _nameController.text,
-        email: _usernameController.text,
-        password: _passwordController.text,
+    // Proceed to next step
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SignupPageOne(
+          name: _nameController.text,
+          email: _usernameController.text,
+          password: _passwordController.text,
+        ),
       ),
-    ),
-  );
-}
-
-
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -143,7 +143,6 @@ void _navigateToSignupPageOne() {
                   fit: BoxFit.cover,
                 ),
               ),
-              
               Positioned(
                 top: screenSize.height * 0.1,
                 left: screenSize.width * 0.1,
@@ -156,53 +155,54 @@ void _navigateToSignupPageOne() {
                   ),
                 ),
               ),
-              
               Positioned(
                 top: screenSize.height * 0.217,
                 left: screenSize.width * 0.02,
                 child: TextButton(
-                  onPressed: (){},
+                  onPressed: () {},
                   child: InkWell(
-                  onTap: () {
-                    // Implement Google sign-in here if needed
-                  },
-                  child: Ink(
-                    width: screenSize.width * 0.9,
-                    height: screenSize.height * 0.07,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(screenSize.width * 0.02),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.5),
-                          spreadRadius: screenSize.width * 0.003,
-                          blurRadius: screenSize.width * 0.01,
-                          offset: Offset(0, screenSize.width * 0.007),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Image.asset(
-                          'Images/glogo.png',
-                          width: screenSize.width * 0.06,
-                          height: screenSize.width * 0.06,
-                        ),
-                        const SizedBox(width: 10),
-                        Text(
-                          "Continue with Google",
-                          style: TextStyle(
-                            color: Colors.black.withOpacity(0.54),
-                            fontSize: screenSize.width * 0.04,
-                            fontWeight: FontWeight.bold,
+                    onTap: () {
+                      // Implement Google sign-in here if needed
+                    },
+                    child: Ink(
+                      width: screenSize.width * 0.9,
+                      height: screenSize.height * 0.07,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius:
+                            BorderRadius.circular(screenSize.width * 0.02),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color.fromARGB(255, 0, 0, 0)
+                                .withOpacity(0.5),
+                            spreadRadius: screenSize.width * 0.003,
+                            blurRadius: screenSize.width * 0.01,
+                            offset: Offset(0, screenSize.width * 0.007),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Image.asset(
+                            'Images/glogo.png',
+                            width: screenSize.width * 0.06,
+                            height: screenSize.width * 0.06,
+                          ),
+                          const SizedBox(width: 10),
+                          Text(
+                            "Continue with Google",
+                            style: TextStyle(
+                              color: Colors.black.withOpacity(0.54),
+                              fontSize: screenSize.width * 0.04,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
               ),
               Positioned(
                 top: screenSize.height * 0.292,
@@ -230,10 +230,12 @@ void _navigateToSignupPageOne() {
                     height: minHeight,
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(screenSize.width * 0.02),
+                      borderRadius:
+                          BorderRadius.circular(screenSize.width * 0.02),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color.fromARGB(120, 0, 0, 0).withOpacity(0.5),
+                          color: const Color.fromARGB(120, 0, 0, 0)
+                              .withOpacity(0.5),
                           spreadRadius: screenSize.width * 0.005,
                           blurRadius: screenSize.width * 0.02,
                           offset: Offset(0, screenSize.height * 0.01),
@@ -245,7 +247,8 @@ void _navigateToSignupPageOne() {
                       children: <Widget>[
                         SizedBox(height: screenSize.height * 0.015),
                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: screenSize.width * 0.05),
                           child: Text(
                             "Name:",
                             style: TextStyle(
@@ -257,7 +260,8 @@ void _navigateToSignupPageOne() {
                         ),
                         SizedBox(height: screenSize.height * 0.01),
                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: screenSize.width * 0.05),
                           child: SizedBox(
                             height: screenSize.height * 0.068,
                             width: screenSize.width * 0.85,
@@ -270,11 +274,13 @@ void _navigateToSignupPageOne() {
                                 border: InputBorder.none,
                                 enabledBorder: OutlineInputBorder(
                                   borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(screenSize.width * 0.02),
+                                  borderRadius: BorderRadius.circular(
+                                      screenSize.width * 0.02),
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(screenSize.width * 0.1),
+                                  borderRadius: BorderRadius.circular(
+                                      screenSize.width * 0.1),
                                 ),
                                 hintText: 'Enter your name',
                               ),
@@ -283,9 +289,10 @@ void _navigateToSignupPageOne() {
                         ),
                         SizedBox(height: screenSize.height * 0.015),
                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: screenSize.width * 0.05),
                           child: Text(
-                            "Username:",
+                            "Email:",
                             style: TextStyle(
                               fontFamily: 'Roboto',
                               fontSize: screenSize.width * 0.04,
@@ -295,7 +302,8 @@ void _navigateToSignupPageOne() {
                         ),
                         SizedBox(height: screenSize.height * 0.01),
                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: screenSize.width * 0.05),
                           child: SizedBox(
                             height: screenSize.height * 0.068,
                             width: screenSize.width * 0.85,
@@ -308,11 +316,13 @@ void _navigateToSignupPageOne() {
                                 border: InputBorder.none,
                                 enabledBorder: OutlineInputBorder(
                                   borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(screenSize.width * 0.02),
+                                  borderRadius: BorderRadius.circular(
+                                      screenSize.width * 0.02),
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(screenSize.width * 0.1),
+                                  borderRadius: BorderRadius.circular(
+                                      screenSize.width * 0.1),
                                 ),
                                 hintText: 'Enter your username',
                               ),
@@ -321,7 +331,8 @@ void _navigateToSignupPageOne() {
                         ),
                         SizedBox(height: screenSize.height * 0.015),
                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: screenSize.width * 0.05),
                           child: Text(
                             "Password:",
                             style: TextStyle(
@@ -333,7 +344,8 @@ void _navigateToSignupPageOne() {
                         ),
                         SizedBox(height: screenSize.height * 0.01),
                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: screenSize.width * 0.05),
                           child: SizedBox(
                             height: screenSize.height * 0.068,
                             width: screenSize.width * 0.85,
@@ -346,11 +358,13 @@ void _navigateToSignupPageOne() {
                                 border: InputBorder.none,
                                 enabledBorder: OutlineInputBorder(
                                   borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(screenSize.width * 0.02),
+                                  borderRadius: BorderRadius.circular(
+                                      screenSize.width * 0.02),
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(screenSize.width * 0.1),
+                                  borderRadius: BorderRadius.circular(
+                                      screenSize.width * 0.1),
                                 ),
                                 hintText: 'Enter your Password',
                               ),
@@ -359,7 +373,8 @@ void _navigateToSignupPageOne() {
                         ),
                         SizedBox(height: screenSize.height * 0.015),
                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: screenSize.width * 0.05),
                           child: Text(
                             "Confirm Password:",
                             style: TextStyle(
@@ -371,7 +386,8 @@ void _navigateToSignupPageOne() {
                         ),
                         SizedBox(height: screenSize.height * 0.01),
                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: screenSize.width * 0.05),
                           child: SizedBox(
                             height: screenSize.height * 0.068,
                             width: screenSize.width * 0.85,
@@ -384,11 +400,13 @@ void _navigateToSignupPageOne() {
                                 border: InputBorder.none,
                                 enabledBorder: OutlineInputBorder(
                                   borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(screenSize.width * 0.02),
+                                  borderRadius: BorderRadius.circular(
+                                      screenSize.width * 0.02),
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(screenSize.width * 0.1),
+                                  borderRadius: BorderRadius.circular(
+                                      screenSize.width * 0.1),
                                 ),
                                 hintText: 'Enter Password Again',
                               ),
@@ -397,21 +415,26 @@ void _navigateToSignupPageOne() {
                         ),
                         SizedBox(height: screenSize.height * 0.02),
                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.3),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: screenSize.width * 0.3),
                           child: SizedBox(
                             width: screenSize.width * 0.3,
                             height: minButtonHeight,
                             child: TextButton(
                               onPressed: _navigateToSignupPageOne,
                               style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.all(const Color(0xFF0092D1)),
-                                foregroundColor: MaterialStateProperty.all(Colors.white),
+                                backgroundColor: MaterialStateProperty.all(
+                                    const Color(0xFF0092D1)),
+                                foregroundColor:
+                                    MaterialStateProperty.all(Colors.white),
                                 padding: MaterialStateProperty.all(
-                                  EdgeInsets.symmetric(vertical: screenSize.height * 0.015),
+                                  EdgeInsets.symmetric(
+                                      vertical: screenSize.height * 0.015),
                                 ),
                                 shape: MaterialStateProperty.all(
                                   RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(screenSize.width * 0.02),
+                                    borderRadius: BorderRadius.circular(
+                                        screenSize.width * 0.02),
                                   ),
                                 ),
                               ),
@@ -452,7 +475,8 @@ void _navigateToSignupPageOne() {
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const LoginPage()),
+                      MaterialPageRoute(
+                          builder: (context) => const LoginPage()),
                     );
                   },
                   child: Text(
