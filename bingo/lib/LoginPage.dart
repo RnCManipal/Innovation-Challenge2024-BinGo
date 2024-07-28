@@ -100,7 +100,8 @@ class _LoginPageState extends State<LoginPage> {
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) =>const SignupPage()),
+                          MaterialPageRoute(
+                              builder: (context) => const SignupPage()),
                         );
                       },
                       child: const Image(
@@ -184,9 +185,10 @@ class _LoginPageState extends State<LoginPage> {
                 child: GestureDetector(
                   onTap: () {
                     Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) =>ForgotPasswordPage()),
-                        );
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ForgotPasswordPage()),
+                    );
                   },
                   child: Container(
                     width: screenSize.width * 0.9,
@@ -212,7 +214,7 @@ class _LoginPageState extends State<LoginPage> {
                           padding: EdgeInsets.symmetric(
                               horizontal: screenSize.width * 0.05),
                           child: Text(
-                            "Username:",
+                            "Email:",
                             style: TextStyle(
                               fontFamily: 'Roboto',
                               fontSize: screenSize.width * 0.04,
@@ -321,7 +323,8 @@ class _LoginPageState extends State<LoginPage> {
                                     Navigator.pushReplacement(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) => const HomePage()),
+                                          builder: (context) =>
+                                              const HomePage()),
                                     );
                                   } else {
                                     // Handle sign-in failure if needed
