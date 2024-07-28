@@ -6,9 +6,6 @@ class OffersPage extends StatelessWidget {
     final screenSize = MediaQuery.of(context).size;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Offers'),
-      ),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -50,7 +47,7 @@ class OffersPage extends StatelessWidget {
                   ),
                   Positioned(
                     left: screenSize.width * 0.05,
-                    top: screenSize.height * 0.4,
+                    top: screenSize.height * 0.3,
                     child: Container(
                       width: screenSize.width * 0.9,
                       height: screenSize.height * 0.5,
@@ -66,12 +63,11 @@ class OffersPage extends StatelessWidget {
                             left: screenSize.width * 0.3,
                             top: screenSize.height * 0.1,
                             child: Container(
-                              width: screenSize.width * 0.4,
-                              height: screenSize.width * 0.4,
+                              width: screenSize.width * 0.3,
+                              height: screenSize.width * 0.3,
                               decoration: BoxDecoration(
                                 image: DecorationImage(
-                                  image: NetworkImage(
-                                      "https://via.placeholder.com/152x152"),
+                                  image: AssetImage('Images/coming_soon.png'),
                                   fit: BoxFit.contain,
                                 ),
                               ),
@@ -79,7 +75,7 @@ class OffersPage extends StatelessWidget {
                           ),
                           Positioned(
                             left: screenSize.width * 0.2,
-                            top: screenSize.height * 0.4,
+                            top: screenSize.height * 0.33,
                             child: Text(
                               'Coming Soon',
                               style: TextStyle(
