@@ -15,7 +15,8 @@ class _UpdateProfileState extends State<UpdateProfile> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
   Future<void> _updateUserInfo(BuildContext context) async {
     try {
@@ -63,6 +64,34 @@ class _UpdateProfileState extends State<UpdateProfile> {
     }
   }
 
+  int userReportCount = 0; // To store the report count
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserReportCount(); // Fetch count when the widget is initialized
+  }
+
+  Future<void> _fetchUserReportCount() async {
+    try {
+      final User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        String userEmail = user.email ?? ''; // Get user's email
+
+        final QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+            .collection('reports')
+            .where('userEmail', isEqualTo: userEmail)
+            .get();
+
+        setState(() {
+          userReportCount = querySnapshot.size;
+        });
+      }
+    } catch (e) {
+      print("Error fetching report count: $e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -74,9 +103,10 @@ class _UpdateProfileState extends State<UpdateProfile> {
               Padding(
                 padding: EdgeInsets.only(
                   top: widget.screenSize.height * 0.09,
+                  left: widget.screenSize.width * 0.09
                 ),
                 child: SizedBox(
-                  width: widget.screenSize.width * 0.3,
+                  width: widget.screenSize.width * 0.4,
                   child: Text(
                     "BinGo",
                     style: TextStyle(
@@ -90,7 +120,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
               ),
               Padding(
                 padding: EdgeInsets.only(
-                  top: widget.screenSize.height * 0.02,
+                  top: widget.screenSize.height * 0.01,
                   left: widget.screenSize.width * 0.25,
                 ),
                 child: SizedBox(
@@ -105,10 +135,12 @@ class _UpdateProfileState extends State<UpdateProfile> {
                   ),
                 ),
               ),
-              SizedBox(height: widget.screenSize.height * 0.01,),
+              SizedBox(
+                height: widget.screenSize.height * 0.01,
+              ),
               Container(
                 width: widget.screenSize.width * 0.9,
-                height: widget.screenSize.height*0.59,
+                height: widget.screenSize.height * 0.59,
                 decoration: BoxDecoration(
                   color: const Color(0xffE0FFFF),
                   borderRadius: BorderRadius.circular(10),
@@ -155,59 +187,21 @@ class _UpdateProfileState extends State<UpdateProfile> {
                             border: InputBorder.none,
                             enabledBorder: OutlineInputBorder(
                               borderSide: BorderSide.none,
-                              borderRadius: BorderRadius.circular(widget.screenSize.width * 0.02),
+                              borderRadius: BorderRadius.circular(
+                                  widget.screenSize.width * 0.02),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderSide: BorderSide.none,
-                              borderRadius: BorderRadius.circular(widget.screenSize.width * 0.1),
+                              borderRadius: BorderRadius.circular(
+                                  widget.screenSize.width * 0.1),
                             ),
                             hintText: 'Enter your name',
                           ),
                         ),
                       ),
                     ),
-                    SizedBox(height: widget.screenSize.height * 0.015),
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: widget.screenSize.width * 0.05,
-                      ),
-                      child: Text(
-                        "Username:",
-                        style: TextStyle(
-                          fontFamily: 'Roboto',
-                          fontSize: widget.screenSize.width * 0.04,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
+
                     SizedBox(height: widget.screenSize.height * 0.01),
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: widget.screenSize.width * 0.05,
-                      ),
-                      child: SizedBox(
-                        height: widget.screenSize.height * 0.068,
-                        width: widget.screenSize.width * 0.85,
-                        child: TextField(
-                          controller: _usernameController,
-                          obscureText: false,
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: const Color(0xFFF0F0F0),
-                            border: InputBorder.none,
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide.none,
-                              borderRadius: BorderRadius.circular(widget.screenSize.width * 0.02),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide.none,
-                              borderRadius: BorderRadius.circular(widget.screenSize.width * 0.1),
-                            ),
-                            hintText: 'Enter your username',
-                          ),
-                        ),
-                      ),
-                    ),
                     SizedBox(height: widget.screenSize.height * 0.015),
                     Padding(
                       padding: EdgeInsets.symmetric(
@@ -239,18 +233,20 @@ class _UpdateProfileState extends State<UpdateProfile> {
                             border: InputBorder.none,
                             enabledBorder: OutlineInputBorder(
                               borderSide: BorderSide.none,
-                              borderRadius: BorderRadius.circular(widget.screenSize.width * 0.02),
+                              borderRadius: BorderRadius.circular(
+                                  widget.screenSize.width * 0.02),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderSide: BorderSide.none,
-                              borderRadius: BorderRadius.circular(widget.screenSize.width * 0.1),
+                              borderRadius: BorderRadius.circular(
+                                  widget.screenSize.width * 0.1),
                             ),
                             hintText: 'Enter your Password',
                           ),
                         ),
                       ),
                     ),
-                    SizedBox(height: widget.screenSize.height * 0.015),
+                    SizedBox(height: widget.screenSize.height * 0.025),
                     Padding(
                       padding: EdgeInsets.symmetric(
                         horizontal: widget.screenSize.width * 0.05,
@@ -281,18 +277,20 @@ class _UpdateProfileState extends State<UpdateProfile> {
                             border: InputBorder.none,
                             enabledBorder: OutlineInputBorder(
                               borderSide: BorderSide.none,
-                              borderRadius: BorderRadius.circular(widget.screenSize.width * 0.02),
+                              borderRadius: BorderRadius.circular(
+                                  widget.screenSize.width * 0.02),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderSide: BorderSide.none,
-                              borderRadius: BorderRadius.circular(widget.screenSize.width * 0.1),
+                              borderRadius: BorderRadius.circular(
+                                  widget.screenSize.width * 0.1),
                             ),
                             hintText: 'Enter Password Again',
                           ),
                         ),
                       ),
                     ),
-                    SizedBox(height: widget.screenSize.height * 0.02),
+                    SizedBox(height: widget.screenSize.height * 0.05),
                     Padding(
                       padding: EdgeInsets.symmetric(
                         horizontal: widget.screenSize.width * 0.3,
