@@ -1,5 +1,6 @@
 import 'package:bingo/offers_page.dart';
 import 'package:flutter/material.dart';
+import 'driverReportsTab.dart';
 
 
 class Home extends StatelessWidget {
@@ -55,7 +56,7 @@ class Home extends StatelessWidget {
               ),
               const SizedBox(height: 20), // Example spacing
               CustomContainer(
-                height: screenSize.height*0.22,
+                height: screenSize.height*0.25,
                 screenSize: screenSize,
                 children: [
                   Padding(

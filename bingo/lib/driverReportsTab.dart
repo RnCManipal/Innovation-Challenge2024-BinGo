@@ -160,7 +160,7 @@ class _DriverReportTabState extends State<DriverReportTab> {
                                         },
                                         child: Container(
                                           width: screenWidth * 0.6,
-                                          height: screenHeight * 0.07,
+                                          height: screenHeight * 0.08,
                                           decoration: BoxDecoration(
                                             color: const Color(0xffE0FFFF),
                                             borderRadius: BorderRadius.circular(screenWidth * 0.02),
@@ -311,7 +311,7 @@ class _DriverReportTabState extends State<DriverReportTab> {
                                   },
                                   child: Container(
                                     width: screenWidth * 0.6,
-                                    height: screenHeight * 0.07,
+                                    height: screenHeight * 0.08,
                                     decoration: BoxDecoration(
                                       color: const Color(0xffE0FFFF),
                                       borderRadius: BorderRadius.circular(screenWidth * 0.02),

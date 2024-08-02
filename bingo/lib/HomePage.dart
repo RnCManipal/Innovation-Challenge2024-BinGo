@@ -20,19 +20,37 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int selectedImageIndex = 0; // Track the index of the selected image
+  String? driverZipCode;
   late User loggedInUser; // Variable to hold logged-in user details
   late DocumentSnapshot
       userDoc; // Variable to hold user document from Firestore
   int reportCount = 0;
-
+  
   @override
-  void initState() {
-    super.initState();
-    // Get the currently logged-in user
-    loggedInUser = FirebaseAuth.instance.currentUser!;
-    fetchUserDoc();
-  }
+void initState() {
+  super.initState();
+  
+  // Get the currently logged-in user
+  loggedInUser = FirebaseAuth.instance.currentUser!;
+  fetchUserDoc();
 
+  fetchDriverZipCode().then((zipCode) {
+    setState(() {
+      driverZipCode = zipCode; // Update the state with the ZIP code
+    });
+  });
+}
+  Future<String?> fetchDriverZipCode() async {
+    User? user = FirebaseAuth.instance.currentUser; // Get current user
+    if (user != null) {
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+      if (userDoc.exists) {
+        final data = userDoc.data() as Map<String, dynamic>?;
+        return data?['zipCode']; // Replace with the actual field name
+      }
+    }
+    return null;
+  }
   void fetchUserDoc() {
     FirebaseFirestore.instance
         .collection('users')
@@ -48,6 +66,7 @@ class _HomePageState extends State<HomePage> {
 
   // Fetch user document from Firestore using the UID
   void fetchReportCount(String userEmail) {
+    if(userDoc['accountType']=='User'){
     FirebaseFirestore.instance
         .collection('reports')
         .where('userEmail', isEqualTo: userEmail)
@@ -57,6 +76,19 @@ class _HomePageState extends State<HomePage> {
         reportCount = querySnapshot.docs.length;
       });
     });
+    }
+    if(userDoc['accountType']=='Driver'){
+    FirebaseFirestore.instance
+        .collection('reports')
+        .where('zipCode', isEqualTo: driverZipCode)
+        .where('isResolved',isEqualTo: true)
+        .snapshots()
+        .listen((querySnapshot) {
+      setState(() {
+        reportCount = querySnapshot.docs.length;
+      });
+    });
+    }
   }
 
   String getAccountType() {
