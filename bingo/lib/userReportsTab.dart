@@ -91,6 +91,21 @@ class _ViewUserReportsTabState extends State<ViewUserReportsTab> {
                   ),
                 ),
                 Positioned(
+                  top: screenHeight * 0.17,
+                  left: screenWidth * 0.6,
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      await FirebaseAuth.instance.signOut();
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const UserReportTab()),
+                      );
+                    },
+                    child: const Text('Create Report'),
+                  ),
+                ),
+                Positioned(
                   top: screenHeight * 0.21,
                   left: screenWidth * 0.05,
                   child: Text(
