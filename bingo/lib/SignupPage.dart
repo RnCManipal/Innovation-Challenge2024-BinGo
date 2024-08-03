@@ -324,7 +324,7 @@ class _SignupPageState extends State<SignupPage> {
                                   borderRadius: BorderRadius.circular(
                                       screenSize.width * 0.1),
                                 ),
-                                hintText: 'Enter your username',
+                                hintText: 'Enter your email',
                               ),
                             ),
                           ),

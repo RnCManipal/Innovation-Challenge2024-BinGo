@@ -52,6 +52,24 @@ class _LoginPageState extends State<LoginPage> {
 
       return userCredential.user;
     } catch (e) {
+      if (!mounted){
+        showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (BuildContext context) {
+      return const AlertDialog(
+        content: Row(
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(width: 20),
+            Text("Creating account..."),
+          ],
+        ),
+      );
+    },
+  );
+
+      };
       print('Error signing in with email and password: $e');
       throw e; // Re-throw the exception to handle it in the UI if needed
     }
@@ -192,7 +210,7 @@ class _LoginPageState extends State<LoginPage> {
                   },
                   child: Container(
                     width: screenSize.width * 0.9,
-                    height: screenSize.height*0.45,
+                    height: minHeight,
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius:
