@@ -42,6 +42,20 @@ class _UserReportTabState extends State<UserReportTab> {
           child: Stack(
             children: <Widget>[
               Positioned(
+                  top: screenSize.height * 0.05,
+                  left: screenSize.width * 0.05,
+                  child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => (ViewUserReportsTab())),
+                        );
+                      },
+                      child: const Image(
+                        image: AssetImage('Images/BackButton.png'),
+                      ))),
+              Positioned(
                 top: screenHeight * 0.08,
                 left: screenWidth * 0.05,
                 child: Text(
