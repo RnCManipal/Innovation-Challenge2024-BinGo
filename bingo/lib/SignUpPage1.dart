@@ -65,22 +65,8 @@ class _SignupPageOneState extends State<SignupPageOne> {
       );
       return;
     }
-
-    showDialog(
-    context: context,
-    barrierDismissible: false,
-    builder: (BuildContext context) {
-      return const AlertDialog(
-        content: Row(
-          children: [
-            CircularProgressIndicator(),
-            SizedBox(width: 20),
-            Text("Creating account"),
-          ],
-        ),
-      );
-    },
-  );
+  
+    
 
     try {
       UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(

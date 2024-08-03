@@ -157,10 +157,11 @@ class ViewPage extends StatelessWidget {
                           child: Padding(
                             padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.02),
                             child: Text(
-                              'Marked as Resolved',
+                              'Mark as Resolved',
                               style: TextStyle(
                                 fontSize: screenWidth * 0.04,
                               ),
+                              textAlign: TextAlign.center,
                             ),
                           ),
                         ),
