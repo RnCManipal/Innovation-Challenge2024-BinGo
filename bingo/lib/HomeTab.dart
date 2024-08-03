@@ -1,12 +1,105 @@
 import 'package:bingo/offers_page.dart';
 import 'package:flutter/material.dart';
-import 'driverReportsTab.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Home extends StatelessWidget {
-  const Home({Key? key, required this.screenSize}) : super(key: key);
-
+  Home({Key? key, required this.screenSize}) : super(key: key);
+  
   final Size screenSize;
+  
+void _showPopup(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: BorderSide(color: Color(0xFFFF9900), width: 3),
+        ),
+        title: Text(
+          "BinGo User Guide",
+          style: TextStyle(
+            fontFamily: 'Jost',
+            fontWeight: FontWeight.bold,
+            fontSize: screenSize.width * 0.06,
+            color: Color(0xFFFF9900),
+          ),
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildSection("How to Earn Points:", [
+                "For Users:",
+                "• Report trash: If you see litter or an overflowing bin, report it in the app.",
+                "• Each valid report earns you points.",
+                "\nFor Drivers:",
+                "• Resolve reports: Clean up reported areas or empty full bins.",
+                "• Each resolved report earns you points.",
+              ]),
+              SizedBox(height: 20),
+              _buildSection("Using Your Points:", [
+                "1. Go to the 'Offers' page.",
+                "2. Browse available rewards.",
+                "3. Redeem your points for eco-friendly products, discounts, or other exciting offers!",
+              ]),
+              SizedBox(height: 20),
+              Text(
+                "Remember, your actions help keep our community clean. Thank you for using BinGo!",
+                style: TextStyle(
+                  fontStyle: FontStyle.italic,
+                  color: Colors.black87,
+                  fontSize: screenSize.width * 0.035,
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: <Widget>[
+          TextButton(
+            child: Text(
+              "Close",
+              style: TextStyle(color: Color(0xFFFF9900)),
+            ),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
+
+  Widget _buildSection(String title, List<String> points) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        title,
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: screenSize.width * 0.045,
+          color: Color(0xFFFF9900),
+        ),
+      ),
+      SizedBox(height: 10),
+      ...points.map((point) => Padding(
+            padding: EdgeInsets.only(left: 10, bottom: 5),
+            child: Text(
+              point,
+              style: TextStyle(
+                fontSize: screenSize.width * 0.04,
+                color: Colors.black87,
+              ),
+            ),
+          )),
+    ],
+  );
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -15,14 +108,17 @@ class Home extends StatelessWidget {
 
     return Expanded(
       child: SingleChildScrollView(
-        child: Center(
+        child: Stack(
+        children: [Center(
           child: Column(
             children: [
+              
               Padding(
                 padding: EdgeInsets.only(left: screenSize.width*0.224),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+
                     SizedBox(
                       width: textWidth,
                       child:Text(
@@ -54,70 +150,72 @@ class Home extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 20), // Example spacing
+              const SizedBox(height: 20), // Example spacingq
               CustomContainer(
-                height: screenSize.height*0.25,
-                screenSize: screenSize,
-                children: [
-                  Padding(
-                          padding: EdgeInsets.only(top: screenSize.height * 0.02, left: screenSize.width * 0.1),
-                          child: Text(
-                            "1500",
-                            style: TextStyle(
-                              fontFamily: 'Roboto',
-                              fontSize: screenSize.width * 0.1,
-                              fontWeight: FontWeight.bold,
-                              color: const Color.fromARGB(255, 15, 191, 38),
-                            ),
+              height: screenSize.height * 0.25,
+              screenSize: screenSize,
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(top: screenSize.height * 0.02, left: screenSize.width * 0.1),
+                  child: Row(
+                    children: [
+                      Text(
+                        "0",
+                        style: TextStyle(
+                          fontFamily: 'Roboto',
+                          fontSize: screenSize.width * 0.1,
+                          fontWeight: FontWeight.bold,
+                          color: const Color.fromARGB(255, 15, 191, 38),
+                        ),
+                      ),
+                      SizedBox(width: 20), // Add some space between "0" and "points"
+                      Text(
+                        "points",
+                        style: TextStyle(
+                          fontFamily: 'Roboto',
+                          fontSize: screenSize.width * 0.06,
+                          fontWeight: FontWeight.bold,
+                          color: const Color.fromARGB(255, 0, 0, 0),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 15), // Adjusted spacing
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.15),
+                  child: SizedBox(
+                    width: screenSize.width * 0.6,
+                    height: screenSize.height * 0.06,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => OffersPage()),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color.fromARGB(255, 255, 153, 1),
+                        foregroundColor: Colors.white,
+                        padding: EdgeInsets.symmetric(vertical: screenSize.height * 0.015),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(screenSize.width * 0.02),
+                        ),
+                      ),
+                      child: Center(
+                        child: Text(
+                          "View Offers",
+                          style: TextStyle(
+                            fontSize: screenSize.width * 0.049,
+                            fontWeight: FontWeight.normal,
                           ),
                         ),
-                  Padding(
-                          padding: EdgeInsets.only(top: screenSize.height * 0.01, left: screenSize.width * 0.52),
-                          child: Text(
-                            "points",
-                            style: TextStyle(
-                              fontFamily: 'Roboto',
-                              fontSize: screenSize.width * 0.06,
-                              fontWeight: FontWeight.bold,
-                              color: const Color.fromARGB(255, 0, 0, 0),
-                            ),
-                          ),
-                        ),
-                  const SizedBox(height: 5),
-                  Padding(
-                              padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.15),
-                              child: SizedBox(
-                              width: screenSize.width * 0.6,
-                              height: screenSize.height * 0.06,
-                              child: ElevatedButton( // Use ElevatedButton for Material 3 styling
-                              onPressed: () {
-                                Navigator.push(
-                                context,
-                              MaterialPageRoute(builder: (context) => OffersPage()),
-                                );
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color.fromARGB(255, 255, 153, 1), // Custom color
-                                foregroundColor: Colors.white,
-                                padding: EdgeInsets.symmetric(vertical: screenSize.height * 0.015),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(screenSize.width * 0.02),
-                                ),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  "View Offers",
-                                  style: TextStyle(
-                                    fontSize: screenSize.width * 0.049,
-                                    fontWeight: FontWeight.normal,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ]
+                      ),
                     ),
+                  ),
+                ),
+              ]
+              ),
               const SizedBox(height: 20), // Example spacing
               CustomContainer(
               height:screenSize.height*0.5,
@@ -178,11 +276,18 @@ class Home extends StatelessWidget {
                   ]
                 ),
               const SizedBox(height: 100),
- // Example spacing
             ],
           ),
         ),
+        Positioned(
+            top: 10,
+            left: 10,
+            child: IconButton(
+              icon: Icon(Icons.info_rounded, color: Colors.orange),
+              onPressed: () => _showPopup(context))),
+      ]
       ),
+      ) 
     );
   }
 }

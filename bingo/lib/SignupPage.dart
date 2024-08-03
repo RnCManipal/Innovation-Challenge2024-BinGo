@@ -34,7 +34,7 @@ class _SignupPageState extends State<SignupPage> {
       });
     }
   }
-  
+
   bool isEmailValid(String email) {
     return RegExp(r'^[\w-\.]+@[a-zA-Z]+\.[a-zA-Z]{2,}$').hasMatch(email);
   }
@@ -473,7 +473,6 @@ class _SignupPageState extends State<SignupPage> {
                 left: screenSize.width * 0.63,
                 child: GestureDetector(
                   onTap: () {
-                    
                     Navigator.push(
                       context,
                       MaterialPageRoute(

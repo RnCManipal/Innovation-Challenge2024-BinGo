@@ -25,6 +25,7 @@ class _HomePageState extends State<HomePage> {
   late DocumentSnapshot
       userDoc; // Variable to hold user document from Firestore
   int reportCount = 0;
+  int pointcount=0;
   
   @override
 void initState() {
@@ -74,6 +75,7 @@ void initState() {
         .listen((querySnapshot) {
       setState(() {
         reportCount = querySnapshot.docs.length;
+        pointcount=reportCount*10;
       });
     });
     }
@@ -86,6 +88,7 @@ void initState() {
         .listen((querySnapshot) {
       setState(() {
         reportCount = querySnapshot.docs.length;
+        pointcount=reportCount*10;
       });
     });
     }
@@ -358,7 +361,7 @@ void initState() {
                                   top: screenSize.height * 0.03,
                                   left: screenSize.width * 0.1),
                               child: Text(
-                                "0",
+                                pointcount.toString(),
                                 style: TextStyle(
                                   fontFamily: 'Roboto',
                                   fontSize: screenSize.width * 0.1,
