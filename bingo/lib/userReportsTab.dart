@@ -1,3 +1,4 @@
+import 'package:bingo/createreport.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:convert';
 import 'dart:io';
@@ -8,538 +9,543 @@ import 'package:image_picker/image_picker.dart';
 import 'package:geocoding/geocoding.dart' as geocode;
 import 'package:http/http.dart' as http;
 
-class UserReportTab extends StatefulWidget {
-  const UserReportTab({Key? key}) : super(key: key);
-
+class ViewUserReportsTab extends StatefulWidget {
   @override
-  State<UserReportTab> createState() => _UserReportTabState();
+  _ViewUserReportsTabState createState() => _ViewUserReportsTabState();
 }
 
-class _UserReportTabState extends State<UserReportTab> {
-  File? image;
-  final TextEditingController titleController = TextEditingController();
-  final TextEditingController locationController = TextEditingController();
-  final TextEditingController descriptionController = TextEditingController();
-  String severity = "Medium"; // Default severity value
-  bool uploading = false; // Flag to track image upload state
-  String? zipCode; // To store retrieved zip code
+class _ViewUserReportsTabState extends State<ViewUserReportsTab> {
+  Map<String, dynamic>? selectedReport; // Track selected report details
+  String? userEmail; // Store user's email
+  int selectedImageIndex =
+      0; // Track selected image index for the navigation bar
+
+  @override
+  void initState() {
+    super.initState();
+    fetchUserEmail().then((email) {
+      setState(() {
+        userEmail = email; // Update the state with the email
+      });
+    });
+  }
+
+  Future<String?> fetchUserEmail() async {
+    User? user = FirebaseAuth.instance.currentUser; // Get current user
+    if (user != null) {
+      return user.email;
+    }
+    return null;
+  }
 
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
-    final Size screenSize = MediaQuery.of(context).size;
-    bool isButtonDisabled =
-        image == null; // Disable button if no image is selected
 
+    return selectedReport != null
+        ? selectedReport!['isResolved']
+            ? ViewPageResolved(
+                report: selectedReport!,
+                onClose: () {
+                  setState(() {
+                    selectedReport = null;
+                  });
+                },
+              )
+            : ViewPage(
+                report: selectedReport!,
+                onClose: () {
+                  setState(() {
+                    selectedReport = null;
+                  });
+                },
+                onResolve: () async {
+                  if (selectedReport != null) {
+                    await FirebaseFirestore.instance
+                        .collection('reports')
+                        .doc(selectedReport!['id'])
+                        .update({'isResolved': true});
+                    setState(() {
+                      selectedReport =
+                          null; // Clear selected report after resolving
+                    });
+                  }
+                },
+              )
+        : Scaffold(
+            backgroundColor: Colors.white,
+            body: Stack(
+              children: [
+                Positioned(
+                  top: screenHeight * 0.08,
+                  left: screenWidth * 0.05,
+                  child: Text(
+                    "Reports",
+                    style: TextStyle(
+                      color: const Color(0xffF79839),
+                      fontSize: screenWidth * 0.12,
+                      fontFamily: 'Jost',
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                Positioned(
+                  top: screenHeight * 0.21,
+                  left: screenWidth * 0.05,
+                  child: Text(
+                    "Resolve",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: screenWidth * 0.09,
+                      fontFamily: 'Roboto',
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ),
+                Positioned(
+                  top: screenHeight * 0.3,
+                  left: screenWidth * 0.1,
+                  child: Container(
+                    width: screenWidth * 0.8,
+                    height: screenHeight * 0.25,
+                    padding: EdgeInsets.all(screenWidth * 0.04),
+                    decoration: BoxDecoration(
+                      color: const Color(0xffE0FFFF),
+                      borderRadius: BorderRadius.circular(screenWidth * 0.02),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          spreadRadius: 4.0,
+                          blurRadius: 8.0,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: userEmail == null
+                        ? Center(child: CircularProgressIndicator())
+                        : StreamBuilder<QuerySnapshot>(
+                            stream: FirebaseFirestore.instance
+                                .collection('reports')
+                                .where('userEmail', isEqualTo: userEmail)
+                                .where('isResolved',
+                                    isEqualTo:
+                                        false) // Fetch unresolved reports
+                                .snapshots(),
+                            builder: (context, snapshot) {
+                              if (!snapshot.hasData) {
+                                return const Center(
+                                    child: CircularProgressIndicator());
+                              }
+                              var reports = snapshot.data!.docs;
+
+                              // Sorting reports based on severity
+                              reports.sort((a, b) =>
+                                  a['severity'].compareTo(b['severity']));
+
+                              return SingleChildScrollView(
+                                child: Column(
+                                  children:
+                                      List.generate(reports.length, (index) {
+                                    var report = reports[index];
+
+                                    return Padding(
+                                      padding: EdgeInsets.only(
+                                          bottom: screenWidth * 0.04),
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            selectedReport = {
+                                              'id': report.id,
+                                              'title': report['title'],
+                                              'description':
+                                                  report['description'],
+                                              'severity': report['severity'],
+                                              'imageUrl': report['imageUrl'],
+                                              'location': report['location'],
+                                              'isResolved':
+                                                  report['isResolved'],
+                                            };
+                                          });
+                                        },
+                                        child: Container(
+                                          width: screenWidth * 0.6,
+                                          height: screenHeight * 0.07,
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xffE0FFFF),
+                                            borderRadius: BorderRadius.circular(
+                                                screenWidth * 0.02),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.grey
+                                                    .withOpacity(0.5),
+                                                spreadRadius: 3.0,
+                                                blurRadius: 6.0,
+                                                offset: Offset(0, 3),
+                                              ),
+                                            ],
+                                          ),
+                                          child: Padding(
+                                            padding: EdgeInsets.all(
+                                                screenWidth * 0.04),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Expanded(
+                                                  child: Text(
+                                                    report['title'],
+                                                    style: TextStyle(
+                                                      fontFamily: 'Roboto',
+                                                      fontSize:
+                                                          screenWidth * 0.04,
+                                                    ),
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  width: screenWidth * 0.28,
+                                                  height: screenHeight * 0.04,
+                                                  child: ElevatedButton(
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                      backgroundColor:
+                                                          const Color(
+                                                              0xFFFBBC05),
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(
+                                                                    screenWidth *
+                                                                        0.02),
+                                                      ),
+                                                    ),
+                                                    onPressed: () {
+                                                      setState(() {
+                                                        selectedReport = {
+                                                          'id': report.id,
+                                                          'title':
+                                                              report['title'],
+                                                          'description': report[
+                                                              'description'],
+                                                          'severity': report[
+                                                              'severity'],
+                                                          'imageUrl': report[
+                                                              'imageUrl'],
+                                                          'location': report[
+                                                              'location'],
+                                                          'isResolved': report[
+                                                              'isResolved'],
+                                                        };
+                                                      });
+                                                    },
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        Icon(
+                                                          Icons.remove_red_eye,
+                                                          size: screenHeight *
+                                                              0.02,
+                                                          color: Colors.white,
+                                                        ),
+                                                        SizedBox(
+                                                            width: screenWidth *
+                                                                0.01),
+                                                        Text(
+                                                          'View',
+                                                          style: TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize:
+                                                                screenWidth *
+                                                                    0.04,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }),
+                                ),
+                              );
+                            },
+                          ),
+                  ),
+                ),
+                Positioned(
+                  top: screenHeight * 0.56,
+                  left: screenWidth * 0.05,
+                  child: Text(
+                    "Resolved",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: screenWidth * 0.09,
+                      fontFamily: 'Roboto',
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ),
+                Positioned(
+                  top: screenHeight *
+                      0.65, // Adjusted position for resolved reports
+                  left: screenWidth * 0.1,
+                  child: Container(
+                    width: screenWidth * 0.8,
+                    height: screenHeight * 0.25,
+                    padding: EdgeInsets.all(screenWidth * 0.04),
+                    decoration: BoxDecoration(
+                      color: const Color(0xffE0FFFF),
+                      borderRadius: BorderRadius.circular(screenWidth * 0.02),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          spreadRadius: 4.0,
+                          blurRadius: 8.0,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: StreamBuilder<QuerySnapshot>(
+                      stream: FirebaseFirestore.instance
+                          .collection('reports')
+                          .where('userEmail', isEqualTo: userEmail)
+                          .where('isResolved',
+                              isEqualTo: true) // Fetch resolved reports
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData) {
+                          return const Center(
+                              child: CircularProgressIndicator());
+                        }
+                        var resolvedReports = snapshot.data!.docs;
+
+                        return SingleChildScrollView(
+                          child: Column(
+                            children:
+                                List.generate(resolvedReports.length, (index) {
+                              var report = resolvedReports[index];
+
+                              return Padding(
+                                padding:
+                                    EdgeInsets.only(bottom: screenWidth * 0.04),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      selectedReport = {
+                                        'id': report.id,
+                                        'title': report['title'],
+                                        'description': report['description'],
+                                        'severity': report['severity'],
+                                        'imageUrl': report['imageUrl'],
+                                        'location': report['location'],
+                                        'isResolved': report['isResolved'],
+                                      };
+                                    });
+                                  },
+                                  child: Container(
+                                    width: screenWidth * 0.6,
+                                    height: screenHeight * 0.07,
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xffE0FFFF),
+                                      borderRadius: BorderRadius.circular(
+                                          screenWidth * 0.02),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.5),
+                                          spreadRadius: 3.0,
+                                          blurRadius: 6.0,
+                                          offset: Offset(0, 3),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Padding(
+                                      padding:
+                                          EdgeInsets.all(screenWidth * 0.04),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              report['title'],
+                                              style: TextStyle(
+                                                fontFamily: 'Roboto',
+                                                fontSize: screenWidth * 0.04,
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            width: screenWidth * 0.28,
+                                            height: screenHeight * 0.04,
+                                            child: ElevatedButton(
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor:
+                                                    const Color(0xFFFBBC05),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          screenWidth * 0.02),
+                                                ),
+                                              ),
+                                              onPressed: () {
+                                                setState(() {
+                                                  selectedReport = {
+                                                    'id': report.id,
+                                                    'title': report['title'],
+                                                    'description':
+                                                        report['description'],
+                                                    'severity':
+                                                        report['severity'],
+                                                    'imageUrl':
+                                                        report['imageUrl'],
+                                                    'location':
+                                                        report['location'],
+                                                    'isResolved':
+                                                        report['isResolved'],
+                                                  };
+                                                });
+                                              },
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  Icon(
+                                                    Icons.remove_red_eye,
+                                                    size: screenHeight * 0.02,
+                                                    color: Colors.white,
+                                                  ),
+                                                  SizedBox(
+                                                      width:
+                                                          screenWidth * 0.01),
+                                                  Text(
+                                                    'View',
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize:
+                                                          screenWidth * 0.04,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+  }
+}
+
+class ViewPage extends StatelessWidget {
+  final Map<String, dynamic> report;
+  final VoidCallback onClose;
+  final VoidCallback onResolve;
+
+  ViewPage(
+      {required this.report, required this.onClose, required this.onResolve});
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.white,
-        body: SingleChildScrollView(
-            child: SizedBox(
-          height: screenSize.height * 1.2,
-          child: Stack(
-            children: <Widget>[
-              Positioned(
-                top: screenHeight * 0.08,
-                left: screenWidth * 0.05,
-                child: Text(
-                  "Reports",
-                  style: TextStyle(
-                    color: Color(0xffF79839),
-                    fontSize: screenWidth * 0.12,
-                    fontFamily: 'Jost',
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              Positioned(
-                top: screenHeight * 0.155,
-                left: screenWidth * 0.05,
-                child: Text(
-                  "and earn rewards",
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: screenWidth * 0.05,
-                    fontFamily: 'Glory',
-                    fontWeight: FontWeight.normal,
-                  ),
-                ),
-              ),
-              Positioned(
-                top: screenHeight * 0.21,
-                left: screenWidth * 0.05,
-                child: Text(
-                  "Create a Report",
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: screenWidth * 0.09,
-                    fontFamily: 'Roboto',
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-              ),
-              Positioned(
-                top: screenHeight * 0.3,
-                left: screenWidth * 0.025,
-                child: Container(
-                  width: screenWidth * 0.95,
-                  height: screenHeight * 0.8, // Adjust height to fit the screen
-                  padding: EdgeInsets.all(screenWidth * 0.05),
-                  decoration: BoxDecoration(
-                    color: Color(0xffE0FFFF),
-                    borderRadius: BorderRadius.circular(screenWidth * 0.02),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.5),
-                        spreadRadius: screenWidth * 0.01,
-                        blurRadius: screenWidth * 0.035,
-                        offset: Offset(0, screenWidth * 0.02),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Title",
-                        style: TextStyle(
-                          fontSize: screenWidth * 0.04,
-                          fontFamily: 'Roboto',
-                          fontWeight: FontWeight.normal,
-                        ),
-                      ),
-                      SizedBox(height: screenWidth * 0.02),
-                      TextField(
-                        controller: titleController,
-                        decoration: InputDecoration(
-                          filled: true,
-                          fillColor: Colors.white,
-                          hintText: 'Enter title',
-                          border: OutlineInputBorder(
-                            borderRadius:
-                                BorderRadius.circular(screenWidth * 0.02),
-                            borderSide: BorderSide.none,
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: screenWidth * 0.04),
-                      Text(
-                        "Description",
-                        style: TextStyle(
-                          fontSize: screenWidth * 0.04,
-                          fontFamily: 'Roboto',
-                          fontWeight: FontWeight.normal,
-                        ),
-                      ),
-                      SizedBox(height: screenWidth * 0.02),
-                      TextField(
-                        controller: descriptionController,
-                        maxLines: 3,
-                        decoration: InputDecoration(
-                          filled: true,
-                          fillColor: Colors.white,
-                          hintText: 'Enter description',
-                          border: OutlineInputBorder(
-                            borderRadius:
-                                BorderRadius.circular(screenWidth * 0.02),
-                            borderSide: BorderSide.none,
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: screenWidth * 0.04),
-                      Text(
-                        "Severity",
-                        style: TextStyle(
-                          fontSize: screenWidth * 0.04,
-                          fontFamily: 'Roboto',
-                          fontWeight: FontWeight.normal,
-                        ),
-                      ),
-                      SizedBox(height: screenWidth * 0.02),
-                      DropdownButtonFormField<String>(
-                        value: severity,
-                        items: ["High", "Medium", "Low"].map((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(value),
-                          );
-                        }).toList(),
-                        onChanged: (newValue) {
-                          setState(() {
-                            severity = newValue!;
-                          });
-                        },
-                        decoration: InputDecoration(
-                          filled: true,
-                          fillColor: Colors.white,
-                          border: OutlineInputBorder(
-                            borderRadius:
-                                BorderRadius.circular(screenWidth * 0.02),
-                            borderSide: BorderSide.none,
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: screenWidth * 0.04),
-                      Text(
-                        "Location",
-                        style: TextStyle(
-                          fontSize: screenWidth * 0.04,
-                          fontFamily: 'Roboto',
-                          fontWeight: FontWeight.normal,
-                        ),
-                      ),
-                      SizedBox(height: screenWidth * 0.02),
-                      TextField(
-                        controller: locationController,
-                        decoration: InputDecoration(
-                          filled: true,
-                          fillColor: Colors.white,
-                          hintText: 'Enter location',
-                          border: OutlineInputBorder(
-                            borderRadius:
-                                BorderRadius.circular(screenWidth * 0.02),
-                            borderSide: BorderSide.none,
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: screenWidth * 0.04),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          ElevatedButton.icon(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Color(0xFFFBBC05),
-                              shape: RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.circular(screenWidth * 0.02),
-                              ),
-                            ),
-                            onPressed: () async {
-                              final picture = await ImagePicker()
-                                  .pickImage(source: ImageSource.camera);
-                              if (picture != null) {
-                                image = File(picture.path);
-                                setState(() {});
-                              }
-                            },
-                            icon: Icon(Icons.camera_alt, color: Colors.white),
-                            label: Text(
-                              'Camera',
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          ),
-                          ElevatedButton.icon(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Color(0xFFFBBC05),
-                              shape: RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.circular(screenWidth * 0.02),
-                              ),
-                            ),
-                            onPressed: () async {
-                              final picture = await ImagePicker()
-                                  .pickImage(source: ImageSource.gallery);
-                              if (picture != null) {
-                                image = File(picture.path);
-                                setState(() {});
-                              }
-                            },
-                            icon: Icon(Icons.upload, color: Colors.white),
-                            label: Text(
-                              'Upload',
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: screenWidth * 0.04),
-                      uploading
-                          ? Center(child: CircularProgressIndicator())
-                          : Center(
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Color(0xffF79839),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(
-                                        screenWidth * 0.02),
-                                  ),
-                                ),
-                                onPressed: isButtonDisabled
-                                    ? null
-                                    : saveReportToFirestore,
-                                child: Text(
-                                  'File a Report',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontFamily: 'Roboto',
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: screenWidth * 0.04,
-                                  ),
-                                ),
-                              ),
-                            ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        )));
+      appBar: AppBar(
+        title: Text('Report Details'),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: onClose,
+        ),
+      ),
+      body: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Title: ${report['title']}',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            SizedBox(height: 10),
+            Text('Description: ${report['description']}'),
+            SizedBox(height: 10),
+            Text('Severity: ${report['severity']}'),
+            SizedBox(height: 10),
+            Text('Location: ${report['location']}'),
+            SizedBox(height: 10),
+            report['imageUrl'] != null
+                ? Image.network(report['imageUrl'])
+                : Container(),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: onResolve,
+              child: Text('Mark as Resolved'),
+            ),
+          ],
+        ),
+      ),
+    );
   }
+}
 
-  Future<void> saveReportToFirestore() async {
-    String title = titleController.text.trim();
-    String location = locationController.text.trim();
-    String description = descriptionController.text.trim();
+class ViewPageResolved extends StatelessWidget {
+  final Map<String, dynamic> report;
+  final VoidCallback onClose;
 
-    if (title.isEmpty ||
-        location.isEmpty ||
-        description.isEmpty ||
-        severity.isEmpty) {
-      // Show an error dialog if any of the fields are empty
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Error'),
-            content: Text('Please fill out all fields.'),
-            actions: <Widget>[
-              TextButton(
-                child: Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
-      return;
-    }
+  ViewPageResolved({required this.report, required this.onClose});
 
-    setState(() {
-      uploading = true; // Start showing loader while uploading
-    });
-
-    try {
-      // Get current user information
-      final user = await FirebaseAuth.instance
-          .authStateChanges()
-          .firstWhere((user) => user != null);
-
-      if (user == null) {
-        throw Exception('User not logged in');
-      }
-
-      String userEmail = user.email ?? 'Unknown';
-
-      List<geocode.Location> locations =
-          await geocode.locationFromAddress(location);
-      if (locations.isEmpty) {
-        throw Exception('Failed to get coordinates for the provided location');
-      }
-      double latitude = locations.first.latitude;
-      double longitude = locations.first.longitude;
-
-      // Call API to get the Zip Code using latitude and longitude
-      zipCode = await fetchZipCode(latitude, longitude);
-
-      // Access Firestore instance and collection
-      FirebaseFirestore firestore = FirebaseFirestore.instance;
-      CollectionReference reports = firestore.collection('reports');
-
-      // Add a new document with auto-generated ID
-      DocumentReference ref = await reports.add({
-        'title': title,
-        'latitude': latitude,
-        'longitude': longitude,
-        'description': description,
-        'severity': severity,
-        'isResolved': false,
-        'location': location,
-        'zipCode': zipCode,
-        'userEmail': userEmail,
-      });
-      // Upload image if available
-      if (image != null) {
-        String fileName =
-            '${ref.id}_${DateTime.now().millisecondsSinceEpoch}.png'; // Using Firestore document ID and timestamp
-        Reference storageRef =
-            FirebaseStorage.instance.ref().child('images/reports/$fileName');
-        await storageRef.putFile(image!);
-
-        // Update Firestore document with image URL
-        String imageUrl = await storageRef.getDownloadURL();
-        await ref.update({'imageUrl': imageUrl});
-      }
-
-      // Clear input fields after saving
-      titleController.clear();
-      locationController.clear();
-      descriptionController.clear();
-      severity = "Medium"; // Reset severity to default
-      image = null;
-      zipCode = null; // Reset zip code
-
-      // Show success message
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Success'),
-            content: Text('Report filed successfully!'),
-            actions: <Widget>[
-              TextButton(
-                child: Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
-    } catch (e) {
-      print('Error saving report: $e');
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Error'),
-            content: Text('Failed to file report. Please try again.'),
-            actions: <Widget>[
-              TextButton(
-                child: Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
-    } on FirebaseAuthException catch (e) {
-      // Handle Firebase authentication errors (e.g., user not found)
-      print('FirebaseAuthException: $e');
-      // ... Show appropriate error dialog
-    } catch (e) {
-      // Handle other errors
-      print('Error saving report: $e');
-      // ... Show appropriate error dialog
-    } finally {
-      setState(() {
-        uploading = false; // Stop showing loader after uploading
-      });
-    }
-
-    try {
-      // Geocode the location to get latitude and longitude
-      List<geocode.Location> locations =
-          await geocode.locationFromAddress(location);
-      if (locations.isEmpty) {
-        throw Exception('Failed to get coordinates for the provided location');
-      }
-      double latitude = locations.first.latitude;
-      double longitude = locations.first.longitude;
-
-      // Call API to get the Zip Code using latitude and longitude
-      zipCode = await fetchZipCode(latitude, longitude);
-
-      // Access Firestore instance and collection
-      FirebaseFirestore firestore = FirebaseFirestore.instance;
-      CollectionReference reports = firestore.collection('reports');
-
-      // Add a new document with auto-generated ID
-      DocumentReference ref = await reports.add({
-        'title': title,
-        'latitude': latitude,
-        'longitude': longitude,
-        'description': description,
-        'severity': severity,
-        'isResolved': false,
-        'location': location,
-        'zipCode': zipCode, // Store retrieved zip code in Firestore
-      });
-
-      // Upload image if available
-      if (image != null) {
-        String fileName =
-            '${ref.id}_${DateTime.now().millisecondsSinceEpoch}.png'; // Using Firestore document ID and timestamp
-        Reference storageRef =
-            FirebaseStorage.instance.ref().child('images/reports/$fileName');
-        await storageRef.putFile(image!);
-
-        // Update Firestore document with image URL
-        String imageUrl = await storageRef.getDownloadURL();
-        await ref.update({'imageUrl': imageUrl});
-      }
-
-      // Clear input fields after saving
-      titleController.clear();
-      locationController.clear();
-      descriptionController.clear();
-      severity = "Medium"; // Reset severity to default
-      image = null;
-      zipCode = null; // Reset zip code
-
-      // Show success message
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Success'),
-            content: Text('Report filed successfully!'),
-            actions: <Widget>[
-              TextButton(
-                child: Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
-    } catch (e) {
-      print('Error saving report: $e');
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Error'),
-            content: Text('Failed to file report. Please try again.'),
-            actions: <Widget>[
-              TextButton(
-                child: Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
-    } finally {
-      setState(() {
-        uploading = false; // Stop showing loader after uploading
-      });
-    }
-  }
-
-  Future<String?> fetchZipCode(double latitude, double longitude) async {
-    final String apiUrl =
-        'https://bingo-server-gnanasais-projects.vercel.app/get_zip_code'; // Replace with your actual API URL
-    final response =
-        await http.get(Uri.parse('$apiUrl?lat=$latitude&lng=$longitude'));
-
-    print('Response status: ${response.statusCode}');
-    print('Response body: ${response.body}');
-
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      return data['zipCode'];
-    } else {
-      throw Exception('Failed to fetch zip code');
-    }
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Report Details'),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: onClose,
+        ),
+      ),
+      body: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Title: ${report['title']}',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            SizedBox(height: 10),
+            Text('Description: ${report['description']}'),
+            SizedBox(height: 10),
+            Text('Severity: ${report['severity']}'),
+            SizedBox(height: 10),
+            Text('Location: ${report['location']}'),
+            SizedBox(height: 10),
+            report['imageUrl'] != null
+                ? Image.network(report['imageUrl'])
+                : Container(),
+            SizedBox(height: 20),
+            Text('Status: Resolved',
+                style: TextStyle(
+                    color: Colors.green, fontWeight: FontWeight.bold)),
+          ],
+        ),
+      ),
+    );
   }
 }
