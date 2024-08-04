@@ -144,7 +144,7 @@ void updateSelectedIndex(int index) {
                 SizedBox(
                   height: textTopPadding, // Top space before text
                 ),
-                if (selectedImageIndex == 0) Home(screenSize: screenSize),
+                if (selectedImageIndex == 0) Home(screenSize: screenSize,reportCount: pointcount,),
               ],
             ),
           ),
@@ -375,7 +375,7 @@ void updateSelectedIndex(int index) {
                               child: Row(
                                 children: [
                                   Text(
-                                    "0",
+                                    pointcount.toString(),
                                     style: TextStyle(
                                       fontFamily: 'Roboto',
                                       fontSize: screenSize.width * 0.1,

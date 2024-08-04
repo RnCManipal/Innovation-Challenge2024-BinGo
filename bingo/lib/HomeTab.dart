@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'HomePage.dart';
 
 class Home extends StatelessWidget {
-  Home({Key? key, required this.screenSize}) : super(key: key);
+  Home({Key? key, required this.screenSize,required this.reportCount}) : super(key: key);
+  final int reportCount;
   
   final Size screenSize;
   
@@ -159,7 +160,7 @@ void _showPopup(BuildContext context) {
                   child: Row(
                     children: [
                       Text(
-                        "0",
+                        reportCount.toString(),
                         style: TextStyle(
                           fontFamily: 'Roboto',
                           fontSize: screenSize.width * 0.1,
