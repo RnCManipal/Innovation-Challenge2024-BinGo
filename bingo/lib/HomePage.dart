@@ -1,8 +1,7 @@
 import 'package:bingo/HomeTab.dart';
 import 'package:bingo/MapTab.dart';
-import 'package:bingo/MapTabUser.dart';
-import 'package:bingo/MapTabDriver.dart';
 import 'package:bingo/ReportTab.dart';
+import 'package:bingo/createreport.dart';
 import 'package:bingo/offers_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -12,11 +11,14 @@ import 'SignupPage.dart'; // Import your SignupPage.dart file
 import 'UpdateProfile.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  static final GlobalKey<_HomePageState> homePageKey = GlobalKey<_HomePageState>();
+  HomePage({Key? key}) : super(key: homePageKey);
 
   @override
   _HomePageState createState() => _HomePageState();
 }
+
+
 
 class _HomePageState extends State<HomePage> {
   int selectedImageIndex = 0; // Track the index of the selected image
@@ -41,6 +43,11 @@ void initState() {
     });
   });
 }
+void updateSelectedIndex(int index) {
+    setState(() {
+      selectedImageIndex = index;
+    });
+  }
   Future<String?> fetchDriverZipCode() async {
     User? user = FirebaseAuth.instance.currentUser; // Get current user
     if (user != null) {
@@ -169,6 +176,12 @@ void initState() {
           ),
           Center(
             child: selectedImageIndex ==
+                    7 
+                ? UserReportTab()
+                : Container(), 
+          ),
+          Center(
+            child: selectedImageIndex ==
                     5 // Assuming selectedImageIndex 5 is for "User.png"
                 ? SingleChildScrollView(
                     child: Column(
@@ -178,6 +191,7 @@ void initState() {
                       Padding(
                         padding: EdgeInsets.only(
                           top: screenSize.height * 0.05,
+                          left:screenSize.width * 0.08,
                         ),
                         child: SizedBox(
                           width: screenSize.width * 0.4,
@@ -353,35 +367,33 @@ void initState() {
                           ]),
                       const SizedBox(height: 20),
                       CustomContainer(
-                          height: screenSize.height * 0.28,
+                          height: screenSize.height * 0.2,
                           screenSize: screenSize,
                           children: [
                             Padding(
-                              padding: EdgeInsets.only(
-                                  top: screenSize.height * 0.03,
-                                  left: screenSize.width * 0.1),
-                              child: Text(
-                                pointcount.toString(),
-                                style: TextStyle(
-                                  fontFamily: 'Roboto',
-                                  fontSize: screenSize.width * 0.1,
-                                  fontWeight: FontWeight.bold,
-                                  color: const Color.fromARGB(255, 15, 191, 38),
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.only(
-                                  bottom: screenSize.height * 0.0,
-                                  left: screenSize.width * 0.52),
-                              child: Text(
-                                "points",
-                                style: TextStyle(
-                                  fontFamily: 'Roboto',
-                                  fontSize: screenSize.width * 0.06,
-                                  fontWeight: FontWeight.bold,
-                                  color: const Color.fromARGB(255, 0, 0, 0),
-                                ),
+                              padding: EdgeInsets.only(top: screenSize.height * 0.02, left: screenSize.width * 0.1),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    "0",
+                                    style: TextStyle(
+                                      fontFamily: 'Roboto',
+                                      fontSize: screenSize.width * 0.1,
+                                      fontWeight: FontWeight.bold,
+                                      color: const Color.fromARGB(255, 15, 191, 38),
+                                    ),
+                                  ),
+                                  SizedBox(width: 20), // Add some space between "0" and "points"
+                                  Text(
+                                    "points",
+                                    style: TextStyle(
+                                      fontFamily: 'Roboto',
+                                      fontSize: screenSize.width * 0.06,
+                                      fontWeight: FontWeight.bold,
+                                      color: const Color.fromARGB(255, 0, 0, 0),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                             const SizedBox(height: 5),
@@ -393,7 +405,10 @@ void initState() {
                                 height: screenSize.height * 0.06,
                                 child: TextButton(
                                   onPressed: () {
-                                    print("button pressed");
+                                    setState(() {
+                                selectedImageIndex =
+                                    4; // Assuming 6 is the index for Update Profile tab
+                              });;
                                   },
                                   style: ButtonStyle(
                                     backgroundColor: WidgetStateProperty.all(
@@ -646,10 +661,7 @@ void initState() {
     return GestureDetector(
       onTap: () {
         // Update selected image index when tapped
-        setState(() {
-          selectedImageIndex = index;
-        });
-        print(selectedImageIndex);
+        HomePage.homePageKey.currentState?.updateSelectedIndex(index);
       },
       child: Container(
         margin: const EdgeInsets.all(8.0), // Adjust margin as needed

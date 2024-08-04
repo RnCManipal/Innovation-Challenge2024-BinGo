@@ -1,5 +1,3 @@
-import 'package:bingo/userReportsTab.dart';
-import 'package:bingo/createreport.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:convert';
 import 'dart:io';
@@ -35,26 +33,12 @@ class _UserReportTabState extends State<UserReportTab> {
         image == null; // Disable button if no image is selected
 
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: SizedBox(
-          height: screenSize.height * 1.5,
+        backgroundColor: Colors.white,
+        body: SingleChildScrollView(
+            child: SizedBox(
+          height: screenSize.height * 1.2,
           child: Stack(
             children: <Widget>[
-              Positioned(
-                  top: screenSize.height * 0.05,
-                  left: screenSize.width * 0.05,
-                  child: GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => (ViewUserReportsTab())),
-                        );
-                      },
-                      child: const Image(
-                        image: AssetImage('Images/BackButton.png'),
-                      ))),
               Positioned(
                 top: screenHeight * 0.08,
                 left: screenWidth * 0.05,
@@ -99,8 +83,7 @@ class _UserReportTabState extends State<UserReportTab> {
                 left: screenWidth * 0.025,
                 child: Container(
                   width: screenWidth * 0.95,
-                  height:
-                      screenHeight * 0.901, // Adjust height to fit the screen
+                  height: screenHeight * 0.8, // Adjust height to fit the screen
                   padding: EdgeInsets.all(screenWidth * 0.05),
                   decoration: BoxDecoration(
                     color: Color(0xffE0FFFF),
@@ -269,17 +252,13 @@ class _UserReportTabState extends State<UserReportTab> {
                           ),
                         ],
                       ),
-                      SizedBox(height: screenWidth * 0.07),
+                      SizedBox(height: screenWidth * 0.04),
                       uploading
                           ? Center(child: CircularProgressIndicator())
                           : Center(
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                      const Color.fromARGB(255, 255, 153, 1),
-                                  padding: EdgeInsets.symmetric(
-                                      vertical: screenSize.height * 0.015,
-                                      horizontal: screenSize.height * 0.015),
+                                  backgroundColor: Color(0xffF79839),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(
                                         screenWidth * 0.02),
@@ -294,59 +273,18 @@ class _UserReportTabState extends State<UserReportTab> {
                                     color: Colors.white,
                                     fontFamily: 'Roboto',
                                     fontWeight: FontWeight.bold,
-                                    fontSize: screenWidth * 0.05,
+                                    fontSize: screenWidth * 0.04,
                                   ),
                                 ),
                               ),
                             ),
-                      SizedBox(height: screenWidth * 0.04),
-                      Center(
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: screenSize.width * 0.15),
-                          child: SizedBox(
-                            width: screenSize.width * 0.6,
-                            height: screenSize.height * 0.06,
-                            child: ElevatedButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                         ViewUserReportsTab()),
-                                );
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    const Color.fromARGB(255, 255, 153, 1),
-                                foregroundColor: Colors.white,
-                                padding: EdgeInsets.symmetric(
-                                    vertical: screenSize.height * 0.015),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(
-                                      screenSize.width * 0.02),
-                                ),
-                              ),
-                              child: Text('View Reports',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontFamily: 'Roboto',
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: screenWidth * 0.04,
-                                  )),
-                            ),
-                          ),
-                        ),
-                      ),
                     ],
                   ),
                 ),
               ),
             ],
           ),
-        ),
-      ),
-    );
+        )));
   }
 
   Future<void> saveReportToFirestore() async {

@@ -29,7 +29,7 @@ class _SignupPageState extends State<SignupPage> {
       WidgetsBinding.instance!.addPostFrameCallback((_) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const HomePage()),
+          MaterialPageRoute(builder: (context) => HomePage()),
         );
       });
     }

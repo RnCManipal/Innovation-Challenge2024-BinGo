@@ -342,7 +342,7 @@ class _LoginPageState extends State<LoginPage> {
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) =>
-                                              const HomePage()),
+                                              HomePage()),
                                     );
                                   } else {
                                     // Handle sign-in failure if needed

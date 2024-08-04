@@ -1,7 +1,6 @@
 import 'package:bingo/offers_page.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'HomePage.dart';
 
 class Home extends StatefulWidget {
   Home({Key? key, required this.screenSize}) : super(key: key);

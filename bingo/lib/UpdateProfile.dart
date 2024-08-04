@@ -24,7 +24,6 @@ class _UpdateProfileState extends State<UpdateProfile> {
       if (user != null) {
         String uid = user.uid;
         String name = _nameController.text;
-        String username = _usernameController.text;
         String password = _passwordController.text;
         String confirmPassword = _confirmPasswordController.text;
 
@@ -32,7 +31,6 @@ class _UpdateProfileState extends State<UpdateProfile> {
           // Update Firestore
           await FirebaseFirestore.instance.collection('users').doc(uid).update({
             'name': name,
-            'email': username,
           });
           // Update Firebase Authentication password
           await user.updatePassword(password);
@@ -43,7 +41,6 @@ class _UpdateProfileState extends State<UpdateProfile> {
 
           // Clear the input fields
           _nameController.clear();
-          _usernameController.clear();
           _passwordController.clear();
           _confirmPasswordController.clear();
         } else {
