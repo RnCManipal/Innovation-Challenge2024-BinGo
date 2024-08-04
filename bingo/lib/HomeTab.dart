@@ -151,7 +151,7 @@ void _showPopup(BuildContext context) {
               ),
               const SizedBox(height: 20), // Example spacingq
               CustomContainer(
-              height: screenSize.height * 0.25,
+              height: screenSize.height * 0.2,
               screenSize: screenSize,
               children: [
                 Padding(

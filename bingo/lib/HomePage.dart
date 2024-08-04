@@ -367,35 +367,33 @@ void updateSelectedIndex(int index) {
                           ]),
                       const SizedBox(height: 20),
                       CustomContainer(
-                          height: screenSize.height * 0.28,
+                          height: screenSize.height * 0.2,
                           screenSize: screenSize,
                           children: [
                             Padding(
-                              padding: EdgeInsets.only(
-                                  top: screenSize.height * 0.03,
-                                  left: screenSize.width * 0.1),
-                              child: Text(
-                                pointcount.toString(),
-                                style: TextStyle(
-                                  fontFamily: 'Roboto',
-                                  fontSize: screenSize.width * 0.1,
-                                  fontWeight: FontWeight.bold,
-                                  color: const Color.fromARGB(255, 15, 191, 38),
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.only(
-                                  bottom: screenSize.height * 0.0,
-                                  left: screenSize.width * 0.52),
-                              child: Text(
-                                "points",
-                                style: TextStyle(
-                                  fontFamily: 'Roboto',
-                                  fontSize: screenSize.width * 0.06,
-                                  fontWeight: FontWeight.bold,
-                                  color: const Color.fromARGB(255, 0, 0, 0),
-                                ),
+                              padding: EdgeInsets.only(top: screenSize.height * 0.02, left: screenSize.width * 0.1),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    "0",
+                                    style: TextStyle(
+                                      fontFamily: 'Roboto',
+                                      fontSize: screenSize.width * 0.1,
+                                      fontWeight: FontWeight.bold,
+                                      color: const Color.fromARGB(255, 15, 191, 38),
+                                    ),
+                                  ),
+                                  SizedBox(width: 20), // Add some space between "0" and "points"
+                                  Text(
+                                    "points",
+                                    style: TextStyle(
+                                      fontFamily: 'Roboto',
+                                      fontSize: screenSize.width * 0.06,
+                                      fontWeight: FontWeight.bold,
+                                      color: const Color.fromARGB(255, 0, 0, 0),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                             const SizedBox(height: 5),

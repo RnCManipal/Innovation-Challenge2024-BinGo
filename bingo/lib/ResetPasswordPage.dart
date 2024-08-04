@@ -161,7 +161,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                               borderSide: BorderSide.none,
                               borderRadius: BorderRadius.circular(screenSize.width * 0.1),
                             ),
-                            hintText: 'Enter your username',
+                            hintText: 'Enter your email',
                           ),
                           keyboardType: TextInputType.emailAddress,
                           validator: (value) {
