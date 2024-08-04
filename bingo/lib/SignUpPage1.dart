@@ -92,9 +92,10 @@ class _SignupPageOneState extends State<SignupPageOne> {
 
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const HomePage()),
+        MaterialPageRoute(builder: (context) => HomePage()),
       );
     } catch (e) {
+      
       print('Error creating account: $e');
 
       if (!mounted){

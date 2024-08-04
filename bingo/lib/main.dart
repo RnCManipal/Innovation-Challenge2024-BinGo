@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
           } else {
             if (snapshot.hasData && snapshot.data != null) {
               // User is authenticated, navigate to HomePage
-              return const HomePage();
+              return HomePage();
             } else {
               // No user authenticated, navigate to SignupPage or LoginPage
               return const SignupPage(); // You can replace this with LoginPage or any other widget

@@ -8,6 +8,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:geocoding/geocoding.dart' as geocode;
 import 'package:http/http.dart' as http;
+import 'HomePage.dart';
 
 class ViewUserReportsTab extends StatefulWidget {
   @override
@@ -94,14 +95,9 @@ class _ViewUserReportsTabState extends State<ViewUserReportsTab> {
                   top: screenHeight * 0.17,
                   left: screenWidth * 0.6,
                   child: ElevatedButton(
-                    onPressed: () async {
-                      await FirebaseAuth.instance.signOut();
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const UserReportTab()),
-                      );
-                    },
+                    onPressed: () {
+                        HomePage.homePageKey.currentState?.updateSelectedIndex(7);
+                      },
                     child: const Text('Create Report'),
                   ),
                 ),

@@ -1,7 +1,6 @@
 import 'package:bingo/offers_page.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'HomePage.dart';
 
 class Home extends StatelessWidget {
   Home({Key? key, required this.screenSize}) : super(key: key);
@@ -189,10 +188,7 @@ void _showPopup(BuildContext context) {
                     height: screenSize.height * 0.06,
                     child: ElevatedButton(
                       onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => OffersPage()),
-                        );
+                        HomePage.homePageKey.currentState?.updateSelectedIndex(4);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color.fromARGB(255, 255, 153, 1),
