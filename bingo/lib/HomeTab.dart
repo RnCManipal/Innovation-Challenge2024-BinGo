@@ -1,6 +1,7 @@
 import 'package:bingo/offers_page.dart';
 import 'package:flutter/material.dart';
-import 'HomePage.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Home extends StatefulWidget {
   Home({Key? key, required this.screenSize}) : super(key: key);
@@ -21,9 +22,12 @@ class _HomeState extends State<Home> {
   Future<void> _checkAndShowGuide() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      final userDoc = FirebaseFirestore.instance.collection('users').doc(user.uid);
+      final userDoc =
+          FirebaseFirestore.instance.collection('users').doc(user.uid);
       final doc = await userDoc.get();
-      if (!doc.exists || !doc.data()!.containsKey('seenGuide') || !doc.data()!['seenGuide']) {
+      if (!doc.exists ||
+          !doc.data()!.containsKey('seenGuide') ||
+          !doc.data()!['seenGuide']) {
         _showPopup(context);
         // Update Firestore to indicate that the guide has been seen
         await userDoc.set({'seenGuide': true}, SetOptions(merge: true));
@@ -136,7 +140,8 @@ class _HomeState extends State<Home> {
               child: Column(
                 children: [
                   Padding(
-                    padding: EdgeInsets.only(left: widget.screenSize.width * 0.224),
+                    padding:
+                        EdgeInsets.only(left: widget.screenSize.width * 0.224),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -147,12 +152,14 @@ class _HomeState extends State<Home> {
                             style: TextStyle(
                               fontFamily: 'Jost',
                               fontWeight: FontWeight.bold,
-                              fontSize: widget.screenSize.width * 0.1, // Responsive font size
+                              fontSize: widget.screenSize.width *
+                                  0.1, // Responsive font size
                             ),
                           ),
                         ),
                         Padding(
-                          padding: EdgeInsets.only(left: widget.screenSize.width * 0.135),
+                          padding: EdgeInsets.only(
+                              left: widget.screenSize.width * 0.135),
                           child: SizedBox(
                             width: textWidth,
                             child: Text(
@@ -160,7 +167,8 @@ class _HomeState extends State<Home> {
                               style: TextStyle(
                                 fontFamily: 'Jost',
                                 fontWeight: FontWeight.bold,
-                                fontSize: widget.screenSize.width * 0.1, // Responsive font size
+                                fontSize: widget.screenSize.width *
+                                    0.1, // Responsive font size
                               ),
                             ),
                           ),
@@ -174,7 +182,9 @@ class _HomeState extends State<Home> {
                     screenSize: widget.screenSize,
                     children: [
                       Padding(
-                        padding: EdgeInsets.only(top: widget.screenSize.height * 0.02, left: widget.screenSize.width * 0.1),
+                        padding: EdgeInsets.only(
+                            top: widget.screenSize.height * 0.02,
+                            left: widget.screenSize.width * 0.1),
                         child: Row(
                           children: [
                             Text(
@@ -186,7 +196,9 @@ class _HomeState extends State<Home> {
                                 color: const Color.fromARGB(255, 15, 191, 38),
                               ),
                             ),
-                            SizedBox(width: 20), // Add some space between "0" and "points"
+                            SizedBox(
+                                width:
+                                    20), // Add some space between "0" and "points"
                             Text(
                               "points",
                               style: TextStyle(
@@ -201,7 +213,8 @@ class _HomeState extends State<Home> {
                       ),
                       const SizedBox(height: 15), // Adjusted spacing
                       Padding(
-                        padding: EdgeInsets.symmetric(horizontal: widget.screenSize.width * 0.15),
+                        padding: EdgeInsets.symmetric(
+                            horizontal: widget.screenSize.width * 0.15),
                         child: SizedBox(
                           width: widget.screenSize.width * 0.6,
                           height: widget.screenSize.height * 0.06,
@@ -209,15 +222,19 @@ class _HomeState extends State<Home> {
                             onPressed: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => OffersPage()),
+                                MaterialPageRoute(
+                                    builder: (context) => OffersPage()),
                               );
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color.fromARGB(255, 255, 153, 1),
+                              backgroundColor:
+                                  const Color.fromARGB(255, 255, 153, 1),
                               foregroundColor: Colors.white,
-                              padding: EdgeInsets.symmetric(vertical: widget.screenSize.height * 0.015),
+                              padding: EdgeInsets.symmetric(
+                                  vertical: widget.screenSize.height * 0.015),
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(widget.screenSize.width * 0.02),
+                                borderRadius: BorderRadius.circular(
+                                    widget.screenSize.width * 0.02),
                               ),
                             ),
                             child: Center(
@@ -240,7 +257,9 @@ class _HomeState extends State<Home> {
                     screenSize: widget.screenSize,
                     children: [
                       Padding(
-                        padding: EdgeInsets.symmetric(vertical: widget.screenSize.height * 0.04, horizontal: widget.screenSize.width * 0.06),
+                        padding: EdgeInsets.symmetric(
+                            vertical: widget.screenSize.height * 0.04,
+                            horizontal: widget.screenSize.width * 0.06),
                         child: Image.asset(
                           'Images/TruckPhoto.png',
                           height: widget.screenSize.height * 0.25,
@@ -248,7 +267,9 @@ class _HomeState extends State<Home> {
                         ),
                       ),
                       Padding(
-                        padding: EdgeInsets.only(top: widget.screenSize.height * 0, left: widget.screenSize.width * 0),
+                        padding: EdgeInsets.only(
+                            top: widget.screenSize.height * 0,
+                            left: widget.screenSize.width * 0),
                         child: Text(
                           "Help us make the waste management process more efficient",
                           textAlign: TextAlign.center,
@@ -256,7 +277,7 @@ class _HomeState extends State<Home> {
                             fontFamily: 'Jost',
                             fontSize: widget.screenSize.width * 0.06,
                             fontWeight: FontWeight.normal,
-                            color: const Color.fromARGB(255, 0, 0, 0),       
+                            color: const Color.fromARGB(255, 0, 0, 0),
                           ),
                         ),
                       ),
@@ -268,7 +289,9 @@ class _HomeState extends State<Home> {
                     height: widget.screenSize.height * 0.5,
                     children: [
                       Padding(
-                        padding: EdgeInsets.symmetric(vertical: widget.screenSize.height * 0.03, horizontal: widget.screenSize.width * 0.04),
+                        padding: EdgeInsets.symmetric(
+                            vertical: widget.screenSize.height * 0.03,
+                            horizontal: widget.screenSize.width * 0.04),
                         child: Image.asset(
                           'Images/Community.png',
                           height: widget.screenSize.height * 0.25,
@@ -276,7 +299,8 @@ class _HomeState extends State<Home> {
                         ),
                       ),
                       Padding(
-                        padding: EdgeInsets.only(top: widget.screenSize.height * 0),
+                        padding:
+                            EdgeInsets.only(top: widget.screenSize.height * 0),
                         child: Text(
                           "Support your community's health by reporting any spills and also earn reward points",
                           textAlign: TextAlign.center,
@@ -284,7 +308,7 @@ class _HomeState extends State<Home> {
                             fontFamily: 'Jost',
                             fontSize: widget.screenSize.width * 0.06,
                             fontWeight: FontWeight.normal,
-                            color: const Color.fromARGB(255, 0, 0, 0),       
+                            color: const Color.fromARGB(255, 0, 0, 0),
                           ),
                         ),
                       ),
