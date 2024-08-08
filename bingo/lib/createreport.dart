@@ -7,6 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:geocoding/geocoding.dart' as geocode;
 import 'package:http/http.dart' as http;
+import 'HomePage.dart';
 
 class UserReportTab extends StatefulWidget {
   const UserReportTab({Key? key}) : super(key: key);
@@ -36,9 +37,21 @@ class _UserReportTabState extends State<UserReportTab> {
         backgroundColor: Colors.white,
         body: SingleChildScrollView(
             child: SizedBox(
-          height: screenSize.height * 1.2,
+          height: screenSize.height * 1.5,
           child: Stack(
             children: <Widget>[
+              Positioned(
+                top: screenSize.height * 0.08,
+                left: screenSize.width * 0.8,
+                child: GestureDetector(
+                  onTap: () {
+                      HomePage.homePageKey.currentState?.updateSelectedIndex(2);
+                  },
+                  child: const Image(
+                    image: AssetImage('Images/BackButton.png'),
+                  ),
+                ),
+              ),
               Positioned(
                 top: screenHeight * 0.08,
                 left: screenWidth * 0.05,
@@ -83,7 +96,7 @@ class _UserReportTabState extends State<UserReportTab> {
                 left: screenWidth * 0.025,
                 child: Container(
                   width: screenWidth * 0.95,
-                  height: screenHeight * 0.8, // Adjust height to fit the screen
+                  height: screenHeight * 1, // Adjust height to fit the screen
                   padding: EdgeInsets.all(screenWidth * 0.05),
                   decoration: BoxDecoration(
                     color: Color(0xffE0FFFF),
@@ -252,6 +265,22 @@ class _UserReportTabState extends State<UserReportTab> {
                           ),
                         ],
                       ),
+                      Positioned(
+                        top: screenHeight * 0.6,
+                        left: screenWidth * 0.05,
+                        child: image != null
+                            ? Container(
+                                width: screenWidth * 1,
+                                height: screenHeight * 0.2,
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                    image: FileImage(image!),
+                                    fit: BoxFit.contain,
+                                  ),
+                                ),
+                              )
+                            : SizedBox.shrink(),
+                      ),
                       SizedBox(height: screenWidth * 0.04),
                       uploading
                           ? Center(child: CircularProgressIndicator())
@@ -278,253 +307,154 @@ class _UserReportTabState extends State<UserReportTab> {
                                 ),
                               ),
                             ),
+                    
                     ],
                   ),
                 ),
               ),
+              
             ],
           ),
         )));
   }
 
-  Future<void> saveReportToFirestore() async {
-    String title = titleController.text.trim();
-    String location = locationController.text.trim();
-    String description = descriptionController.text.trim();
+Future<void> saveReportToFirestore() async {
+  String title = titleController.text.trim();
+  String location = locationController.text.trim();
+  String description = descriptionController.text.trim();
 
-    if (title.isEmpty ||
-        location.isEmpty ||
-        description.isEmpty ||
-        severity.isEmpty) {
-      // Show an error dialog if any of the fields are empty
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Error'),
-            content: Text('Please fill out all fields.'),
-            actions: <Widget>[
-              TextButton(
-                child: Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
-      return;
+  if (title.isEmpty || location.isEmpty || description.isEmpty || severity.isEmpty) {
+    // Show an error dialog if any of the fields are empty
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Error'),
+          content: Text('Please fill out all fields.'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+    return;
+  }
+
+  setState(() {
+    uploading = true; // Start showing loader while uploading
+  });
+
+  try {
+    // Get current user information
+    final user = await FirebaseAuth.instance
+        .authStateChanges()
+        .firstWhere((user) => user != null);
+
+    if (user == null) {
+      throw Exception('User not logged in');
     }
 
-    setState(() {
-      uploading = true; // Start showing loader while uploading
+    String userEmail = user.email ?? 'Unknown';
+
+    // Geocode the location to get latitude and longitude
+    List<geocode.Location> locations =
+        await geocode.locationFromAddress(location);
+    if (locations.isEmpty) {
+      throw Exception('Failed to get coordinates for the provided location');
+    }
+    double latitude = locations.first.latitude;
+    double longitude = locations.first.longitude;
+
+    // Call API to get the Zip Code using latitude and longitude
+    zipCode = await fetchZipCode(latitude, longitude);
+
+    // Access Firestore instance and collection
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+    CollectionReference reports = firestore.collection('reports');
+
+    // Add a new document with auto-generated ID
+    DocumentReference ref = await reports.add({
+      'title': title,
+      'latitude': latitude,
+      'longitude': longitude,
+      'description': description,
+      'severity': severity,
+      'isResolved': false,
+      'isSpam': false,
+      'location': location,
+      'zipCode': zipCode,
+      'userEmail': userEmail,
     });
 
-    try {
-      // Get current user information
-      final user = await FirebaseAuth.instance
-          .authStateChanges()
-          .firstWhere((user) => user != null);
+    // Upload image if available
+    if (image != null) {
+      String fileName =
+          '${ref.id}_${DateTime.now().millisecondsSinceEpoch}.png'; // Using Firestore document ID and timestamp
+      Reference storageRef =
+          FirebaseStorage.instance.ref().child('images/reports/$fileName');
+      await storageRef.putFile(image!);
 
-      if (user == null) {
-        throw Exception('User not logged in');
-      }
-
-      String userEmail = user.email ?? 'Unknown';
-
-      List<geocode.Location> locations =
-          await geocode.locationFromAddress(location);
-      if (locations.isEmpty) {
-        throw Exception('Failed to get coordinates for the provided location');
-      }
-      double latitude = locations.first.latitude;
-      double longitude = locations.first.longitude;
-
-      // Call API to get the Zip Code using latitude and longitude
-      zipCode = await fetchZipCode(latitude, longitude);
-
-      // Access Firestore instance and collection
-      FirebaseFirestore firestore = FirebaseFirestore.instance;
-      CollectionReference reports = firestore.collection('reports');
-
-      // Add a new document with auto-generated ID
-      DocumentReference ref = await reports.add({
-        'title': title,
-        'latitude': latitude,
-        'longitude': longitude,
-        'description': description,
-        'severity': severity,
-        'isResolved': false,
-        'location': location,
-        'zipCode': zipCode,
-        'userEmail': userEmail,
-      });
-      // Upload image if available
-      if (image != null) {
-        String fileName =
-            '${ref.id}_${DateTime.now().millisecondsSinceEpoch}.png'; // Using Firestore document ID and timestamp
-        Reference storageRef =
-            FirebaseStorage.instance.ref().child('images/reports/$fileName');
-        await storageRef.putFile(image!);
-
-        // Update Firestore document with image URL
-        String imageUrl = await storageRef.getDownloadURL();
-        await ref.update({'imageUrl': imageUrl});
-      }
-
-      // Clear input fields after saving
-      titleController.clear();
-      locationController.clear();
-      descriptionController.clear();
-      severity = "Medium"; // Reset severity to default
-      image = null;
-      zipCode = null; // Reset zip code
-
-      // Show success message
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Success'),
-            content: Text('Report filed successfully!'),
-            actions: <Widget>[
-              TextButton(
-                child: Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
-    } catch (e) {
-      print('Error saving report: $e');
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Error'),
-            content: Text('Failed to file report. Please try again.'),
-            actions: <Widget>[
-              TextButton(
-                child: Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
-    } on FirebaseAuthException catch (e) {
-      // Handle Firebase authentication errors (e.g., user not found)
-      print('FirebaseAuthException: $e');
-      // ... Show appropriate error dialog
-    } catch (e) {
-      // Handle other errors
-      print('Error saving report: $e');
-      // ... Show appropriate error dialog
-    } finally {
-      setState(() {
-        uploading = false; // Stop showing loader after uploading
-      });
+      // Update Firestore document with image URL
+      String imageUrl = await storageRef.getDownloadURL();
+      await ref.update({'imageUrl': imageUrl});
     }
 
-    try {
-      // Geocode the location to get latitude and longitude
-      List<geocode.Location> locations =
-          await geocode.locationFromAddress(location);
-      if (locations.isEmpty) {
-        throw Exception('Failed to get coordinates for the provided location');
-      }
-      double latitude = locations.first.latitude;
-      double longitude = locations.first.longitude;
+    // Clear input fields after saving
+    titleController.clear();
+    locationController.clear();
+    descriptionController.clear();
+    severity = "Medium"; // Reset severity to default
+    image = null;
+    zipCode = null; // Reset zip code
 
-      // Call API to get the Zip Code using latitude and longitude
-      zipCode = await fetchZipCode(latitude, longitude);
-
-      // Access Firestore instance and collection
-      FirebaseFirestore firestore = FirebaseFirestore.instance;
-      CollectionReference reports = firestore.collection('reports');
-
-      // Add a new document with auto-generated ID
-      DocumentReference ref = await reports.add({
-        'title': title,
-        'latitude': latitude,
-        'longitude': longitude,
-        'description': description,
-        'severity': severity,
-        'isResolved': false,
-        'location': location,
-        'zipCode': zipCode, // Store retrieved zip code in Firestore
-      });
-
-      // Upload image if available
-      if (image != null) {
-        String fileName =
-            '${ref.id}_${DateTime.now().millisecondsSinceEpoch}.png'; // Using Firestore document ID and timestamp
-        Reference storageRef =
-            FirebaseStorage.instance.ref().child('images/reports/$fileName');
-        await storageRef.putFile(image!);
-
-        // Update Firestore document with image URL
-        String imageUrl = await storageRef.getDownloadURL();
-        await ref.update({'imageUrl': imageUrl});
-      }
-
-      // Clear input fields after saving
-      titleController.clear();
-      locationController.clear();
-      descriptionController.clear();
-      severity = "Medium"; // Reset severity to default
-      image = null;
-      zipCode = null; // Reset zip code
-
-      // Show success message
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Success'),
-            content: Text('Report filed successfully!'),
-            actions: <Widget>[
-              TextButton(
-                child: Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
-    } catch (e) {
-      print('Error saving report: $e');
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Error'),
-            content: Text('Failed to file report. Please try again.'),
-            actions: <Widget>[
-              TextButton(
-                child: Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
-    } finally {
-      setState(() {
-        uploading = false; // Stop showing loader after uploading
-      });
-    }
+    // Show success message
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Success'),
+          content: Text('Report filed successfully!'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  } catch (e) {
+    print('Error saving report: $e');
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Error'),
+          content: Text('Failed to file report. Please try again.'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  } finally {
+    setState(() {
+      uploading = false; // Stop showing loader after uploading
+    });
   }
+}
 
   Future<String?> fetchZipCode(double latitude, double longitude) async {
     final String apiUrl =

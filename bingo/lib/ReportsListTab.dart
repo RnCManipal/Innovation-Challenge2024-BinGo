@@ -70,6 +70,17 @@ class _DriverReportTabState extends State<DriverReportTab> {
                     });
                   }
                 },
+                onSpam: () async {
+                  if (selectedReport != null) {
+                    await FirebaseFirestore.instance
+                        .collection('reports')
+                        .doc(selectedReport!['id'])
+                        .update({'isSpam': true,'isResolved':Null});
+                    setState(() {
+                      selectedReport = null; // Clear selected report after resolving
+                    });
+                  }
+                },
               )
         : Scaffold(
             backgroundColor: Colors.white,

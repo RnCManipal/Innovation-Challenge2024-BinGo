@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'HomePage.dart';
 
 class UpdateProfile extends StatefulWidget {
   final Size screenSize;
@@ -13,7 +14,6 @@ class UpdateProfile extends StatefulWidget {
 
 class _UpdateProfileState extends State<UpdateProfile> {
   final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
@@ -56,7 +56,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
     } catch (error) {
       print("Error: $error");
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text("Error updating info"),
+        content: Text("Error updating info $error"),
       ));
     }
   }

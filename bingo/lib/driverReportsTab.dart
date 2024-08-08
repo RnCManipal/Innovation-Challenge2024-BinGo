@@ -70,6 +70,17 @@ class _DriverReportTabState extends State<DriverReportTab> {
                     });
                   }
                 },
+                onSpam: () async {
+                  if (selectedReport != null) {
+                    await FirebaseFirestore.instance
+                        .collection('reports')
+                        .doc(selectedReport!['id'])
+                        .update({'isSpam': true,'isResolved': "NA"});
+                    setState(() {
+                      selectedReport = null; // Clear selected report after resolving
+                    });
+                  }
+                },
               )
         : Scaffold(
             backgroundColor: Colors.white,
@@ -103,9 +114,9 @@ class _DriverReportTabState extends State<DriverReportTab> {
                 ),
                 Positioned(
                   top: screenHeight * 0.3,
-                  left: screenWidth * 0.1,
+                  left: screenWidth * 0.05,
                   child: Container(
-                    width: screenWidth * 0.8,
+                    width: screenWidth * 0.9,
                     height: screenHeight * 0.25,
                     padding: EdgeInsets.all(screenWidth * 0.04),
                     decoration: BoxDecoration(
@@ -135,7 +146,11 @@ class _DriverReportTabState extends State<DriverReportTab> {
                               var reports = snapshot.data!.docs;
 
                               // Sorting reports based on severity
-                              reports.sort((a, b) => a['severity'].compareTo(b['severity']));
+                              reports.sort((a, b) {
+                              int severityA = getSeverityLevel(a['severity']);
+                              int severityB = getSeverityLevel(b['severity']);
+                              return severityA.compareTo(severityB);
+                            });
 
                               return SingleChildScrollView(
                                 child: Column(
@@ -159,17 +174,17 @@ class _DriverReportTabState extends State<DriverReportTab> {
                                           });
                                         },
                                         child: Container(
-                                          width: screenWidth * 0.6,
-                                          height: screenHeight * 0.08,
+                                          width: screenWidth * 0.8,
+                                          height: screenHeight * 0.09,
                                           decoration: BoxDecoration(
                                             color: const Color(0xffE0FFFF),
                                             borderRadius: BorderRadius.circular(screenWidth * 0.02),
                                             boxShadow: [
                                               BoxShadow(
-                                                color: Colors.grey.withOpacity(0.5),
-                                                spreadRadius: 3.0,
+                                                color: Colors.grey.withOpacity(0.3),
+                                                spreadRadius: 2.0,
                                                 blurRadius: 6.0,
-                                                offset: Offset(0, 3),
+                                                offset: Offset(0, 2),
                                               ),
                                             ],
                                           ),
@@ -179,14 +194,28 @@ class _DriverReportTabState extends State<DriverReportTab> {
                                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                               children: [
                                                 Expanded(
-                                                  child: Text(
-                                                    report['title'],
-                                                    style: TextStyle(
-                                                      fontFamily: 'Roboto',
-                                                      fontSize: screenWidth * 0.04,
-                                                    ),
-                                                    overflow: TextOverflow.ellipsis,
-                                                  ),
+                                                  child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                report['title'],
+                                                style: TextStyle(
+                                                  fontFamily: 'Roboto',
+                                                  fontSize: screenWidth * 0.04,
+                                                ),
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                              SizedBox(height: screenWidth * 0.01), // Add some spacing between title and additional text
+                                              Text(
+                                                "Severity:"+report['severity'],
+                                                style: TextStyle(
+                                                  fontFamily: 'Roboto',
+                                                  fontSize: screenWidth * 0.03, // Adjust the font size as needed
+                                                  color: Colors.grey, // You can change the color as desired
+                                                ),
+                                              ),
+                                            ],
+                                          ),
                                                 ),
                                                 SizedBox(
                                                   width: screenWidth * 0.28,
@@ -259,9 +288,9 @@ class _DriverReportTabState extends State<DriverReportTab> {
                 ),
                 Positioned(
                   top: screenHeight * 0.65, // Adjusted position for resolved reports
-                  left: screenWidth * 0.1,
+                  left: screenWidth * 0.05,
                   child: Container(
-                    width: screenWidth * 0.8,
+                    width: screenWidth * 0.9,
                     height: screenHeight * 0.25,
                     padding: EdgeInsets.all(screenWidth * 0.04),
                     decoration: BoxDecoration(
@@ -310,34 +339,48 @@ class _DriverReportTabState extends State<DriverReportTab> {
                                     });
                                   },
                                   child: Container(
-                                    width: screenWidth * 0.6,
-                                    height: screenHeight * 0.08,
+                                    width: screenWidth * 0.8,
+                                    height: screenHeight * 0.09,
                                     decoration: BoxDecoration(
                                       color: const Color(0xffE0FFFF),
                                       borderRadius: BorderRadius.circular(screenWidth * 0.02),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: Colors.grey.withOpacity(0.5),
-                                          spreadRadius: 3.0,
+                                          color: Colors.grey.withOpacity(0.3),
+                                          spreadRadius: 2.0,
                                           blurRadius: 6.0,
-                                          offset: Offset(0, 3),
+                                          offset: Offset(0, 2),
                                         ),
                                       ],
                                     ),
                                     child: Padding(
-                                      padding:                                      EdgeInsets.all(screenWidth * 0.04),
+                                      padding:EdgeInsets.all(screenWidth * 0.04),
                                       child: Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
                                           Expanded(
-                                            child: Text(
-                                              report['title'],
-                                              style: TextStyle(
-                                                fontFamily: 'Roboto',
-                                                fontSize: screenWidth * 0.04,
+                                            child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                report['title'],
+                                                style: TextStyle(
+                                                  fontFamily: 'Roboto',
+                                                  fontSize: screenWidth * 0.04,
+                                                ),
+                                                overflow: TextOverflow.ellipsis,
                                               ),
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
+                                              SizedBox(height: screenWidth * 0.01), // Add some spacing between title and additional text
+                                              Text(
+                                                "Severity:"+report['severity'],
+                                                style: TextStyle(
+                                                  fontFamily: 'Roboto',
+                                                  fontSize: screenWidth * 0.03, // Adjust the font size as needed
+                                                  color: Colors.grey, // You can change the color as desired
+                                                ),
+                                              ),
+                                            ],
+                                          ),
                                           ),
                                           SizedBox(
                                             width: screenWidth * 0.28,
@@ -398,5 +441,17 @@ class _DriverReportTabState extends State<DriverReportTab> {
               ],
             ),
           );
+  }
+}
+int getSeverityLevel(String severity) {
+  switch (severity) {
+    case 'High':
+      return 1;
+    case 'Medium':
+      return 2;
+    case 'Low':
+      return 3;
+    default:
+      return 0;
   }
 }
