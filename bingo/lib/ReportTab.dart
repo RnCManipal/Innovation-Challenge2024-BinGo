@@ -52,7 +52,7 @@ class _ReportTabState extends State<ReportTab> {
       // Conditional rendering based on accountType
       return Center(
         child: accountType == 'User'
-            ? const UserReportTab()
+            ? ViewUserReportsTab()
             : accountType == 'Driver'
                 ? const DriverReportTab()
                 : Text(

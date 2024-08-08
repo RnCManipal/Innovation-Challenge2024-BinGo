@@ -1,8 +1,7 @@
 import 'package:bingo/HomeTab.dart';
 import 'package:bingo/MapTab.dart';
-import 'package:bingo/MapTabUser.dart';
-import 'package:bingo/MapTabDriver.dart';
 import 'package:bingo/ReportTab.dart';
+import 'package:bingo/createreport.dart';
 import 'package:bingo/offers_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -12,35 +11,94 @@ import 'SignupPage.dart'; // Import your SignupPage.dart file
 import 'UpdateProfile.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  static final GlobalKey<_HomePageState> homePageKey = GlobalKey<_HomePageState>();
+  HomePage({Key? key}) : super(key: homePageKey);
 
   @override
   _HomePageState createState() => _HomePageState();
 }
 
+
+
 class _HomePageState extends State<HomePage> {
   int selectedImageIndex = 0; // Track the index of the selected image
+  String? driverZipCode;
   late User loggedInUser; // Variable to hold logged-in user details
   late DocumentSnapshot
       userDoc; // Variable to hold user document from Firestore
-
+  int reportCount = 0;
+  int pointcount=0;
+  
   @override
-  void initState() {
-    super.initState();
-    // Get the currently logged-in user
-    loggedInUser = FirebaseAuth.instance.currentUser!;
-    // Fetch user document from Firestore using the UID
+void initState() {
+  super.initState();
+  
+  // Get the currently logged-in user
+  loggedInUser = FirebaseAuth.instance.currentUser!;
+  fetchUserDoc();
+
+  fetchDriverZipCode().then((zipCode) {
+    setState(() {
+      driverZipCode = zipCode; // Update the state with the ZIP code
+    });
+  });
+}
+void updateSelectedIndex(int index) {
+    setState(() {
+      selectedImageIndex = index;
+    });
+  }
+  Future<String?> fetchDriverZipCode() async {
+    User? user = FirebaseAuth.instance.currentUser; // Get current user
+    if (user != null) {
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+      if (userDoc.exists) {
+        final data = userDoc.data() as Map<String, dynamic>?;
+        return data?['zipCode']; // Replace with the actual field name
+      }
+    }
+    return null;
+  }
+  void fetchUserDoc() {
     FirebaseFirestore.instance
         .collection('users')
         .doc(loggedInUser.uid)
-        .get()
-        .then((doc) {
+        .snapshots()
+        .listen((doc) {
       setState(() {
-        userDoc = doc; // Store the fetched document
+        userDoc = doc;
       });
-    }).catchError((error) {
-      print('Error fetching user data: $error');
+      fetchReportCount(doc['email']);
     });
+  }
+
+  // Fetch user document from Firestore using the UID
+  void fetchReportCount(String userEmail) {
+    if(userDoc['accountType']=='User'){
+    FirebaseFirestore.instance
+        .collection('reports')
+        .where('userEmail', isEqualTo: userEmail)
+        .snapshots()
+        .listen((querySnapshot) {
+      setState(() {
+        reportCount = querySnapshot.docs.length;
+        pointcount=reportCount*10;
+      });
+    });
+    }
+    if(userDoc['accountType']=='Driver'){
+    FirebaseFirestore.instance
+        .collection('reports')
+        .where('zipCode', isEqualTo: driverZipCode)
+        .where('isResolved',isEqualTo: true)
+        .snapshots()
+        .listen((querySnapshot) {
+      setState(() {
+        reportCount = querySnapshot.docs.length;
+        pointcount=reportCount*10;
+      });
+    });
+    }
   }
 
   String getAccountType() {
@@ -48,6 +106,22 @@ class _HomePageState extends State<HomePage> {
       return userDoc['accountType'];
     }
     return 'Loading...'; // Default to 'user' if accountType is not set
+  }
+
+  Future<void> addFieldToExistingDocument(
+      String documentId, String userEmail) async {
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+    CollectionReference users = firestore.collection('users');
+
+    // Reference to the existing document
+    DocumentReference ref = users.doc(documentId);
+
+    // Update the document to add a new field
+    await ref.update({
+      'No of Reports': reportCount,
+    }).catchError((error) {
+      print("Failed to update document: $error");
+    });
   }
 
   @override
@@ -70,7 +144,7 @@ class _HomePageState extends State<HomePage> {
                 SizedBox(
                   height: textTopPadding, // Top space before text
                 ),
-                if (selectedImageIndex == 0) Home(screenSize: screenSize),
+                if (selectedImageIndex == 0) Home(screenSize: screenSize,reportCount: pointcount,),
               ],
             ),
           ),
@@ -102,6 +176,12 @@ class _HomePageState extends State<HomePage> {
           ),
           Center(
             child: selectedImageIndex ==
+                    7 
+                ? UserReportTab()
+                : Container(), 
+          ),
+          Center(
+            child: selectedImageIndex ==
                     5 // Assuming selectedImageIndex 5 is for "User.png"
                 ? SingleChildScrollView(
                     child: Column(
@@ -111,9 +191,10 @@ class _HomePageState extends State<HomePage> {
                       Padding(
                         padding: EdgeInsets.only(
                           top: screenSize.height * 0.05,
+                          left:screenSize.width * 0.08,
                         ),
                         child: SizedBox(
-                          width: screenSize.width * 0.3,
+                          width: screenSize.width * 0.4,
                           child: Text(
                             "BinGo",
                             style: TextStyle(
@@ -131,20 +212,20 @@ class _HomePageState extends State<HomePage> {
                             vertical: screenSize.height * 0.02,
                             horizontal: screenSize.width * 0.39),
                         child: SizedBox(
-                          width: screenSize.width * 0.32,
+                          width: screenSize.width * 0.4,
                           child: Text(
                             "Profile",
                             style: TextStyle(
                               fontFamily: 'Jost',
                               fontWeight: FontWeight.bold,
                               fontSize: screenSize.width *
-                                  0.07, // Responsive font size
+                                  0.06, // Responsive font size
                             ),
                           ),
                         ),
                       ),
                       CustomContainer(
-                          height: screenSize.height * 0.4,
+                          height: screenSize.height * 0.49,
                           screenSize: screenSize,
                           children: [
                             if (userDoc != null)
@@ -160,7 +241,7 @@ class _HomePageState extends State<HomePage> {
                                       fontFamily: 'Jost',
                                       fontWeight: FontWeight.bold,
                                       fontSize: screenSize.width *
-                                          0.06, // Responsive font size
+                                          0.05, // Responsive font size
                                     ),
                                   ),
                                 ),
@@ -170,14 +251,14 @@ class _HomePageState extends State<HomePage> {
                                   top: screenSize.height * 0,
                                   left: screenSize.height * 0.045),
                               child: SizedBox(
-                                width: screenSize.width * 0.8,
+                                width: screenSize.width * 0.5,
                                 child: Text(
                                   "${userDoc['name']}",
                                   style: TextStyle(
                                     fontFamily: 'Jost',
                                     fontWeight: FontWeight.normal,
                                     fontSize: screenSize.width *
-                                        0.06, // Responsive font size
+                                        0.05, // Responsive font size
                                   ),
                                 ),
                               ),
@@ -194,7 +275,7 @@ class _HomePageState extends State<HomePage> {
                                     fontFamily: 'Jost',
                                     fontWeight: FontWeight.bold,
                                     fontSize: screenSize.width *
-                                        0.06, // Responsive font size
+                                        0.05, // Responsive font size
                                   ),
                                 ),
                               ),
@@ -211,7 +292,7 @@ class _HomePageState extends State<HomePage> {
                                     fontFamily: 'Jost',
                                     fontWeight: FontWeight.normal,
                                     fontSize: screenSize.width *
-                                        0.04, // Responsive font size
+                                        0.05, // Responsive font size
                                   ),
                                 ),
                               ),
@@ -228,7 +309,40 @@ class _HomePageState extends State<HomePage> {
                                     fontFamily: 'Jost',
                                     fontWeight: FontWeight.bold,
                                     fontSize: screenSize.width *
-                                        0.06, // Responsive font size
+                                        0.05, // Responsive font size
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(
+                                  top: screenSize.height * 0.016,
+                                  left: screenSize.height * 0.045),
+                              child: SizedBox(
+                                width: screenSize.width * 0.6,
+                                child: Text(
+                                  reportCount.toString(),
+                                  style: TextStyle(
+                                    fontFamily: 'Jost',
+                                    fontSize: screenSize.width *
+                                        0.05, // Responsive font size
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(
+                                  top: screenSize.height * 0.016,
+                                  left: screenSize.height * 0.045),
+                              child: SizedBox(
+                                width: screenSize.width * 0.6,
+                                child: Text(
+                                  "Account Type:",
+                                  style: TextStyle(
+                                    fontFamily: 'Jost',
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: screenSize.width *
+                                        0.05, // Responsive font size
                                   ),
                                 ),
                               ),
@@ -245,7 +359,7 @@ class _HomePageState extends State<HomePage> {
                                     fontFamily: 'Jost',
                                     fontWeight: FontWeight.normal,
                                     fontSize: screenSize.width *
-                                        0.04, // Responsive font size
+                                        0.05, // Responsive font size
                                   ),
                                 ),
                               ),
@@ -253,35 +367,33 @@ class _HomePageState extends State<HomePage> {
                           ]),
                       const SizedBox(height: 20),
                       CustomContainer(
-                          height: screenSize.height * 0.22,
+                          height: screenSize.height * 0.2,
                           screenSize: screenSize,
                           children: [
                             Padding(
-                              padding: EdgeInsets.only(
-                                  top: screenSize.height * 0.03,
-                                  left: screenSize.width * 0.1),
-                              child: Text(
-                                "1500",
-                                style: TextStyle(
-                                  fontFamily: 'Roboto',
-                                  fontSize: screenSize.width * 0.1,
-                                  fontWeight: FontWeight.bold,
-                                  color: const Color.fromARGB(255, 15, 191, 38),
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.only(
-                                  bottom: screenSize.height * 0.0,
-                                  left: screenSize.width * 0.52),
-                              child: Text(
-                                "points",
-                                style: TextStyle(
-                                  fontFamily: 'Roboto',
-                                  fontSize: screenSize.width * 0.06,
-                                  fontWeight: FontWeight.bold,
-                                  color: const Color.fromARGB(255, 0, 0, 0),
-                                ),
+                              padding: EdgeInsets.only(top: screenSize.height * 0.02, left: screenSize.width * 0.1),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    pointcount.toString(),
+                                    style: TextStyle(
+                                      fontFamily: 'Roboto',
+                                      fontSize: screenSize.width * 0.1,
+                                      fontWeight: FontWeight.bold,
+                                      color: const Color.fromARGB(255, 15, 191, 38),
+                                    ),
+                                  ),
+                                  SizedBox(width: 20), // Add some space between "0" and "points"
+                                  Text(
+                                    "points",
+                                    style: TextStyle(
+                                      fontFamily: 'Roboto',
+                                      fontSize: screenSize.width * 0.06,
+                                      fontWeight: FontWeight.bold,
+                                      color: const Color.fromARGB(255, 0, 0, 0),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                             const SizedBox(height: 5),
@@ -293,7 +405,10 @@ class _HomePageState extends State<HomePage> {
                                 height: screenSize.height * 0.06,
                                 child: TextButton(
                                   onPressed: () {
-                                    print("button pressed");
+                                    setState(() {
+                                selectedImageIndex =
+                                    4; // Assuming 6 is the index for Update Profile tab
+                              });;
                                   },
                                   style: ButtonStyle(
                                     backgroundColor: WidgetStateProperty.all(
@@ -546,10 +661,7 @@ class _HomePageState extends State<HomePage> {
     return GestureDetector(
       onTap: () {
         // Update selected image index when tapped
-        setState(() {
-          selectedImageIndex = index;
-        });
-        print(selectedImageIndex);
+        HomePage.homePageKey.currentState?.updateSelectedIndex(index);
       },
       child: Container(
         margin: const EdgeInsets.all(8.0), // Adjust margin as needed

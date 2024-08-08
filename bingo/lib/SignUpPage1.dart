@@ -65,22 +65,8 @@ class _SignupPageOneState extends State<SignupPageOne> {
       );
       return;
     }
-
-    showDialog(
-    context: context,
-    barrierDismissible: false,
-    builder: (BuildContext context) {
-      return const AlertDialog(
-        content: Row(
-          children: [
-            CircularProgressIndicator(),
-            SizedBox(width: 20),
-            Text("Creating account"),
-          ],
-        ),
-      );
-    },
-  );
+  
+    
 
     try {
       UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
@@ -106,9 +92,10 @@ class _SignupPageOneState extends State<SignupPageOne> {
 
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const HomePage()),
+        MaterialPageRoute(builder: (context) => HomePage()),
       );
     } catch (e) {
+      
       print('Error creating account: $e');
 
       if (!mounted){
