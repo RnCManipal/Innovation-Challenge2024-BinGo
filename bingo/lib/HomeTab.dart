@@ -179,7 +179,7 @@ class _HomeState extends State<Home> {
                   ),
                   const SizedBox(height: 20), // Example spacing
                   CustomContainer(
-                    height: widget.screenSize.height * 0.25,
+                    height: widget.screenSize.height * 0.20,
                     screenSize: widget.screenSize,
                     children: [
                       Padding(

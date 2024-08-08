@@ -5,11 +5,13 @@ class ViewPage extends StatelessWidget {
   final Map<String, dynamic> report;
   final VoidCallback onClose;
   final VoidCallback onResolve;
+  final VoidCallback onSpam;
 
   const ViewPage({
     required this.report,
     required this.onClose,
     required this.onResolve,
+    required this.onSpam,
     Key? key,
   }) : super(key: key);
 
@@ -158,6 +160,31 @@ class ViewPage extends StatelessWidget {
                             padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.02),
                             child: Text(
                               'Mark as Resolved',
+                              style: TextStyle(
+                                fontSize: screenWidth * 0.04,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Center(
+                      child: SizedBox(
+                        width: screenWidth * 0.53,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            backgroundColor: const Color(0xFFF79839),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(screenWidth * 0.02),
+                            ),
+                          ),
+                          onPressed: onSpam, // Call the resolve callback
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.02),
+                            child: Text(
+                              'Mark as Spam',
                               style: TextStyle(
                                 fontSize: screenWidth * 0.04,
                               ),

@@ -406,7 +406,7 @@ class _SignupPageOneState extends State<SignupPageOne> {
                     style: TextStyle(
                       fontSize: screenSize.height * 0.03,
                       fontWeight: FontWeight.bold,
-                      color: Color.fromARGB(255, 10, 16, 6),
+                      color: const Color.fromARGB(255, 98, 255, 0),
                     ),
                   ),
                 ),

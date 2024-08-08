@@ -89,8 +89,9 @@ void updateSelectedIndex(int index) {
     if(userDoc['accountType']=='Driver'){
     FirebaseFirestore.instance
         .collection('reports')
-        .where('zipCode', isEqualTo: driverZipCode)
         .where('isResolved',isEqualTo: true)
+        .where('zipCode', isEqualTo: driverZipCode)
+        .where('isSpam',isEqualTo: false)
         .snapshots()
         .listen((querySnapshot) {
       setState(() {
@@ -225,7 +226,7 @@ void updateSelectedIndex(int index) {
                         ),
                       ),
                       CustomContainer(
-                          height: screenSize.height * 0.49,
+                          height: screenSize.height * 0.4,
                           screenSize: screenSize,
                           children: [
                             if (userDoc != null)
@@ -628,6 +629,7 @@ void updateSelectedIndex(int index) {
                     screenSize.width * 0.12,
                     screenSize.height * 0.12,
                   ),
+                  
                   SizedBox(width: screenSize.width * 0.03),
                   _buildImageWithSelectableBackground(
                     'Images/Discount.png',
@@ -657,7 +659,12 @@ void updateSelectedIndex(int index) {
   Widget _buildImageWithSelectableBackground(
       String imagePath, int index, double height, double width, double radius) {
     bool isSelected = selectedImageIndex == index;
-
+    if(index==5 && selectedImageIndex==6){
+      isSelected=true;
+    }
+    if(index==2 && selectedImageIndex==7){
+      isSelected=true;
+    }
     return GestureDetector(
       onTap: () {
         // Update selected image index when tapped

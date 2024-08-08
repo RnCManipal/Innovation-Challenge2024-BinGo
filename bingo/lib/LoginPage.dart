@@ -79,8 +79,8 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
 
-    double minButtonHeight = screenSize.height * 0.055;
-    double minHeight = screenSize.height * 0.42;
+    double minButtonHeight = screenSize.height * 0.06;
+    double minHeight = screenSize.height * 0.46;
     if (screenSize.height <= 690) {
       minHeight = screenSize.height * 0.48;
       minButtonHeight = screenSize.height * 0.063;
