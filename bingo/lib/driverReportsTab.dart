@@ -114,9 +114,9 @@ class _DriverReportTabState extends State<DriverReportTab> {
                 ),
                 Positioned(
                   top: screenHeight * 0.3,
-                  left: screenWidth * 0.075,
+                  left: screenWidth * 0.05,
                   child: Container(
-                    width: screenWidth * 0.85,
+                    width: screenWidth * 0.9,
                     height: screenHeight * 0.25,
                     padding: EdgeInsets.all(screenWidth * 0.04),
                     decoration: BoxDecoration(
@@ -181,10 +181,10 @@ class _DriverReportTabState extends State<DriverReportTab> {
                                             borderRadius: BorderRadius.circular(screenWidth * 0.02),
                                             boxShadow: [
                                               BoxShadow(
-                                                color: Colors.grey.withOpacity(0.5),
-                                                spreadRadius: 3.0,
+                                                color: Colors.grey.withOpacity(0.3),
+                                                spreadRadius: 2.0,
                                                 blurRadius: 6.0,
-                                                offset: Offset(0, 3),
+                                                offset: Offset(0, 2),
                                               ),
                                             ],
                                           ),
@@ -288,9 +288,9 @@ class _DriverReportTabState extends State<DriverReportTab> {
                 ),
                 Positioned(
                   top: screenHeight * 0.65, // Adjusted position for resolved reports
-                  left: screenWidth * 0.075,
+                  left: screenWidth * 0.05,
                   child: Container(
-                    width: screenWidth * 0.85,
+                    width: screenWidth * 0.9,
                     height: screenHeight * 0.25,
                     padding: EdgeInsets.all(screenWidth * 0.04),
                     decoration: BoxDecoration(
@@ -346,10 +346,10 @@ class _DriverReportTabState extends State<DriverReportTab> {
                                       borderRadius: BorderRadius.circular(screenWidth * 0.02),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: Colors.grey.withOpacity(0.5),
-                                          spreadRadius: 3.0,
+                                          color: Colors.grey.withOpacity(0.3),
+                                          spreadRadius: 2.0,
                                           blurRadius: 6.0,
-                                          offset: Offset(0, 3),
+                                          offset: Offset(0, 2),
                                         ),
                                       ],
                                     ),

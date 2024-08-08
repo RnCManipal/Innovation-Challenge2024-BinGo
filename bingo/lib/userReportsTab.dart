@@ -103,9 +103,9 @@ class _ViewUserReportsTabState extends State<ViewUserReportsTab> {
                 ),
                 Positioned(
                   top: screenHeight * 0.3,
-                  left: screenWidth * 0.075,
+                  left: screenWidth * 0.05,
                   child: Container(
-                    width: screenWidth * 0.85,
+                    width: screenWidth * 0.9,
                     height: screenHeight * 0.25,
                     padding: EdgeInsets.all(screenWidth * 0.04),
                     decoration: BoxDecoration(
@@ -162,9 +162,9 @@ class _ViewUserReportsTabState extends State<ViewUserReportsTab> {
                 ),
                 Positioned(
                   top: screenHeight * 0.65,
-                  left: screenWidth * 0.075,
+                  left: screenWidth * 0.05,
                   child: Container(
-                    width: screenWidth * 0.85,
+                    width: screenWidth * 0.9,
                     height: screenHeight * 0.25,
                     padding: EdgeInsets.all(screenWidth * 0.04),
                     decoration: BoxDecoration(
@@ -226,17 +226,17 @@ class _ViewUserReportsTabState extends State<ViewUserReportsTab> {
           });
         },
         child: Container(
-          width: screenWidth * 0.9,
+          width: screenWidth * 0.8,
           height: screenHeight * 0.08,
           decoration: BoxDecoration(
             color: const Color(0xffE0FFFF),
             borderRadius: BorderRadius.circular(screenWidth * 0.02),
             boxShadow: [
               BoxShadow(
-                color: Colors.grey.withOpacity(0.5),
-                spreadRadius: 3.0,
+                color: Colors.grey.withOpacity(0.3),
+                spreadRadius: 2.0,
                 blurRadius: 6.0,
-                offset: Offset(0, 3),
+                offset: Offset(0, 2),
               ),
             ],
           ),
@@ -363,7 +363,7 @@ class ViewPage extends StatelessWidget {
             left: screenWidth * 0.1,
             child: Container(
               width: screenWidth * 0.8,
-              height: screenHeight * 0.5,
+              height: screenHeight * 0.6,
               padding: EdgeInsets.all(screenWidth * 0.05),
               decoration: BoxDecoration(
                 color: const Color(0xffE0FFFF),
