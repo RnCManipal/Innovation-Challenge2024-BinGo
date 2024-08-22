@@ -24,7 +24,7 @@ class _BinMapDriverState extends State<BinMapDriver> {
   final List<LatLng> _waypoints = [];
   CameraPosition _initialCameraPosition = const CameraPosition(
     target: LatLng(0, 0), // Default value, will be updated later
-    zoom: 15,
+    zoom: 17,
   );
 
   LocationData? _currentLocation;
@@ -159,7 +159,7 @@ class _BinMapDriverState extends State<BinMapDriver> {
         _initialCameraPosition = CameraPosition(
           target:
               LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
-          zoom: 15,
+          zoom: 17,
         );
       });
     }
@@ -182,7 +182,7 @@ class _BinMapDriverState extends State<BinMapDriver> {
               _currentLocation!.latitude!,
               _currentLocation!.longitude!,
             ),
-            zoom: 15,
+            zoom: 17,
           ),
         ),
       );

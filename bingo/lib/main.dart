@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 
-import 'HomePage.dart'; // Assuming you have a HomePage widget definedgit 
+import 'HomePage.dart'; // Assuming you have a HomePage widget definedgit
 import 'SignupPage.dart'; // Assuming you have a SignupPage widget defined
 
 Future<void> main() async {

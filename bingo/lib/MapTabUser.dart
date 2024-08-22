@@ -31,6 +31,7 @@ class _BinMapState extends State<BinMap> {
 
     FirebaseFirestore.instance
         .collection('bin_data')
+        .where('bin_id', isGreaterThan: 0)
         .snapshots()
         .listen((snapshot) {
       _markers.clear();
@@ -127,7 +128,7 @@ class _BinMapState extends State<BinMap> {
       _initialCameraPosition = CameraPosition(
         target:
             LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
-        zoom: 15,
+        zoom: 17,
       );
       _updateCameraPosition();
     }
@@ -152,7 +153,7 @@ class _BinMapState extends State<BinMap> {
               _currentLocation!.latitude!,
               _currentLocation!.longitude!,
             ),
-            zoom: 15,
+            zoom: 17,
           ),
         ),
       );
