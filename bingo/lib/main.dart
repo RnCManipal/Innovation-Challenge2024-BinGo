@@ -1,9 +1,10 @@
+import 'package:bingo/LoginPage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 import 'HomePage.dart'; // Assuming you have a HomePage widget definedgit
-import 'SignupPage.dart'; // Assuming you have a SignupPage widget defined
+
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,7 +34,7 @@ class MyApp extends StatelessWidget {
               return HomePage();
             } else {
               // No user authenticated, navigate to SignupPage or LoginPage
-              return const SignupPage(); // You can replace this with LoginPage or any other widget
+              return const LoginPage(); // You can replace this with LoginPage or any other widget
             }
           }
         },

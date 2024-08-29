@@ -73,6 +73,8 @@ class _SignupPageOneState extends State<SignupPageOne> {
         email: widget.email,
         password: widget.password,
       );
+      // Send email verification
+      await userCredential.user?.sendEmailVerification();
 
       Map<String, dynamic> userData = {
         'name': widget.name,
@@ -92,7 +94,7 @@ class _SignupPageOneState extends State<SignupPageOne> {
 
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => HomePage()),
+        MaterialPageRoute(builder: (context) => LoginPage()),
       );
     } catch (e) {
       

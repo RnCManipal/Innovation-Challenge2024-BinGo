@@ -1,4 +1,5 @@
 import 'package:bingo/SignupPage.dart';
+import 'package:bingo/email_verify.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'HomePage.dart'; // Import your HomePage
@@ -49,6 +50,21 @@ class _LoginPageState extends State<LoginPage> {
         email: email,
         password: password,
       );
+      // Check if the user's email is verified
+      User? user = FirebaseAuth.instance.currentUser;
+      // Added redirect to home page if email is verified
+      if (user != null && user.emailVerified) {
+        // Redirect to home page
+        Navigator.pushReplacementNamed(context, '/home');
+        return user;
+      } else {
+        // Show an error message if email is not verified
+        print('Email verification error: Please verify your email address.');
+        // _showErrorDialog('Please verify your email address.');
+        // Sign out the user if email is not verified
+        await FirebaseAuth.instance.signOut();
+        return null;
+      }
 
       return userCredential.user;
     } catch (e) {
@@ -80,7 +96,7 @@ class _LoginPageState extends State<LoginPage> {
     final Size screenSize = MediaQuery.of(context).size;
 
     double minButtonHeight = screenSize.height * 0.06;
-    double minHeight = screenSize.height * 0.46;
+    double minHeight = screenSize.height * 0.54;
     if (screenSize.height <= 690) {
       minHeight = screenSize.height * 0.48;
       minButtonHeight = screenSize.height * 0.063;
@@ -111,20 +127,7 @@ class _LoginPageState extends State<LoginPage> {
                 child: Image.asset('Images/Natural Food.png',
                     height: screenSize.height * 0.16),
               ),
-              Positioned(
-                  top: screenSize.height * 0.05,
-                  left: screenSize.width * 0.05,
-                  child: GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const SignupPage()),
-                        );
-                      },
-                      child: const Image(
-                        image: AssetImage('Images/BackButton.png'),
-                      ))),
+
               Positioned(
                 top: screenSize.height * 0.15,
                 left: screenSize.width * 0.1,
@@ -205,7 +208,7 @@ class _LoginPageState extends State<LoginPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => ForgotPasswordPage()),
+                          builder: (context) => EmailVerify()),
                     );
                   },
                   child: Container(
@@ -309,7 +312,8 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                         ),
-                        SizedBox(height: screenSize.height * 0.01),
+                        SizedBox(height: screenSize.height * 0.005),
+                        SizedBox(height: screenSize.height * 0.03),
                         Padding(
                           padding: EdgeInsets.symmetric(
                               horizontal: screenSize.width * 0.05),
@@ -319,11 +323,26 @@ class _LoginPageState extends State<LoginPage> {
                               fontFamily: 'Roboto',
                               fontSize: screenSize.width * 0.03,
                               fontWeight: FontWeight.w400,
-                              color: Colors.black,
+                              color: Colors.blue,
                             ),
                           ),
                         ),
-                        SizedBox(height: screenSize.height * 0.03),
+                        SizedBox(height: screenSize.height * 0.005),
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: screenSize.width * 0.05),
+
+                          child: Text(
+                            "Resend Email Verification?",
+                            style: TextStyle(
+                              fontFamily: 'Roboto',
+                              fontSize: screenSize.width * 0.03,
+                              fontWeight: FontWeight.w400,
+                              color: Colors.blue,
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: screenSize.height * 0.015),
                         Padding(
                           padding: EdgeInsets.symmetric(
                               horizontal: screenSize.width * 0.3),
@@ -400,7 +419,37 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                         ),
+                        SizedBox(height: screenSize.height * 0.02),
+                        Center(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text(
+                                "Already have an Account?",
+                                style: TextStyle(fontSize: 16),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const SignupPage(),
+                                    ),
+                                  );
+                                },
+                                child: const Text(
+                                  " Sign Up",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                      color: Colors.blue),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ],
+
                     ),
                   ),
                 ),
