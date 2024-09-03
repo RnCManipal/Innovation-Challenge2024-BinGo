@@ -1,5 +1,6 @@
 import 'package:bingo/SignupPage.dart';
 import 'package:bingo/email_verify.dart';
+import 'package:bingo/googlelogin.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'HomePage.dart'; // Import your HomePage
@@ -17,16 +18,16 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  //Google login
+  // // Google login
   // void click() async {
   //   try {
   //     final User? googleUser = await signInWithGoogle();
-
+  //
   //     if (googleUser != null) {
   //       setState(() {
   //         user = googleUser;
   //       });
-
+  //
   //       // Navigate to HomePage after successful login
   //       Navigator.pushReplacement(
   //         context,
@@ -41,8 +42,31 @@ class _LoginPageState extends State<LoginPage> {
   //     // Handle sign-in error
   //   }
   // }
+  void _showErrorDialog(BuildContext context, String message) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Verification Required'),
+              content: Text(message),
+              actions: <Widget>[
+                TextButton(
+                  child: Text('OK'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      }
+
+
+  
 
   Future<User?> signInWithEmailAndPassword(
+    
       String email, String password) async {
     try {
       final UserCredential userCredential =
@@ -59,33 +83,41 @@ class _LoginPageState extends State<LoginPage> {
         return user;
       } else {
         // Show an error message if email is not verified
-        print('Email verification error: Please verify your email address.');
-        // _showErrorDialog('Please verify your email address.');
+        _showErrorDialog(context, 'Please verify your email address.');
+
         // Sign out the user if email is not verified
-        await FirebaseAuth.instance.signOut();
+        try {
+          await FirebaseAuth.instance.signOut();
+        } catch (e) {
+          // Handle sign-out errors (e.g., network issues)
+          print('Error signing out: $e');
+        }
+
         return null;
       }
 
+// Function to show an error dialog
+      
       return userCredential.user;
     } catch (e) {
-      if (!mounted){
+      if (!mounted) {
         showDialog(
-    context: context,
-    barrierDismissible: false,
-    builder: (BuildContext context) {
-      return const AlertDialog(
-        content: Row(
-          children: [
-            CircularProgressIndicator(),
-            SizedBox(width: 20),
-            Text("Creating account..."),
-          ],
-        ),
-      );
-    },
-  );
-
-      };
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context) {
+            return const AlertDialog(
+              content: Row(
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(width: 20),
+                  Text("Creating account..."),
+                ],
+              ),
+            );
+          },
+        );
+      }
+      ;
       print('Error signing in with email and password: $e');
       throw e; // Re-throw the exception to handle it in the UI if needed
     }
@@ -127,7 +159,6 @@ class _LoginPageState extends State<LoginPage> {
                 child: Image.asset('Images/Natural Food.png',
                     height: screenSize.height * 0.16),
               ),
-
               Positioned(
                 top: screenSize.height * 0.15,
                 left: screenSize.width * 0.1,
@@ -144,7 +175,15 @@ class _LoginPageState extends State<LoginPage> {
                 top: screenSize.height * 0.25,
                 left: screenSize.width * 0.05,
                 child: InkWell(
-                  // onTap: () {click},
+                  onTap: () async {
+                    await FirebaseServicesGoogle().signInWithGoogle();
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => HomePage(),
+                      ),
+                    );
+                  },
                   child: Ink(
                     width: screenSize.width * 0.9,
                     height: screenSize.height * 0.07,
@@ -207,8 +246,7 @@ class _LoginPageState extends State<LoginPage> {
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                          builder: (context) => EmailVerify()),
+                      MaterialPageRoute(builder: (context) => EmailVerify()),
                     );
                   },
                   child: Container(
@@ -331,7 +369,6 @@ class _LoginPageState extends State<LoginPage> {
                         Padding(
                           padding: EdgeInsets.symmetric(
                               horizontal: screenSize.width * 0.05),
-
                           child: Text(
                             "Resend Email Verification?",
                             style: TextStyle(
@@ -360,8 +397,7 @@ class _LoginPageState extends State<LoginPage> {
                                     Navigator.pushReplacement(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) =>
-                                              HomePage()),
+                                          builder: (context) => HomePage()),
                                     );
                                   } else {
                                     // Handle sign-in failure if needed
@@ -449,7 +485,6 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ),
                       ],
-
                     ),
                   ),
                 ),

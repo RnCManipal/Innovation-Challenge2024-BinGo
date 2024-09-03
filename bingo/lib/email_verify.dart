@@ -11,9 +11,28 @@ class EmailVerify extends StatefulWidget {
 class _EmailVerifyState extends State<EmailVerify> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
-  // final _auth = FirebaseAuth.instance;
   final _emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+$');
   bool _isLoading = false;
+ Future<void> resendVerificationEmail(String email) async {
+  try {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      print('Current user: ${user.email}');
+      if (!user.emailVerified) {
+        await user.sendEmailVerification();
+        print('Verification email sent.');
+      } else {
+        print('User is already verified.');
+      }
+    } else {
+      print('No user is signed in.');
+    }
+  } catch (e) {
+    print('Error sending email verification: $e');
+    throw e;
+  }
+}
+
 
   Future<void> _submitForm() async {
     if (_formKey.currentState!.validate()) {
@@ -95,8 +114,7 @@ class _EmailVerifyState extends State<EmailVerify> {
                       height: screenSize.width * 0.3,
                       width: screenSize.height * 0.18,
                       child: Image.asset(
-                          'Images/User.png',
-                          // height: screenSize.height * 0.15,
+                        'Images/User.png',
                         fit: BoxFit.fill,
                       ),
                     ),
@@ -150,14 +168,94 @@ class _EmailVerifyState extends State<EmailVerify> {
                     ),
                     SizedBox(height: screenSize.height * 0.02),
                     ElevatedButton(
-                      onPressed: _isLoading ? null : _submitForm,
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        backgroundColor: Colors.orange,
-                      ),
-                      child: _isLoading
-                          ? CircularProgressIndicator(color: Colors.white)
-                          : Text('Resend Email'),
+                      onPressed: () async {
+                        final email = _emailController.text.trim();
+
+                        if (email.isEmpty) {
+                          // Show an error dialog if the email is empty
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: const Text('Error'),
+                                content: const Text('Please enter an email address.'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: const Text('OK'),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        } else if (!_emailRegex.hasMatch(email)) {
+                          // Added: Show an error dialog if the email format is invalid
+                          showDialog(
+
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: const Text('Error'),
+                                content: const Text('Please enter a valid email address.'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: const Text('OK'),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        } else {
+                          try {
+                            // Call the resendVerificationEmail method with the entered email
+                            await resendVerificationEmail(email);
+
+                            // Show a success dialog indicating that the email has been sent
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: const Text('Email Sent'),
+                                  content: const Text('A verification email has been sent to your email address.'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: const Text('OK'),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          } catch (e) {
+                            // Show an error dialog if there was a problem sending the email
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: const Text('Error'),
+                                  content: const Text('There was an error sending the email. Please try again.'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: const Text('OK'),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          }
+                        }
+                      },
+                      child: const Text("Resend Email"),
                     ),
                   ],
                 ),
