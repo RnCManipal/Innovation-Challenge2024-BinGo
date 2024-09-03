@@ -10,7 +10,12 @@ class SignupPageOne extends StatefulWidget {
   final String email;
   final String password;
 
-  const SignupPageOne({required this.name, required this.email, required this.password, Key? key}) : super(key: key);
+  const SignupPageOne({
+    required this.name,
+    required this.email,
+    required this.password,
+    Key? key,
+  }) : super(key: key);
 
   @override
   _SignupPageOneState createState() => _SignupPageOneState();
@@ -18,10 +23,13 @@ class SignupPageOne extends StatefulWidget {
 
 class _SignupPageOneState extends State<SignupPageOne> {
   String? _selectedAccountType;
-  final List<String> _accountTypes = ['User', 'Driver'];
+  final List<String> _accountTypes = ['User', 'Driver', 'Worker'];
   final TextEditingController _registrationNumberController = TextEditingController();
   final TextEditingController _zipCodeController = TextEditingController();
+  final TextEditingController _employeeIdController = TextEditingController();
+  
   bool isDriverSelected = false;
+  bool isWorkerSelected = false;
 
   Future<void> _createAccount() async {
     if (_selectedAccountType == null) {
@@ -51,7 +59,7 @@ class _SignupPageOneState extends State<SignupPageOne> {
         builder: (BuildContext context) {
           return AlertDialog(
             title: const Text("Error"),
-            content: const Text("Please fill in all fields"),
+            content: const Text("Please fill in all driver fields"),
             actions: <Widget>[
               TextButton(
                 child: const Text("OK"),
@@ -65,14 +73,34 @@ class _SignupPageOneState extends State<SignupPageOne> {
       );
       return;
     }
-  
-    
+
+    if (isWorkerSelected && _employeeIdController.text.isEmpty) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text("Error"),
+            content: const Text("Please fill in your employee ID"),
+            actions: <Widget>[
+              TextButton(
+                child: const Text("OK"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
 
     try {
       UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: widget.email,
         password: widget.password,
       );
+
       // Send email verification
       await userCredential.user?.sendEmailVerification();
 
@@ -87,37 +115,39 @@ class _SignupPageOneState extends State<SignupPageOne> {
         userData['zipCode'] = _zipCodeController.text;
       }
 
+      if (isWorkerSelected) {
+        userData['employeeId'] = _employeeIdController.text;
+      }
+
       await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).set(userData);
 
       if (!mounted) return;
-       Navigator.of(context).pop();
+      Navigator.of(context).pop();
 
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => LoginPage()),
       );
     } catch (e) {
-      
       print('Error creating account: $e');
 
-      if (!mounted){
+      if (!mounted) {
         showDialog(
-    context: context,
-    barrierDismissible: false,
-    builder: (BuildContext context) {
-      return const AlertDialog(
-        content: Row(
-          children: [
-            CircularProgressIndicator(),
-            SizedBox(width: 20),
-            Text("Creating account..."),
-          ],
-        ),
-      );
-    },
-  );
-
-      };
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context) {
+            return const AlertDialog(
+              content: Row(
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(width: 20),
+                  Text("Creating account..."),
+                ],
+              ),
+            );
+          },
+        );
+      }
 
       showDialog(
         context: context,
@@ -150,7 +180,7 @@ class _SignupPageOneState extends State<SignupPageOne> {
       minButtonHeight = screenSize.height * 0.045;
     }
 
-    double containerHeight = isDriverSelected ? minHeight + screenSize.height * 0.23 : minHeight;
+    double containerHeight = isDriverSelected || isWorkerSelected ? minHeight + screenSize.height * 0.23 : minHeight;
 
     return Scaffold(
       backgroundColor: const Color(0xFFE0FFFF),
@@ -271,6 +301,7 @@ class _SignupPageOneState extends State<SignupPageOne> {
                                   setState(() {
                                     _selectedAccountType = newValue;
                                     isDriverSelected = newValue == 'Driver';
+                                    isWorkerSelected = newValue == 'Worker';
                                   });
                                 },
                               ),
@@ -338,6 +369,40 @@ class _SignupPageOneState extends State<SignupPageOne> {
                                 decoration: const InputDecoration(
                                   border: InputBorder.none,
                                   hintText: 'Enter your zip code',
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                        if (isWorkerSelected) ...[
+                          SizedBox(height: screenSize.height * 0.015),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
+                            child: Text(
+                              "Employee ID:",
+                              style: TextStyle(
+                                fontFamily: 'Roboto',
+                                fontSize: screenSize.width * 0.04,
+                                fontWeight: FontWeight.normal,
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: screenSize.height * 0.01),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
+                            child: Container(
+                              height: screenSize.height * 0.068,
+                              width: screenSize.width * 0.85,
+                              padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.02),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF0F0F0),
+                                borderRadius: BorderRadius.circular(screenSize.width * 0.02),
+                              ),
+                              child: TextField(
+                                controller: _employeeIdController,
+                                decoration: const InputDecoration(
+                                  border: InputBorder.none,
+                                  hintText: 'Enter your employee ID',
                                 ),
                               ),
                             ),
@@ -420,4 +485,3 @@ class _SignupPageOneState extends State<SignupPageOne> {
     );
   }
 }
-
