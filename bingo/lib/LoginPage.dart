@@ -79,7 +79,12 @@ class _LoginPageState extends State<LoginPage> {
       // Added redirect to home page if email is verified
       if (user != null && user.emailVerified) {
         // Redirect to home page
-        Navigator.pushReplacementNamed(context, '/home');
+        Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => HomePage(),
+                      ),
+                    );
         return user;
       } else {
         // Show an error message if email is not verified
