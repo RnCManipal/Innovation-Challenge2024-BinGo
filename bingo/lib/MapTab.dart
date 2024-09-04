@@ -51,7 +51,7 @@ class _MapTabState extends State<MapTab> {
     } else {
       // Conditional rendering based on accountType
       return Center(
-        child: accountType == 'User'
+        child: accountType == 'User' ||accountType == 'Worker'
             ? const BinMap()
             : accountType == 'Driver'
                 ? const BinMapDriver()

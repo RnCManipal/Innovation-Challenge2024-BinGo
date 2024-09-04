@@ -53,7 +53,7 @@ class _ReportTabState extends State<ReportTab> {
       return Center(
         child: accountType == 'User'
             ? ViewUserReportsTab()
-            : accountType == 'Driver'
+            : accountType == 'Driver' ||accountType == 'Worker'
                 ? const DriverReportTab()
                 : Text(
                     'Unknown account type: $accountType',

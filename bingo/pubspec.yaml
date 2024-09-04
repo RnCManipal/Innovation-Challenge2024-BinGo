@@ -51,6 +51,7 @@ dependencies:
   html: ^0.15.0
   flutter_mapbox_navigation: ^0.2.2
   url_launcher: ^6.0.17
+  firebase_messaging: ^15.1.0
 
 dev_dependencies:
   flutter_test:
