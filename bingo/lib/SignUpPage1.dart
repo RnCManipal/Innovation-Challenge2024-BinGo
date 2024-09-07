@@ -27,7 +27,8 @@ class _SignupPageOneState extends State<SignupPageOne> {
   final TextEditingController _registrationNumberController = TextEditingController();
   final TextEditingController _zipCodeController = TextEditingController();
   final TextEditingController _employeeIdController = TextEditingController();
-  
+  final TextEditingController _areaCodeController = TextEditingController(); // New controller
+
   bool isDriverSelected = false;
   bool isWorkerSelected = false;
 
@@ -74,13 +75,13 @@ class _SignupPageOneState extends State<SignupPageOne> {
       return;
     }
 
-    if (isWorkerSelected && _employeeIdController.text.isEmpty) {
+    if (isWorkerSelected && (_employeeIdController.text.isEmpty || _areaCodeController.text.isEmpty)) {
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
             title: const Text("Error"),
-            content: const Text("Please fill in your employee ID"),
+            content: const Text("Please fill in all worker fields"),
             actions: <Widget>[
               TextButton(
                 child: const Text("OK"),
@@ -117,6 +118,7 @@ class _SignupPageOneState extends State<SignupPageOne> {
 
       if (isWorkerSelected) {
         userData['employeeId'] = _employeeIdController.text;
+        userData['areaCode'] = _areaCodeController.text; // Added area code
       }
 
       await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).set(userData);
@@ -403,6 +405,38 @@ class _SignupPageOneState extends State<SignupPageOne> {
                                 decoration: const InputDecoration(
                                   border: InputBorder.none,
                                   hintText: 'Enter your employee ID',
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: screenSize.height * 0.015),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
+                            child: Text(
+                              "Area Code:",
+                              style: TextStyle(
+                                fontFamily: 'Roboto',
+                                fontSize: screenSize.width * 0.04,
+                                fontWeight: FontWeight.normal,
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: screenSize.height * 0.01),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
+                            child: Container(
+                              height: screenSize.height * 0.068,
+                              width: screenSize.width * 0.85,
+                              padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.02),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF0F0F0),
+                                borderRadius: BorderRadius.circular(screenSize.width * 0.02),
+                              ),
+                              child: TextField(
+                                controller: _areaCodeController,
+                                decoration: const InputDecoration(
+                                  border: InputBorder.none,
+                                  hintText: 'Enter your area code',
                                 ),
                               ),
                             ),
