@@ -54,7 +54,7 @@ class _BinMapWorkerState extends State<BinMapWorker> {
 
     FirebaseFirestore.instance
         .collection('bin_data')
-        .where('areacode', isEqualTo: _driverAreacode)
+        .where('bin_id', isEqualTo: _driverAreacode)
         .snapshots()
         .listen((snapshot) {
       _markers.clear();
@@ -110,7 +110,7 @@ class _BinMapWorkerState extends State<BinMapWorker> {
           .doc(userId)
           .get();
 
-      return userDoc['areacode'];
+      return userDoc['bin_id'];
     } catch (e) {
       print('Error retrieving driver ZIP code: $e');
       return null;

@@ -14,44 +14,92 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  User? user;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  // // Google login
-  // void click() async {
-  //   try {
-  //     final User? googleUser = await signInWithGoogle();
-  //
-  //     if (googleUser != null) {
-  //       setState(() {
-  //         user = googleUser;
-  //       });
-  //
-  //       // Navigate to HomePage after successful login
-  //       Navigator.pushReplacement(
-  //         context,
-  //         MaterialPageRoute(builder: (context) => HomePage()),
-  //       );
-  //     } else {
-  //       // Handle sign-in failure if needed
-  //       print('Sign-in with Google failed');
-  //     }
-  //   } catch (e) {
-  //     print('Error signing in with Google: $e');
-  //     // Handle sign-in error
-  //   }
-  // }
-  void _showErrorDialog(BuildContext context, String message) {
+  void _showVerificationPopup() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return const AlertDialog(
+          content: Row(
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(width: 20),
+              Text("Verifying your email..."),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<User?> signInWithEmailAndPassword(String email, String password) async {
+    try {
+      final UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null && user.emailVerified) {
+        return user;
+      } else {
+        // Sign out if email is not verified
+        await FirebaseAuth.instance.signOut();
+        return null;
+      }
+    } catch (e) {
+      print('Error signing in with email and password: $e');
+      throw e; // Re-throw the exception to handle it in the UI if needed
+    }
+  }
+
+  void _handleLogin() async {
+    _showVerificationPopup();
+    try {
+      User? user = await signInWithEmailAndPassword(
+        _emailController.text,
+        _passwordController.text,
+      );
+
+      if (user != null) {
+        // Navigate to HomePage after successful login
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomePage()),
+        );
+      } else {
+        // Show error if email is not verified
+        Navigator.of(context).pop(); // Close the verification popup
         showDialog(
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text('Verification Required'),
-              content: Text(message),
+              title: const Text("Verification Required"),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text("Please verify your email address."),
+                  SizedBox(height: 20),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => EmailVerify(),
+                        ),
+                      );
+                    },
+                    child: const Text("Go to Email Verification"),
+                  ),
+                ],
+              ),
               actions: <Widget>[
                 TextButton(
-                  child: Text('OK'),
+                  child: const Text("OK"),
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
@@ -61,70 +109,26 @@ class _LoginPageState extends State<LoginPage> {
           },
         );
       }
-
-
-  
-
-  Future<User?> signInWithEmailAndPassword(
-    
-      String email, String password) async {
-    try {
-      final UserCredential userCredential =
-          await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-      // Check if the user's email is verified
-      User? user = FirebaseAuth.instance.currentUser;
-      // Added redirect to home page if email is verified
-      if (user != null && user.emailVerified) {
-        // Redirect to home page
-        Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => HomePage(),
-                      ),
-                    );
-        return user;
-      } else {
-        // Show an error message if email is not verified
-        _showErrorDialog(context, 'Please verify your email address.');
-
-        // Sign out the user if email is not verified
-        try {
-          await FirebaseAuth.instance.signOut();
-        } catch (e) {
-          // Handle sign-out errors (e.g., network issues)
-          print('Error signing out: $e');
-        }
-
-        return null;
-      }
-
-// Function to show an error dialog
-      
-      return userCredential.user;
     } catch (e) {
-      if (!mounted) {
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (BuildContext context) {
-            return const AlertDialog(
-              content: Row(
-                children: [
-                  CircularProgressIndicator(),
-                  SizedBox(width: 20),
-                  Text("Creating account..."),
-                ],
-              ),
-            );
-          },
-        );
-      }
-      ;
+      Navigator.of(context).pop(); // Close the verification popup
       print('Error signing in with email and password: $e');
-      throw e; // Re-throw the exception to handle it in the UI if needed
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text("Login Failed"),
+            content: Text(e.toString()),
+            actions: <Widget>[
+              TextButton(
+                child: const Text("OK"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
     }
   }
 
@@ -149,20 +153,17 @@ class _LoginPageState extends State<LoginPage> {
               Positioned(
                 top: 0,
                 right: 0,
-                child: Image.asset('Images/Ellipse 1.png',
-                    height: screenSize.height * 0.15),
+                child: Image.asset('Images/Ellipse 1.png', height: screenSize.height * 0.15),
               ),
               Positioned(
                 bottom: 0,
                 right: 0,
-                child: Image.asset('Images/Bonsai.png',
-                    height: screenSize.height * 0.15),
+                child: Image.asset('Images/Bonsai.png', height: screenSize.height * 0.15),
               ),
               Positioned(
                 bottom: 0,
                 left: 0,
-                child: Image.asset('Images/Natural Food.png',
-                    height: screenSize.height * 0.16),
+                child: Image.asset('Images/Natural Food.png', height: screenSize.height * 0.16),
               ),
               Positioned(
                 top: screenSize.height * 0.15,
@@ -184,9 +185,7 @@ class _LoginPageState extends State<LoginPage> {
                     await FirebaseServicesGoogle().signInWithGoogle();
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(
-                        builder: (context) => HomePage(),
-                      ),
+                      MaterialPageRoute(builder: (context) => HomePage()),
                     );
                   },
                   child: Ink(
@@ -194,8 +193,7 @@ class _LoginPageState extends State<LoginPage> {
                     height: screenSize.height * 0.07,
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius:
-                          BorderRadius.circular(screenSize.width * 0.02),
+                      borderRadius: BorderRadius.circular(screenSize.width * 0.02),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.grey.withOpacity(0.5),
@@ -229,7 +227,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
               Positioned(
                 top: screenSize.height * 0.33,
-                left: screenSize.width * 0.15,
+                left: screenSize.width * 0.05,
                 child: SizedBox(
                   width: screenSize.width * 0.9,
                   height: screenSize.height * 0.04,
@@ -259,8 +257,7 @@ class _LoginPageState extends State<LoginPage> {
                     height: minHeight,
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius:
-                          BorderRadius.circular(screenSize.width * 0.02),
+                      borderRadius: BorderRadius.circular(screenSize.width * 0.02),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.grey.withOpacity(0.5),
@@ -275,8 +272,7 @@ class _LoginPageState extends State<LoginPage> {
                       children: <Widget>[
                         SizedBox(height: screenSize.height * 0.03),
                         Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: screenSize.width * 0.05),
+                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
                           child: Text(
                             "Email:",
                             style: TextStyle(
@@ -288,8 +284,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         SizedBox(height: screenSize.height * 0.015),
                         Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: screenSize.width * 0.05),
+                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
                           child: SizedBox(
                             width: screenSize.width * 0.85,
                             child: TextField(
@@ -301,23 +296,20 @@ class _LoginPageState extends State<LoginPage> {
                                 border: InputBorder.none,
                                 enabledBorder: OutlineInputBorder(
                                   borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(
-                                      screenSize.width * 0.02),
+                                  borderRadius: BorderRadius.circular(screenSize.width * 0.02),
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(
-                                      screenSize.width * 0.1),
+                                  borderRadius: BorderRadius.circular(screenSize.width * 0.1),
                                 ),
-                                hintText: 'Enter your username',
+                                hintText: 'Enter your email',
                               ),
                             ),
                           ),
                         ),
                         SizedBox(height: screenSize.height * 0.03),
                         Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: screenSize.width * 0.05),
+                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
                           child: Text(
                             "Password:",
                             style: TextStyle(
@@ -329,8 +321,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         SizedBox(height: screenSize.height * 0.015),
                         Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: screenSize.width * 0.05),
+                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
                           child: SizedBox(
                             width: screenSize.width * 0.85,
                             child: TextField(
@@ -342,13 +333,11 @@ class _LoginPageState extends State<LoginPage> {
                                 border: InputBorder.none,
                                 enabledBorder: OutlineInputBorder(
                                   borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(
-                                      screenSize.width * 0.02),
+                                  borderRadius: BorderRadius.circular(screenSize.width * 0.02),
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(
-                                      screenSize.width * 0.1),
+                                  borderRadius: BorderRadius.circular(screenSize.width * 0.1),
                                 ),
                                 hintText: 'Enter your password',
                               ),
@@ -358,93 +347,41 @@ class _LoginPageState extends State<LoginPage> {
                         SizedBox(height: screenSize.height * 0.005),
                         SizedBox(height: screenSize.height * 0.03),
                         Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: screenSize.width * 0.05),
-                          child: Text(
-                            "Forgot password?",
-                            style: TextStyle(
-                              fontFamily: 'Roboto',
-                              fontSize: screenSize.width * 0.03,
-                              fontWeight: FontWeight.w400,
-                              color: Colors.blue,
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: screenSize.height * 0.005),
-                        Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: screenSize.width * 0.05),
-                          child: Text(
-                            "Resend Email Verification?",
-                            style: TextStyle(
-                              fontFamily: 'Roboto',
-                              fontSize: screenSize.width * 0.03,
-                              fontWeight: FontWeight.w400,
-                              color: Colors.blue,
+                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => ForgotPasswordPage()),
+                              );
+                            },
+                            child: Text(
+                              "Forgot password?",
+                              style: TextStyle(
+                                fontFamily: 'Roboto',
+                                fontSize: screenSize.width * 0.03,
+                                fontWeight: FontWeight.w400,
+                                color: Colors.blue,
+                              ),
                             ),
                           ),
                         ),
                         SizedBox(height: screenSize.height * 0.015),
                         Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: screenSize.width * 0.3),
+                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
                           child: SizedBox(
-                            width: screenSize.width * 0.3,
-                            height: minButtonHeight,
-                            child: TextButton(
-                              onPressed: () {
-                                signInWithEmailAndPassword(
-                                        _emailController.text,
-                                        _passwordController.text)
-                                    .then((user) {
-                                  if (user != null) {
-                                    // Navigate to HomePage after successful login
-                                    Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => HomePage()),
-                                    );
-                                  } else {
-                                    // Handle sign-in failure if needed
-                                    print(
-                                        'Sign-in with email and password failed');
-                                  }
-                                }).catchError((e) {
-                                  // Handle sign-in error
-                                  print(
-                                      'Error signing in with email and password: $e');
-                                  showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return AlertDialog(
-                                        title: const Text("Login Failed"),
-                                        content: Text(e.toString()),
-                                        actions: <Widget>[
-                                          TextButton(
-                                            child: const Text("OK"),
-                                            onPressed: () {
-                                              Navigator.of(context).pop();
-                                            },
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  );
-                                });
-                              },
+                            width: screenSize.width * 0.85,
+                            child: ElevatedButton(
+                              onPressed: _handleLogin,
                               style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.all(
-                                    const Color(0xFF0092D1)),
-                                foregroundColor:
-                                    MaterialStateProperty.all(Colors.white),
+                                backgroundColor: MaterialStateProperty.all(const Color(0xFF0092D1)),
+                                foregroundColor: MaterialStateProperty.all(Colors.white),
                                 padding: MaterialStateProperty.all(
-                                  EdgeInsets.symmetric(
-                                      vertical: screenSize.height * 0.015),
+                                  EdgeInsets.symmetric(vertical: screenSize.height * 0.015),
                                 ),
                                 shape: MaterialStateProperty.all(
                                   RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(
-                                        screenSize.width * 0.02),
+                                    borderRadius: BorderRadius.circular(screenSize.width * 0.02),
                                   ),
                                 ),
                               ),
@@ -481,9 +418,10 @@ class _LoginPageState extends State<LoginPage> {
                                 child: const Text(
                                   " Sign Up",
                                   style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
-                                      color: Colors.blue),
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                    color: Colors.blue,
+                                  ),
                                 ),
                               ),
                             ],

@@ -27,72 +27,48 @@ class _SignupPageOneState extends State<SignupPageOne> {
   final TextEditingController _registrationNumberController = TextEditingController();
   final TextEditingController _zipCodeController = TextEditingController();
   final TextEditingController _employeeIdController = TextEditingController();
-  final TextEditingController _areaCodeController = TextEditingController(); // New controller
+  final TextEditingController _areaCodeController = TextEditingController();
 
   bool isDriverSelected = false;
   bool isWorkerSelected = false;
 
-  Future<void> _createAccount() async {
-    if (_selectedAccountType == null) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text("Error"),
-            content: const Text("Please select an account type"),
-            actions: <Widget>[
-              TextButton(
-                child: const Text("OK"),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
+  Future<void> _showVerificationDialog() async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        Future.delayed(Duration(seconds: 5), () {
+          Navigator.of(context).pop();
+          _createAccount();
+        });
+        return AlertDialog(
+          content: Row(
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(width: 20),
+              Expanded(
+                child: Text("Verification email sent. Check and verify to login."),
               ),
             ],
-          );
-        },
-      );
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _createAccount() async {
+    if (_selectedAccountType == null) {
+      _showErrorDialog("Please select an account type");
       return;
     }
 
     if (isDriverSelected && (_registrationNumberController.text.isEmpty || _zipCodeController.text.isEmpty)) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text("Error"),
-            content: const Text("Please fill in all driver fields"),
-            actions: <Widget>[
-              TextButton(
-                child: const Text("OK"),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
+      _showErrorDialog("Please fill in all driver fields");
       return;
     }
 
     if (isWorkerSelected && (_employeeIdController.text.isEmpty || _areaCodeController.text.isEmpty)) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text("Error"),
-            content: const Text("Please fill in all worker fields"),
-            actions: <Widget>[
-              TextButton(
-                child: const Text("OK"),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
+      _showErrorDialog("Please fill in all worker fields");
       return;
     }
 
@@ -118,7 +94,7 @@ class _SignupPageOneState extends State<SignupPageOne> {
 
       if (isWorkerSelected) {
         userData['employeeId'] = _employeeIdController.text;
-        userData['areaCode'] = _areaCodeController.text; // Added area code
+        userData['areaCode'] = _areaCodeController.text;
       }
 
       await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).set(userData);
@@ -132,61 +108,38 @@ class _SignupPageOneState extends State<SignupPageOne> {
       );
     } catch (e) {
       print('Error creating account: $e');
-
-      if (!mounted) {
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (BuildContext context) {
-            return const AlertDialog(
-              content: Row(
-                children: [
-                  CircularProgressIndicator(),
-                  SizedBox(width: 20),
-                  Text("Creating account..."),
-                ],
-              ),
-            );
-          },
-        );
-      }
-
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text("Account Creation Failed"),
-            content: Text(e.toString()),
-            actions: <Widget>[
-              TextButton(
-                child: const Text("OK"),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
+      _showErrorDialog('Error creating account: $e');
     }
+  }
+
+  void _showErrorDialog(String message) {
+    if (!mounted) return;
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Error"),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              child: const Text("OK"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
 
-    double minButtonHeight = screenSize.height * 0.06;
-    double minHeight = screenSize.height * 0.25;
-    if (screenSize.height <= 690) {
-      minHeight = screenSize.height * 0.5;
-      minButtonHeight = screenSize.height * 0.045;
-    }
-
-    double containerHeight = isDriverSelected || isWorkerSelected ? minHeight + screenSize.height * 0.23 : minHeight;
-
     return Scaffold(
       backgroundColor: const Color(0xFFE0FFFF),
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
       body: SingleChildScrollView(
         child: SizedBox(
           height: screenSize.height,
@@ -195,7 +148,7 @@ class _SignupPageOneState extends State<SignupPageOne> {
               Positioned.fill(
                 child: Image.asset(
                   'Images/Bg.png',
-                  fit: BoxFit.fill,
+                  fit: BoxFit.cover,
                 ),
               ),
               Positioned(
@@ -240,247 +193,204 @@ class _SignupPageOneState extends State<SignupPageOne> {
               Positioned(
                 top: screenSize.height * 0.33,
                 left: screenSize.width * 0.05,
-                child: GestureDetector(
-                  child: Container(
-                    width: screenSize.width * 0.9,
-                    height: containerHeight,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(screenSize.width * 0.02),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color.fromARGB(120, 0, 0, 0).withOpacity(0.5),
-                          spreadRadius: screenSize.width * 0.005,
-                          blurRadius: screenSize.width * 0.02,
-                          offset: Offset(0, screenSize.height * 0.01),
+                right: screenSize.width * 0.05,
+                child: Container(
+                  width: screenSize.width * 0.9,
+                  padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(screenSize.width * 0.02),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        spreadRadius: screenSize.width * 0.005,
+                        blurRadius: screenSize.width * 0.02,
+                        offset: Offset(0, screenSize.width * 0.01),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      SizedBox(height: screenSize.height * 0.015),
+                      Text(
+                        "Type of account:",
+                        style: TextStyle(
+                          fontFamily: 'Roboto',
+                          fontSize: screenSize.width * 0.04,
+                          fontWeight: FontWeight.normal,
                         ),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        SizedBox(height: screenSize.height * 0.015),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
-                          child: Text(
-                            "Type of account:",
-                            style: TextStyle(
-                              fontFamily: 'Roboto',
-                              fontSize: screenSize.width * 0.04,
-                              fontWeight: FontWeight.normal,
+                      ),
+                      SizedBox(height: screenSize.height * 0.01),
+                      Container(
+                        height: screenSize.height * 0.068,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF0F0F0),
+                          borderRadius: BorderRadius.circular(screenSize.width * 0.02),
+                        ),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<String>(
+                            value: _selectedAccountType,
+                            hint: const Padding(
+                              padding: EdgeInsets.only(left: 8.0),
+                              child: Text('Select an item'),
                             ),
+                            isExpanded: true,
+                            items: _accountTypes.map((String item) {
+                              return DropdownMenuItem<String>(
+                                value: item,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 8.0),
+                                  child: Text(item),
+                                ),
+                              );
+                            }).toList(),
+                            onChanged: (String? newValue) {
+                              setState(() {
+                                _selectedAccountType = newValue;
+                                isDriverSelected = newValue == 'Driver';
+                                isWorkerSelected = newValue == 'Worker';
+                              });
+                            },
+                          ),
+                        ),
+                      ),
+                      if (isDriverSelected) ...[
+                        SizedBox(height: screenSize.height * 0.015),
+                        Text(
+                          "Registration Number:",
+                          style: TextStyle(
+                            fontFamily: 'Roboto',
+                            fontSize: screenSize.width * 0.04,
+                            fontWeight: FontWeight.normal,
                           ),
                         ),
                         SizedBox(height: screenSize.height * 0.01),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
-                          child: Container(
-                            height: screenSize.height * 0.068,
-                            width: screenSize.width * 0.85,
-                            padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.02),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFF0F0F0),
-                              borderRadius: BorderRadius.circular(screenSize.width * 0.02),
-                            ),
-                            child: DropdownButtonHideUnderline(
-                              child: DropdownButton<String>(
-                                value: _selectedAccountType,
-                                hint: const Padding(
-                                  padding: EdgeInsets.only(left: 8.0),
-                                  child: Text('Select an item'),
-                                ),
-                                isExpanded: true,
-                                items: _accountTypes.map((String item) {
-                                  return DropdownMenuItem<String>(
-                                    value: item,
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(left: 8.0),
-                                      child: Text(item),
-                                    ),
-                                  );
-                                }).toList(),
-                                onChanged: (String? newValue) {
-                                  setState(() {
-                                    _selectedAccountType = newValue;
-                                    isDriverSelected = newValue == 'Driver';
-                                    isWorkerSelected = newValue == 'Worker';
-                                  });
-                                },
-                              ),
+                        Container(
+                          height: screenSize.height * 0.068,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF0F0F0),
+                            borderRadius: BorderRadius.circular(screenSize.width * 0.02),
+                          ),
+                          child: TextField(
+                            controller: _registrationNumberController,
+                            decoration: const InputDecoration(
+                              border: InputBorder.none,
+                              hintText: 'Enter your registration number',
+                              contentPadding: EdgeInsets.symmetric(horizontal: 8.0),
                             ),
                           ),
                         ),
-                        if (isDriverSelected) ...[
-                          SizedBox(height: screenSize.height * 0.015),
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
-                            child: Text(
-                              "Registration Number:",
-                              style: TextStyle(
-                                fontFamily: 'Roboto',
-                                fontSize: screenSize.width * 0.04,
-                                fontWeight: FontWeight.normal,
-                              ),
-                            ),
+                        SizedBox(height: screenSize.height * 0.015),
+                        Text(
+                          "Zip Code:",
+                          style: TextStyle(
+                            fontFamily: 'Roboto',
+                            fontSize: screenSize.width * 0.04,
+                            fontWeight: FontWeight.normal,
                           ),
-                          SizedBox(height: screenSize.height * 0.01),
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
-                            child: Container(
-                              height: screenSize.height * 0.068,
-                              width: screenSize.width * 0.85,
-                              padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.02),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFF0F0F0),
-                                borderRadius: BorderRadius.circular(screenSize.width * 0.02),
-                              ),
-                              child: TextField(
-                                controller: _registrationNumberController,
-                                decoration: const InputDecoration(
-                                  border: InputBorder.none,
-                                  hintText: 'Enter your registration number',
-                                ),
-                              ),
-                            ),
+                        ),
+                        SizedBox(height: screenSize.height * 0.01),
+                        Container(
+                          height: screenSize.height * 0.068,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF0F0F0),
+                            borderRadius: BorderRadius.circular(screenSize.width * 0.02),
                           ),
-                          SizedBox(height: screenSize.height * 0.015),
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
-                            child: Text(
-                              "Zip Code:",
-                              style: TextStyle(
-                                fontFamily: 'Roboto',
-                                fontSize: screenSize.width * 0.04,
-                                fontWeight: FontWeight.normal,
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: screenSize.height * 0.01),
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
-                            child: Container(
-                              height: screenSize.height * 0.068,
-                              width: screenSize.width * 0.85,
-                              padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.02),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFF0F0F0),
-                                borderRadius: BorderRadius.circular(screenSize.width * 0.02),
-                              ),
-                              child: TextField(
-                                controller: _zipCodeController,
-                                decoration: const InputDecoration(
-                                  border: InputBorder.none,
-                                  hintText: 'Enter your zip code',
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                        if (isWorkerSelected) ...[
-                          SizedBox(height: screenSize.height * 0.015),
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
-                            child: Text(
-                              "Employee ID:",
-                              style: TextStyle(
-                                fontFamily: 'Roboto',
-                                fontSize: screenSize.width * 0.04,
-                                fontWeight: FontWeight.normal,
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: screenSize.height * 0.01),
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
-                            child: Container(
-                              height: screenSize.height * 0.068,
-                              width: screenSize.width * 0.85,
-                              padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.02),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFF0F0F0),
-                                borderRadius: BorderRadius.circular(screenSize.width * 0.02),
-                              ),
-                              child: TextField(
-                                controller: _employeeIdController,
-                                decoration: const InputDecoration(
-                                  border: InputBorder.none,
-                                  hintText: 'Enter your employee ID',
-                                ),
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: screenSize.height * 0.015),
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
-                            child: Text(
-                              "Area Code:",
-                              style: TextStyle(
-                                fontFamily: 'Roboto',
-                                fontSize: screenSize.width * 0.04,
-                                fontWeight: FontWeight.normal,
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: screenSize.height * 0.01),
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
-                            child: Container(
-                              height: screenSize.height * 0.068,
-                              width: screenSize.width * 0.85,
-                              padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.02),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFF0F0F0),
-                                borderRadius: BorderRadius.circular(screenSize.width * 0.02),
-                              ),
-                              child: TextField(
-                                controller: _areaCodeController,
-                                decoration: const InputDecoration(
-                                  border: InputBorder.none,
-                                  hintText: 'Enter your area code',
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                        SizedBox(height: screenSize.height * 0.02),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.3),
-                          child: SizedBox(
-                            width: screenSize.width * 0.3,
-                            height: minButtonHeight,
-                            child: TextButton(
-                              onPressed: _createAccount,
-                              style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.all(const Color(0xFF0092D1)),
-                                foregroundColor: MaterialStateProperty.all(Colors.white),
-                                padding: MaterialStateProperty.all(
-                                  EdgeInsets.symmetric(vertical: screenSize.height * 0.015),
-                                ),
-                                shape: MaterialStateProperty.all(
-                                  RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(screenSize.width * 0.02),
-                                  ),
-                                ),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  "Create",
-                                  style: TextStyle(
-                                    fontSize: screenSize.width * 0.042,
-                                    fontWeight: FontWeight.normal,
-                                  ),
-                                ),
-                              ),
+                          child: TextField(
+                            controller: _zipCodeController,
+                            decoration: const InputDecoration(
+                              border: InputBorder.none,
+                              hintText: 'Enter your zip code',
+                              contentPadding: EdgeInsets.symmetric(horizontal: 8.0),
                             ),
                           ),
                         ),
                       ],
-                    ),
+                      if (isWorkerSelected) ...[
+                        SizedBox(height: screenSize.height * 0.015),
+                        Text(
+                          "Employee ID:",
+                          style: TextStyle(
+                            fontFamily: 'Roboto',
+                            fontSize: screenSize.width * 0.04,
+                            fontWeight: FontWeight.normal,
+                          ),
+                        ),
+                        SizedBox(height: screenSize.height * 0.01),
+                        Container(
+                          height: screenSize.height * 0.068,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF0F0F0),
+                            borderRadius: BorderRadius.circular(screenSize.width * 0.02),
+                          ),
+                          child: TextField(
+                            controller: _employeeIdController,
+                            decoration: const InputDecoration(
+                              border: InputBorder.none,
+                              hintText: 'Enter your employee ID',
+                              contentPadding: EdgeInsets.symmetric(horizontal: 8.0),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: screenSize.height * 0.015),
+                        Text(
+                          "Area Code:",
+                          style: TextStyle(
+                            fontFamily: 'Roboto',
+                            fontSize: screenSize.width * 0.04,
+                            fontWeight: FontWeight.normal,
+                          ),
+                        ),
+                        SizedBox(height: screenSize.height * 0.01),
+                        Container(
+                          height: screenSize.height * 0.068,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF0F0F0),
+                            borderRadius: BorderRadius.circular(screenSize.width * 0.02),
+                          ),
+                          child: TextField(
+                            controller: _areaCodeController,
+                            decoration: const InputDecoration(
+                              border: InputBorder.none,
+                              hintText: 'Enter your area code',
+                              contentPadding: EdgeInsets.symmetric(horizontal: 8.0),
+                            ),
+                          ),
+                        ),
+                      ],
+                      SizedBox(height: screenSize.height * 0.02),
+                      Center(
+                        child: SizedBox(
+                          width: screenSize.width * 0.6,
+                          height: screenSize.height * 0.06,
+                          child: TextButton(
+                            onPressed: _showVerificationDialog,
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all(const Color(0xFF0092D1)),
+                              foregroundColor: MaterialStateProperty.all(Colors.white),
+                              shape: MaterialStateProperty.all(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(screenSize.width * 0.02),
+                                ),
+                              ),
+                            ),
+                            child: Text(
+                              "Create",
+                              style: TextStyle(
+                                fontSize: screenSize.width * 0.042,
+                                fontWeight: FontWeight.normal,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
               Positioned(
-                top: screenSize.height * 0.926,
+                bottom: screenSize.height * 0.05,
                 left: screenSize.width * 0.15,
                 child: Text(
                   "Already have an account?",
@@ -493,8 +403,8 @@ class _SignupPageOneState extends State<SignupPageOne> {
                 ),
               ),
               Positioned(
-                top: screenSize.height * 0.92,
-                left: screenSize.width * 0.63,
+                bottom: screenSize.height * 0.05,
+                right: screenSize.width * 0.1,
                 child: GestureDetector(
                   onTap: () {
                     Navigator.push(
@@ -511,7 +421,7 @@ class _SignupPageOneState extends State<SignupPageOne> {
                     ),
                   ),
                 ),
-              )
+              ),
             ],
           ),
         ),
