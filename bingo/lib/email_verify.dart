@@ -1,73 +1,75 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-class EmailVerify extends StatefulWidget {
-  const EmailVerify({super.key});
+class ResendEmailVerifyPage extends StatefulWidget {
+  const ResendEmailVerifyPage({Key? key}) : super(key: key);
 
   @override
-  State<EmailVerify> createState() => _EmailVerifyState();
+  _ResendEmailVerifyPageState createState() => _ResendEmailVerifyPageState();
 }
 
-class _EmailVerifyState extends State<EmailVerify> {
-  final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
-  final _emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+$');
-  bool _isLoading = false;
- Future<void> resendVerificationEmail(String email) async {
-  try {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      print('Current user: ${user.email}');
-      if (!user.emailVerified) {
-        await user.sendEmailVerification();
-        print('Verification email sent.');
-      } else {
-        print('User is already verified.');
-      }
-    } else {
-      print('No user is signed in.');
-    }
-  } catch (e) {
-    print('Error sending email verification: $e');
-    throw e;
+class _ResendEmailVerifyPageState extends State<ResendEmailVerifyPage> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  bool _isProcessing = false;
+  String _message = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _checkUserStatus();
   }
-}
 
+  Future<void> _checkUserStatus() async {
+    User? user = _auth.currentUser;
 
-  Future<void> _submitForm() async {
-    if (_formKey.currentState!.validate()) {
+    if (user == null) {
       setState(() {
-        _isLoading = true;
+        _message = 'No user is signed in. Please sign in.';
       });
+    } else if (user.emailVerified) {
+      setState(() {
+        _message = 'Your email is already verified.';
+      });
+    } else {
+      setState(() {
+        _message = 'Your email is not verified. Please request a new verification email.';
+      });
+    }
+  }
 
-      final email = _emailController.text.trim();
+  Future<void> _handleLoginAndResendEmail() async {
+    setState(() {
+      _isProcessing = true;
+      _message = ''; // Clear previous message
+    });
 
-      try {
-        // Sending verification email
-        final user = FirebaseAuth.instance.currentUser;
-        if (user != null && !user.emailVerified) {
-          await user.sendEmailVerification();
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Verification email sent to $email.')),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('User is already verified or not logged in.')),
-          );
-        }
-      } on FirebaseAuthException catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${e.message}')),
-        );
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('An unexpected error occurred. Please try again.')),
-        );
-      } finally {
+    try {
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+        email: _emailController.text,
+        password: _passwordController.text,
+      );
+
+      User? user = userCredential.user;
+      if (user != null && !user.emailVerified) {
+        await user.sendEmailVerification();
         setState(() {
-          _isLoading = false;
+          _message = 'Verification email sent. Please check your inbox.';
+        });
+      } else if (user != null && user.emailVerified) {
+        setState(() {
+          _message = 'Your email is already verified.';
         });
       }
+    } catch (e) {
+      setState(() {
+        _message = 'Failed to sign in or send verification email. Please check your credentials and try again.';
+      });
+    } finally {
+      setState(() {
+        _isProcessing = false;
+      });
     }
   }
 
@@ -76,191 +78,108 @@ class _EmailVerifyState extends State<EmailVerify> {
     final Size screenSize = MediaQuery.of(context).size;
 
     return Scaffold(
-      backgroundColor: Color(0xFFFFF3E0), // Light orange background
-      appBar: AppBar(
-        title: Text('Email Verification'),
-        backgroundColor: Colors.orange,
-      ),
-      body: SingleChildScrollView(
+      backgroundColor: const Color(0xFFE0FFFF),
+      body: Center(
         child: Padding(
-          padding: EdgeInsets.only(
-            top: screenSize.height * 0.2,
-            left: screenSize.width * 0.1,
-            right: screenSize.width * 0.1,
-          ),
-          child: Container(
-            width: screenSize.width * 0.8,
-            height: screenSize.height * 0.5,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(screenSize.width * 0.02),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.orange.withOpacity(0.3),
-                  spreadRadius: screenSize.width * 0.005,
-                  blurRadius: screenSize.width * 0.02,
-                  offset: Offset(0, screenSize.width * 0.01),
+          padding: EdgeInsets.all(screenSize.width * 0.05),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text(
+                "Resend Verification",
+                style: TextStyle(
+                  fontFamily: 'Jost',
+                  fontWeight: FontWeight.bold,
+                  fontSize: screenSize.width * 0.08,
                 ),
-              ],
-            ),
-            child: Padding(
-              padding: EdgeInsets.all(screenSize.width * 0.05),
-              child: Form(
-                key: _formKey,
+              ),
+              SizedBox(height: screenSize.height * 0.03),
+              Container(
+                padding: EdgeInsets.all(screenSize.width * 0.05),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(screenSize.width * 0.02),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      spreadRadius: screenSize.width * 0.005,
+                      blurRadius: screenSize.width * 0.02,
+                      offset: Offset(0, screenSize.width * 0.01),
+                    ),
+                  ],
+                ),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SizedBox(
-                      height: screenSize.width * 0.3,
-                      width: screenSize.height * 0.18,
-                      child: Image.asset(
-                        'Images/User.png',
-                        fit: BoxFit.fill,
+                  children: <Widget>[
+                    Text(
+                      "We need you to sign in to verify your email.",
+                      style: TextStyle(
+                        fontFamily: 'Roboto',
+                        fontSize: screenSize.width * 0.04,
+                        fontWeight: FontWeight.normal,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: screenSize.height * 0.03),
+                    TextField(
+                      controller: _emailController,
+                      decoration: InputDecoration(
+                        labelText: 'Email',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    SizedBox(height: screenSize.height * 0.02),
+                    TextField(
+                      controller: _passwordController,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        labelText: 'Password',
+                        border: OutlineInputBorder(),
                       ),
                     ),
                     SizedBox(height: screenSize.height * 0.03),
-                    Text(
-                      "Email Verification",
-                      style: TextStyle(
-                        fontFamily: 'Jost',
-                        fontWeight: FontWeight.bold,
-                        fontSize: screenSize.width * 0.07,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    SizedBox(height: screenSize.height * 0.02),
-                    Text(
-                      "Enter your email to resend the verification email.",
-                      style: TextStyle(
-                        fontFamily: 'Jost',
-                        fontWeight: FontWeight.normal,
-                        fontSize: screenSize.width * 0.03,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    SizedBox(height: screenSize.height * 0.02),
-                    TextFormField(
-                      controller: _emailController,
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: const Color(0xFFF0F0F0),
-                        border: InputBorder.none,
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide.none,
-                          borderRadius: BorderRadius.circular(screenSize.width * 0.02),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide.none,
-                          borderRadius: BorderRadius.circular(screenSize.width * 0.1),
-                        ),
-                        hintText: 'Enter your email',
-                      ),
-                      keyboardType: TextInputType.emailAddress,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your email';
-                        }
-                        if (!_emailRegex.hasMatch(value)) {
-                          return 'Please enter a valid email';
-                        }
-                        return null;
-                      },
-                    ),
-                    SizedBox(height: screenSize.height * 0.02),
                     ElevatedButton(
-                      onPressed: () async {
-                        final email = _emailController.text.trim();
-
-                        if (email.isEmpty) {
-                          // Show an error dialog if the email is empty
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                title: const Text('Error'),
-                                content: const Text('Please enter an email address.'),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: const Text('OK'),
-                                  ),
-                                ],
-                              );
-                            },
-                          );
-                        } else if (!_emailRegex.hasMatch(email)) {
-                          // Added: Show an error dialog if the email format is invalid
-                          showDialog(
-
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                title: const Text('Error'),
-                                content: const Text('Please enter a valid email address.'),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: const Text('OK'),
-                                  ),
-                                ],
-                              );
-                            },
-                          );
-                        } else {
-                          try {
-                            // Call the resendVerificationEmail method with the entered email
-                            await resendVerificationEmail(email);
-
-                            // Show a success dialog indicating that the email has been sent
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  title: const Text('Email Sent'),
-                                  content: const Text('A verification email has been sent to your email address.'),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: const Text('OK'),
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-                          } catch (e) {
-                            // Show an error dialog if there was a problem sending the email
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  title: const Text('Error'),
-                                  content: const Text('There was an error sending the email. Please try again.'),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: const Text('OK'),
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-                          }
-                        }
-                      },
-                      child: const Text("Resend Email"),
+                      onPressed: _isProcessing ? null : _handleLoginAndResendEmail,
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all(const Color(0xFF0092D1)),
+                        foregroundColor: MaterialStateProperty.all(Colors.white),
+                        padding: MaterialStateProperty.all(
+                          EdgeInsets.symmetric(vertical: screenSize.height * 0.015),
+                        ),
+                        shape: MaterialStateProperty.all(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(screenSize.width * 0.02),
+                          ),
+                        ),
+                      ),
+                      child: Center(
+                        child: _isProcessing
+                            ? CircularProgressIndicator(
+                                color: Colors.white,
+                              )
+                            : Text(
+                                "Resend Email",
+                                style: TextStyle(
+                                  fontSize: screenSize.width * 0.04,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                      ),
+                    ),
+                    SizedBox(height: screenSize.height * 0.02),
+                    Text(
+                      _message,
+                      style: TextStyle(
+                        fontFamily: 'Roboto',
+                        fontSize: screenSize.width * 0.04,
+                        fontWeight: FontWeight.normal,
+                        color: _message.contains('Failed') ? Colors.red : Colors.green,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
                   ],
                 ),
               ),
-            ),
+            ],
           ),
         ),
       ),

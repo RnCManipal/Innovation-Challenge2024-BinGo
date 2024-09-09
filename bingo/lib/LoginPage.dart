@@ -89,7 +89,7 @@ class _LoginPageState extends State<LoginPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => EmailVerify(),
+                          builder: (context) => ResendEmailVerifyPage(),
                         ),
                       );
                     },
@@ -249,7 +249,7 @@ class _LoginPageState extends State<LoginPage> {
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => EmailVerify()),
+                      MaterialPageRoute(builder: (context) => ForgotPasswordPage()),
                     );
                   },
                   child: Container(
