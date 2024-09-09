@@ -225,23 +225,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
               ),
-              Positioned(
-                top: screenSize.height * 0.33,
-                left: screenSize.width * 0.05,
-                child: SizedBox(
-                  width: screenSize.width * 0.9,
-                  height: screenSize.height * 0.04,
-                  child: Text(
-                    "-----------------  or  -----------------",
-                    style: TextStyle(
-                      fontFamily: 'Roboto',
-                      fontWeight: FontWeight.normal,
-                      fontSize: screenSize.width * 0.05,
-                      color: Colors.black.withOpacity(0.80),
-                    ),
-                  ),
-                ),
-              ),
+             
               Positioned(
                 top: screenSize.height * 0.38,
                 left: screenSize.width * 0.05,
