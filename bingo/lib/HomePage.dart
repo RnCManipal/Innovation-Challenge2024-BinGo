@@ -9,49 +9,110 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'SignupPage.dart'; // Import your SignupPage.dart file
 import 'UpdateProfile.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class HomePage extends StatefulWidget {
-  static final GlobalKey<_HomePageState> homePageKey = GlobalKey<_HomePageState>();
+  static final GlobalKey<_HomePageState> homePageKey =
+      GlobalKey<_HomePageState>();
   HomePage({Key? key}) : super(key: homePageKey);
 
   @override
   _HomePageState createState() => _HomePageState();
 }
 
-
-
 class _HomePageState extends State<HomePage> {
+  late FirebaseMessaging messaging;
   int selectedImageIndex = 0; // Track the index of the selected image
   String? driverZipCode;
   late User loggedInUser; // Variable to hold logged-in user details
   late DocumentSnapshot
       userDoc; // Variable to hold user document from Firestore
   int reportCount = 0;
-  int pointcount=0;
-  
-  @override
-void initState() {
-  super.initState();
-  
-  // Get the currently logged-in user
-  loggedInUser = FirebaseAuth.instance.currentUser!;
-  fetchUserDoc();
+  int pointcount = 0;
 
-  fetchDriverZipCode().then((zipCode) {
-    setState(() {
-      driverZipCode = zipCode; // Update the state with the ZIP code
+  @override
+  void initState() {
+    super.initState();
+
+    // Get the currently logged-in user
+    loggedInUser = FirebaseAuth.instance.currentUser!;
+    fetchUserDoc();
+
+    fetchDriverZipCode().then((zipCode) {
+      setState(() {
+        driverZipCode = zipCode; // Update the state with the ZIP code
+      });
     });
-  });
-}
-void updateSelectedIndex(int index) {
+
+    messaging = FirebaseMessaging.instance;
+
+    // Request permission for iOS devices
+    messaging.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+
+    // Get the token for this device
+    messaging.getToken().then((token) {
+      print("FCM Token: $token");
+      // You can send this token to your server for sending notifications
+    });
+
+    // Handle foreground messages
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      print("Message received in foreground: ${message.notification?.title}");
+      if (message.notification != null) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text(message.notification!.title ?? 'Notification'),
+              content: Text(message.notification!.body ?? ''),
+              actions: [
+                TextButton(
+                  child: const Text("OK"),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      }
+    });
+
+    // Handle when the app is opened from a terminated state by tapping a notification
+    FirebaseMessaging.instance
+        .getInitialMessage()
+        .then((RemoteMessage? message) {
+      if (message != null) {
+        print(
+            "Message received when app was in terminated state: ${message.notification?.title}");
+      }
+    });
+
+    // Handle when the app is opened from a background state by tapping a notification
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      print("Message opened app: ${message.notification?.title}");
+      // You can navigate to a specific screen based on the notification
+    });
+  }
+
+  void updateSelectedIndex(int index) {
     setState(() {
       selectedImageIndex = index;
     });
   }
+
   Future<String?> fetchDriverZipCode() async {
     User? user = FirebaseAuth.instance.currentUser; // Get current user
     if (user != null) {
-      DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
       if (userDoc.exists) {
         final data = userDoc.data() as Map<String, dynamic>?;
         return data?['zipCode']; // Replace with the actual field name
@@ -59,6 +120,7 @@ void updateSelectedIndex(int index) {
     }
     return null;
   }
+
   void fetchUserDoc() {
     FirebaseFirestore.instance
         .collection('users')
@@ -74,31 +136,31 @@ void updateSelectedIndex(int index) {
 
   // Fetch user document from Firestore using the UID
   void fetchReportCount(String userEmail) {
-    if(userDoc['accountType']=='User'){
-    FirebaseFirestore.instance
-        .collection('reports')
-        .where('userEmail', isEqualTo: userEmail)
-        .snapshots()
-        .listen((querySnapshot) {
-      setState(() {
-        reportCount = querySnapshot.docs.length;
-        pointcount=reportCount*10;
+    if (userDoc['accountType'] == 'User') {
+      FirebaseFirestore.instance
+          .collection('reports')
+          .where('userEmail', isEqualTo: userEmail)
+          .snapshots()
+          .listen((querySnapshot) {
+        setState(() {
+          reportCount = querySnapshot.docs.length;
+          pointcount = reportCount * 10;
+        });
       });
-    });
     }
-    if(userDoc['accountType']=='Driver'){
-    FirebaseFirestore.instance
-        .collection('reports')
-        .where('isResolved',isEqualTo: true)
-        .where('zipCode', isEqualTo: driverZipCode)
-        .where('isSpam',isEqualTo: false)
-        .snapshots()
-        .listen((querySnapshot) {
-      setState(() {
-        reportCount = querySnapshot.docs.length;
-        pointcount=reportCount*10;
+    if (userDoc['accountType'] == 'Driver') {
+      FirebaseFirestore.instance
+          .collection('reports')
+          .where('isResolved', isEqualTo: true)
+          .where('zipCode', isEqualTo: driverZipCode)
+          .where('isSpam', isEqualTo: false)
+          .snapshots()
+          .listen((querySnapshot) {
+        setState(() {
+          reportCount = querySnapshot.docs.length;
+          pointcount = reportCount * 10;
+        });
       });
-    });
     }
   }
 
@@ -145,7 +207,11 @@ void updateSelectedIndex(int index) {
                 SizedBox(
                   height: textTopPadding, // Top space before text
                 ),
-                if (selectedImageIndex == 0) Home(screenSize: screenSize,reportCount: pointcount,),
+                if (selectedImageIndex == 0)
+                  Home(
+                    screenSize: screenSize,
+                    reportCount: pointcount,
+                  ),
               ],
             ),
           ),
@@ -176,10 +242,7 @@ void updateSelectedIndex(int index) {
                 : Container(), // Empty container if selectedImageIndex is not 5
           ),
           Center(
-            child: selectedImageIndex ==
-                    7 
-                ? UserReportTab()
-                : Container(), 
+            child: selectedImageIndex == 7 ? UserReportTab() : Container(),
           ),
           Center(
             child: selectedImageIndex ==
@@ -192,7 +255,7 @@ void updateSelectedIndex(int index) {
                       Padding(
                         padding: EdgeInsets.only(
                           top: screenSize.height * 0.05,
-                          left:screenSize.width * 0.08,
+                          left: screenSize.width * 0.08,
                         ),
                         child: SizedBox(
                           width: screenSize.width * 0.4,
@@ -372,7 +435,9 @@ void updateSelectedIndex(int index) {
                           screenSize: screenSize,
                           children: [
                             Padding(
-                              padding: EdgeInsets.only(top: screenSize.height * 0.02, left: screenSize.width * 0.1),
+                              padding: EdgeInsets.only(
+                                  top: screenSize.height * 0.02,
+                                  left: screenSize.width * 0.1),
                               child: Row(
                                 children: [
                                   Text(
@@ -381,10 +446,13 @@ void updateSelectedIndex(int index) {
                                       fontFamily: 'Roboto',
                                       fontSize: screenSize.width * 0.1,
                                       fontWeight: FontWeight.bold,
-                                      color: const Color.fromARGB(255, 15, 191, 38),
+                                      color: const Color.fromARGB(
+                                          255, 15, 191, 38),
                                     ),
                                   ),
-                                  SizedBox(width: 20), // Add some space between "0" and "points"
+                                  SizedBox(
+                                      width:
+                                          20), // Add some space between "0" and "points"
                                   Text(
                                     "points",
                                     style: TextStyle(
@@ -407,9 +475,10 @@ void updateSelectedIndex(int index) {
                                 child: TextButton(
                                   onPressed: () {
                                     setState(() {
-                                selectedImageIndex =
-                                    4; // Assuming 6 is the index for Update Profile tab
-                              });;
+                                      selectedImageIndex =
+                                          4; // Assuming 6 is the index for Update Profile tab
+                                    });
+                                    ;
                                   },
                                   style: ButtonStyle(
                                     backgroundColor: WidgetStateProperty.all(
@@ -629,7 +698,6 @@ void updateSelectedIndex(int index) {
                     screenSize.width * 0.12,
                     screenSize.height * 0.12,
                   ),
-                  
                   SizedBox(width: screenSize.width * 0.03),
                   _buildImageWithSelectableBackground(
                     'Images/Discount.png',
@@ -659,11 +727,11 @@ void updateSelectedIndex(int index) {
   Widget _buildImageWithSelectableBackground(
       String imagePath, int index, double height, double width, double radius) {
     bool isSelected = selectedImageIndex == index;
-    if(index==5 && selectedImageIndex==6){
-      isSelected=true;
+    if (index == 5 && selectedImageIndex == 6) {
+      isSelected = true;
     }
-    if(index==2 && selectedImageIndex==7){
-      isSelected=true;
+    if (index == 2 && selectedImageIndex == 7) {
+      isSelected = true;
     }
     return GestureDetector(
       onTap: () {
