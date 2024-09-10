@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'back_service.dart';
 
-import 'HomePage.dart'; // Assuming you have a HomePage widget defined
+import 'HomePage.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  // This handler will be called when the app is in the background or terminated
   await Firebase.initializeApp();
   print("Handling a background message: ${message.messageId}");
 }
@@ -18,6 +18,9 @@ Future<void> main() async {
 
   // Set up the background message handler
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+  // Initialize the background service
+  await initializeService();
 
   runApp(const MyApp());
 }
@@ -39,11 +42,9 @@ class MyApp extends StatelessWidget {
             return const Center(child: CircularProgressIndicator());
           } else {
             if (snapshot.hasData && snapshot.data != null) {
-              // User is authenticated, navigate to HomePage
               return HomePage();
             } else {
-              // No user authenticated, navigate to LoginPage
-              return const LoginPage(); // You can replace this with LoginPage or any other widget
+              return const LoginPage();
             }
           }
         },
