@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:async';
 import 'dart:ui';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
@@ -69,9 +70,13 @@ void onStart(ServiceInstance service) async {
   DartPluginRegistrant.ensureInitialized();
   await Firebase.initializeApp();
 
-  // Show a notification when the service starts
-  await showNotification("Background Service Started", "The service is now running in the background", 888);
-
+  // Send initialization notification
+  await showNotification(
+    "Service Initialized", 
+    "Background service has started successfully.", 
+    DateTime.now().millisecondsSinceEpoch.remainder(100000) // Unique notification ID
+  );
+  
   if (service is AndroidServiceInstance) {
     service.on('setAsForeground').listen((event) {
       service.setAsForegroundService();
@@ -80,9 +85,20 @@ void onStart(ServiceInstance service) async {
     service.on('stopService').listen((event) {
       service.stopSelf();
     });
+
+    // Add this new message handler for safe shutdown
+    service.on('prepareForShutdown').listen((event) async {
+      print('Preparing to shut down the background service');
+      
+      // Perform any cleanup operations here
+      // For example, you might want to cancel the periodic timer
+      
+      // After cleanup, stop the service
+      await service.stopSelf();
+    });
   }
 
-  // Periodically update the notification every second
+  // Set up the periodic timer for Firestore checks
   Timer.periodic(const Duration(minutes: 1), (timer) async {
     if (service is AndroidServiceInstance) {
       log('Checking Firestore for high fill_percent values');
@@ -101,12 +117,13 @@ void onStart(ServiceInstance service) async {
         await showNotification(
           'High Fill Percentage Detected',
           'Bin $binId has a fill percentage of $fillPercent%',
-          888,
+          DateTime.now().millisecondsSinceEpoch.remainder(100000), // Unique notification ID
         );
       }
     }
   });
 }
+
 
 // Function to show notification with consistent notificationId
 Future<void> showNotification(String title, String body, int notificationId) async {
@@ -140,4 +157,38 @@ bool onIosBackground(ServiceInstance service) {
   WidgetsFlutterBinding.ensureInitialized();
   DartPluginRegistrant.ensureInitialized();
   return true;
+}
+// Function to check if the user is logged in and account type is 'worker'
+Future<void> checkUserAndStartService() async {
+  User? user = FirebaseAuth.instance.currentUser; // Get the current user
+
+  if (user != null) {
+    // User is logged in, now fetch the user's accountType from Firestore
+    final DocumentSnapshot userDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .get();
+
+    // Assuming 'accountType' field exists in user's document
+    if (userDoc.exists && userDoc['accountType'] == 'Worker') {
+      // If accountType is 'worker', start the background service
+      await initializeService();
+      print('Background service started for worker.');
+    } else {
+      log('User is not a worker or accountType not found.');
+    }
+  } else {
+    log('No user is logged in.');
+  }
+}
+
+Future<void> requestStopBackgroundService() async {
+  final service = FlutterBackgroundService();
+  
+  service.invoke('prepareForShutdown');
+  
+  await Future.delayed(Duration(seconds: 2));
+  
+  bool isRunning = await service.isRunning();
+  print('Background service is running: $isRunning');
 }

@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'back_service.dart';
-
 import 'HomePage.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -16,13 +16,29 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
 
-  // Set up the background message handler
+  // Set up the background message handler for Firebase Cloud Messaging (FCM)
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
+  // Request notification permissions for Android 13 and above
+  await requestNotificationPermission();
+
   // Initialize the background service
-  await initializeService();
+  await checkUserAndStartService();
 
   runApp(const MyApp());
+}
+
+// Function to request notification permission
+Future<void> requestNotificationPermission() async {
+  if (await Permission.notification.isDenied) {
+    // Request permission
+    final status = await Permission.notification.request();
+    if (status.isGranted) {
+      print('Notification permission granted');
+    } else if (status.isDenied) {
+      print('Notification permission denied');
+    }
+  }
 }
 
 class MyApp extends StatelessWidget {
