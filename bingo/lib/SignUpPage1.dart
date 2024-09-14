@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'HomePage.dart';
+
 import 'LoginPage.dart';
 import 'SignupPage.dart';
 
@@ -56,61 +56,88 @@ class _SignupPageOneState extends State<SignupPageOne> {
     );
   }
 
-  Future<void> _createAccount() async {
-    if (_selectedAccountType == null) {
-      _showErrorDialog("Please select an account type");
-      return;
-    }
-
-    if (isDriverSelected && (_registrationNumberController.text.isEmpty || _zipCodeController.text.isEmpty)) {
-      _showErrorDialog("Please fill in all driver fields");
-      return;
-    }
-
-    if (isWorkerSelected && (_employeeIdController.text.isEmpty || _areaCodeController.text.isEmpty)) {
-      _showErrorDialog("Please fill in all worker fields");
-      return;
-    }
-
-    try {
-      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: widget.email,
-        password: widget.password,
-      );
-
-      // Send email verification
-      await userCredential.user?.sendEmailVerification();
-
-      Map<String, dynamic> userData = {
-        'name': widget.name,
-        'email': widget.email,
-        'accountType': _selectedAccountType,
-      };
-
-      if (isDriverSelected) {
-        userData['registrationNumber'] = _registrationNumberController.text;
-        userData['zipCode'] = _zipCodeController.text;
-      }
-
-      if (isWorkerSelected) {
-        userData['employeeId'] = _employeeIdController.text;
-        userData['areaCode'] = _areaCodeController.text;
-      }
-
-      await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).set(userData);
-
-      if (!mounted) return;
-      Navigator.of(context).pop();
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => LoginPage()),
-      );
-    } catch (e) {
-      print('Error creating account: $e');
-      _showErrorDialog('Error creating account: $e');
-    }
+ Future<void> _createAccount() async {
+  if (_selectedAccountType == null) {
+    _showErrorDialog("Please select an account type");
+    return;
   }
+
+  if (isDriverSelected && (_registrationNumberController.text.isEmpty || _zipCodeController.text.isEmpty)) {
+    _showErrorDialog("Please fill in all driver fields");
+    return;
+  }
+
+  if (isWorkerSelected && (_employeeIdController.text.isEmpty || _areaCodeController.text.isEmpty)) {
+    _showErrorDialog("Please fill in all worker fields");
+    return;
+  }
+
+  try {
+    UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      email: widget.email,
+      password: widget.password,
+    );
+
+    // Send email verification
+    await userCredential.user?.sendEmailVerification();
+
+    Map<String, dynamic> userData = {
+      'name': widget.name,
+      'email': widget.email,
+      'accountType': _selectedAccountType,
+    };
+
+    if (isDriverSelected) {
+      userData['registrationNumber'] = _registrationNumberController.text;
+      userData['zipCode'] = _zipCodeController.text;
+    }
+
+    if (isWorkerSelected) {
+      userData['employeeId'] = _employeeIdController.text;
+      userData['areaCode'] = _areaCodeController.text;
+    }
+
+    await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).set(userData);
+
+    // Sign out the user immediately
+    await FirebaseAuth.instance.signOut();
+
+    if (!mounted) return;
+
+    Navigator.of(context).pop(); // Close the dialog
+
+    _showInfoDialog('Account created. Please check your email to verify and then log in from the Login page.');
+  } catch (e) {
+    print('Error creating account: $e');
+    _showErrorDialog('Error creating account: $e');
+  }
+}
+
+void _showInfoDialog(String message) {
+  if (!mounted) return;
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text("Information"),
+        content: Text(message),
+        actions: <Widget>[
+          TextButton(
+            child: const Text("OK"),
+            onPressed: () {
+              Navigator.of(context).pop();
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => LoginPage()),
+              );
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
+
 
   void _showErrorDialog(String message) {
     if (!mounted) return;
@@ -385,8 +412,11 @@ class _SignupPageOneState extends State<SignupPageOne> {
                           ),
                         ),
                       ),
+                       SizedBox(height: screenSize.height * 0.02),
                     ],
+                    
                   ),
+                 
                 ),
               ),
               Positioned(
@@ -396,15 +426,15 @@ class _SignupPageOneState extends State<SignupPageOne> {
                   "Already have an account?",
                   style: TextStyle(
                     fontFamily: 'Jost',
-                    fontWeight: FontWeight.normal,
+                    fontWeight: FontWeight.w600,
                     fontSize: screenSize.width * 0.04,
                     color: const Color.fromARGB(255, 255, 255, 255),
                   ),
                 ),
               ),
               Positioned(
-                bottom: screenSize.height * 0.05,
-                right: screenSize.width * 0.1,
+                bottom: screenSize.height * 0.046,
+                right: screenSize.width * 0.18,
                 child: GestureDetector(
                   onTap: () {
                     Navigator.push(

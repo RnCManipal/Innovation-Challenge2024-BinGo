@@ -27,7 +27,7 @@ class _LoginPageState extends State<LoginPage> {
             children: [
               CircularProgressIndicator(),
               SizedBox(width: 20),
-              Text("Verifying your email..."),
+              Text("Checking Credentials..."),
             ],
           ),
         );
@@ -182,11 +182,7 @@ class _LoginPageState extends State<LoginPage> {
                 left: screenSize.width * 0.05,
                 child: InkWell(
                   onTap: () async {
-                    await FirebaseServicesGoogle().signInWithGoogle();
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => HomePage()),
-                    );
+                   
                   },
                   child: Ink(
                     width: screenSize.width * 0.9,

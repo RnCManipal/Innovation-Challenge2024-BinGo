@@ -1,3 +1,4 @@
+import 'package:bingo/LoginPage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -21,6 +22,13 @@ class _ResendEmailVerifyPageState extends State<ResendEmailVerifyPage> {
     _checkUserStatus();
   }
 
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
   Future<void> _checkUserStatus() async {
     User? user = _auth.currentUser;
 
@@ -40,6 +48,13 @@ class _ResendEmailVerifyPageState extends State<ResendEmailVerifyPage> {
   }
 
   Future<void> _handleLoginAndResendEmail() async {
+    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please enter both email and password.')),
+      );
+      return;
+    }
+
     setState(() {
       _isProcessing = true;
       _message = ''; // Clear previous message
@@ -52,19 +67,21 @@ class _ResendEmailVerifyPageState extends State<ResendEmailVerifyPage> {
       );
 
       User? user = userCredential.user;
-      if (user != null && !user.emailVerified) {
-        await user.sendEmailVerification();
-        setState(() {
-          _message = 'Verification email sent. Please check your inbox.';
-        });
-      } else if (user != null && user.emailVerified) {
-        setState(() {
-          _message = 'Your email is already verified.';
-        });
+      if (user != null) {
+        if (!user.emailVerified) {
+          await user.sendEmailVerification();
+          setState(() {
+            _message = 'Verification email sent. Please check your inbox.';
+          });
+        } else {
+          setState(() {
+            _message = 'Your email is already verified.';
+          });
+        }
       }
-    } catch (e) {
+    } on FirebaseAuthException catch (e) {
       setState(() {
-        _message = 'Failed to sign in or send verification email. Please check your credentials and try again.';
+        _message = e.message ?? 'Failed to sign in or send verification email.';
       });
     } finally {
       setState(() {
@@ -73,113 +90,145 @@ class _ResendEmailVerifyPageState extends State<ResendEmailVerifyPage> {
     }
   }
 
+  void _navigateToLoginPage() {
+    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const LoginPage()),
+                    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFE0FFFF),
+      backgroundColor: const Color(0xFFE0F7FA),
       body: Center(
         child: Padding(
           padding: EdgeInsets.all(screenSize.width * 0.05),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Text(
-                "Resend Verification",
-                style: TextStyle(
-                  fontFamily: 'Jost',
-                  fontWeight: FontWeight.bold,
-                  fontSize: screenSize.width * 0.08,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text(
+                  "Resend Verification",
+                  style: TextStyle(
+                    fontFamily: 'Jost',
+                    fontWeight: FontWeight.bold,
+                    fontSize: screenSize.width * 0.07,
+                    color: const Color(0xFF00796B),
+                  ),
                 ),
-              ),
-              SizedBox(height: screenSize.height * 0.03),
-              Container(
-                padding: EdgeInsets.all(screenSize.width * 0.05),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(screenSize.width * 0.02),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      spreadRadius: screenSize.width * 0.005,
-                      blurRadius: screenSize.width * 0.02,
-                      offset: Offset(0, screenSize.width * 0.01),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: <Widget>[
-                    Text(
-                      "We need you to sign in to verify your email.",
-                      style: TextStyle(
-                        fontFamily: 'Roboto',
-                        fontSize: screenSize.width * 0.04,
-                        fontWeight: FontWeight.normal,
+                SizedBox(height: screenSize.height * 0.03),
+                Container(
+                  padding: EdgeInsets.all(screenSize.width * 0.05),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(screenSize.width * 0.03),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black26,
+                        spreadRadius: screenSize.width * 0.005,
+                        blurRadius: screenSize.width * 0.03,
+                        offset: Offset(0, screenSize.width * 0.01),
                       ),
-                      textAlign: TextAlign.center,
-                    ),
-                    SizedBox(height: screenSize.height * 0.03),
-                    TextField(
-                      controller: _emailController,
-                      decoration: InputDecoration(
-                        labelText: 'Email',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    SizedBox(height: screenSize.height * 0.02),
-                    TextField(
-                      controller: _passwordController,
-                      obscureText: true,
-                      decoration: InputDecoration(
-                        labelText: 'Password',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    SizedBox(height: screenSize.height * 0.03),
-                    ElevatedButton(
-                      onPressed: _isProcessing ? null : _handleLoginAndResendEmail,
-                      style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(const Color(0xFF0092D1)),
-                        foregroundColor: MaterialStateProperty.all(Colors.white),
-                        padding: MaterialStateProperty.all(
-                          EdgeInsets.symmetric(vertical: screenSize.height * 0.015),
+                    ],
+                  ),
+                  child: Column(
+                    children: <Widget>[
+                      Text(
+                        "We need you to sign in to verify your email.",
+                        style: TextStyle(
+                          fontFamily: 'Roboto',
+                          fontSize: screenSize.width * 0.045,
+                          fontWeight: FontWeight.w400,
+                          color: Colors.black54,
                         ),
-                        shape: MaterialStateProperty.all(
-                          RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(screenSize.width * 0.02),
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(height: screenSize.height * 0.03),
+                      TextField(
+                        controller: _emailController,
+                        decoration: InputDecoration(
+                          prefixIcon: Icon(Icons.email, color: Colors.grey),
+                          labelText: 'Email',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
                           ),
                         ),
                       ),
-                      child: Center(
-                        child: _isProcessing
-                            ? CircularProgressIndicator(
-                                color: Colors.white,
-                              )
-                            : Text(
-                                "Resend Email",
-                                style: TextStyle(
-                                  fontSize: screenSize.width * 0.04,
-                                  fontWeight: FontWeight.bold,
+                      SizedBox(height: screenSize.height * 0.02),
+                      TextField(
+                        controller: _passwordController,
+                        obscureText: true,
+                        decoration: InputDecoration(
+                          prefixIcon: Icon(Icons.lock, color: Colors.grey),
+                          labelText: 'Password',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: screenSize.height * 0.03),
+                      ElevatedButton(
+                        onPressed: _isProcessing ? null : _handleLoginAndResendEmail,
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all(const Color(0xFF00796B)),
+                          foregroundColor: MaterialStateProperty.all(Colors.white),
+                          padding: MaterialStateProperty.all(
+                            EdgeInsets.symmetric(vertical: screenSize.height * 0.015),
+                          ),
+                          shape: MaterialStateProperty.all(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(screenSize.width * 0.03),
+                            ),
+                          ),
+                        ),
+                        child: Center(
+                          child: _isProcessing
+                              ? CircularProgressIndicator(
+                                  color: Colors.white,
+                                )
+                              : Text(
+                                  "Resend Email",
+                                  style: TextStyle(
+                                    fontSize: screenSize.width * 0.04,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                              ),
+                        ),
                       ),
-                    ),
-                    SizedBox(height: screenSize.height * 0.02),
-                    Text(
-                      _message,
-                      style: TextStyle(
-                        fontFamily: 'Roboto',
-                        fontSize: screenSize.width * 0.04,
-                        fontWeight: FontWeight.normal,
-                        color: _message.contains('Failed') ? Colors.red : Colors.green,
+                      SizedBox(height: screenSize.height * 0.02),
+                      if (_message.isNotEmpty)
+                        Text(
+                          _message,
+                          style: TextStyle(
+                            fontFamily: 'Roboto',
+                            fontSize: screenSize.width * 0.04,
+                            fontWeight: FontWeight.normal,
+                            color: _message.contains('Failed') ? Colors.red : Colors.green,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      SizedBox(height: screenSize.height * 0.03),
+                      TextButton(
+                        onPressed: _navigateToLoginPage,
+                        child: Text(
+                          "Go to Login Page",
+                          style: TextStyle(
+                            fontFamily: 'Roboto',
+                            fontSize: screenSize.width * 0.04,
+                            fontWeight: FontWeight.w500,
+                            color: const Color(0xFF00796B),
+                          ),
+                        ),
                       ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
