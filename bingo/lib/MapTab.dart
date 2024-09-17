@@ -56,7 +56,7 @@ class _MapTabState extends State<MapTab> {
             : accountType == 'Driver'
             ? const BinMapDriver() // Widget for 'Driver'
             : accountType == 'Worker'
-            ?  BinMapWorker() // Widget for 'Worker'
+            ? const BinMapWorker() // Widget for 'Worker'
             : Text(
           'Unknown account type: $accountType',
           style: const TextStyle(fontSize: 18),

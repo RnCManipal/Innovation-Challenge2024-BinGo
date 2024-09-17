@@ -1,7 +1,6 @@
 import 'package:bingo/HomeTab.dart';
 import 'package:bingo/MapTab.dart';
 import 'package:bingo/ReportTab.dart';
-import 'package:bingo/back_service.dart';
 import 'package:bingo/createreport.dart';
 import 'package:bingo/offers_page.dart';
 import 'package:flutter/material.dart';

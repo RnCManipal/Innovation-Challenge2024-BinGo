@@ -29,7 +29,7 @@ class _BinMapWorkerState extends State<BinMapWorker> {
 
   LocationData? _currentLocation;
   final Location _location = Location();
-  String? _driverAreacode;
+  String? _workerAreacode;
   bool _firstLocationUpdate = true;
 
   @override
@@ -45,16 +45,16 @@ class _BinMapWorkerState extends State<BinMapWorker> {
   }
 
   Future<void> _loadMarkersFromFirestore() async {
-    _driverAreacode = await _getDriverAreacode();
-    if (_driverAreacode == null) {
+    _workerAreacode = await _getWorkerAreacode();
+    if (_workerAreacode == null) {
       print('Failed to retrieve driver ZIP code');
       return;
     }
-    print('Driver ZIP Code: $_driverAreacode');
+    print('Worker Code: $_workerAreacode');
 
     FirebaseFirestore.instance
         .collection('bin_data')
-        .where('bin_id', isEqualTo: _driverAreacode)
+        .where('areacode', isEqualTo: _workerAreacode)
         .snapshots()
         .listen((snapshot) {
       _markers.clear();
@@ -96,7 +96,7 @@ class _BinMapWorkerState extends State<BinMapWorker> {
     });
   }
 
-  Future<String?> _getDriverAreacode() async {
+  Future<String?> _getWorkerAreacode() async {
     try {
       User? user = FirebaseAuth.instance.currentUser;
       if (user == null) {
@@ -110,9 +110,9 @@ class _BinMapWorkerState extends State<BinMapWorker> {
           .doc(userId)
           .get();
 
-      return userDoc['bin_id'];
+      return userDoc['areacode'];
     } catch (e) {
-      print('Error retrieving driver ZIP code: $e');
+      print('Error retrieving worker ZIP code: $e');
       return null;
     }
   }

@@ -57,11 +57,13 @@ Future<void> createNotificationChannel() async {
     'my_foreground', // id must be consistent with the channel used in notifications
     'Background Service Channel', // Name of the channel
     description: 'This channel is used for background service notifications',
-    importance: Importance.high, // Importance must be high for foreground services
+    importance:
+        Importance.high, // Importance must be high for foreground services
   );
 
   await flutterLocalNotificationsPlugin
-      .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+      .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>()
       ?.createNotificationChannel(channel);
 }
 
@@ -71,12 +73,7 @@ void onStart(ServiceInstance service) async {
   await Firebase.initializeApp();
 
   // Send initialization notification
-  await showNotification(
-    "Service Initialized", 
-    "Background service has started successfully.", 
-    DateTime.now().millisecondsSinceEpoch.remainder(100000) // Unique notification ID
-  );
-  
+
   if (service is AndroidServiceInstance) {
     service.on('setAsForeground').listen((event) {
       service.setAsForegroundService();
@@ -89,10 +86,10 @@ void onStart(ServiceInstance service) async {
     // Add this new message handler for safe shutdown
     service.on('prepareForShutdown').listen((event) async {
       print('Preparing to shut down the background service');
-      
+
       // Perform any cleanup operations here
       // For example, you might want to cancel the periodic timer
-      
+
       // After cleanup, stop the service
       await service.stopSelf();
     });
@@ -112,32 +109,35 @@ void onStart(ServiceInstance service) async {
       for (var doc in querySnapshot.docs) {
         final fillPercent = doc['fill_percent'];
         final binId = doc['bin_id'];
-        
+
         // Send a notification for each document found
         await showNotification(
           'High Fill Percentage Detected',
           'Bin $binId has a fill percentage of $fillPercent%',
-          DateTime.now().millisecondsSinceEpoch.remainder(100000), // Unique notification ID
+          DateTime.now()
+              .millisecondsSinceEpoch
+              .remainder(100000), // Unique notification ID
         );
       }
     }
   });
 }
 
-
 // Function to show notification with consistent notificationId
-Future<void> showNotification(String title, String body, int notificationId) async {
+Future<void> showNotification(
+    String title, String body, int notificationId) async {
   const AndroidNotificationDetails androidPlatformChannelSpecifics =
-    AndroidNotificationDetails(
-  'my_foreground', // Notification channel ID
-  'Background Service',
-  channelDescription: 'This channel is used for background service notifications',
-  importance: Importance.low, // Lower importance level
-  priority: Priority.low, // Lower priority
-  showWhen: false, // Do not show the timestamp
-  ongoing: true, // Keeps the notification persistent
-  autoCancel: false, // Prevents the notification from being dismissed by user
-);
+      AndroidNotificationDetails(
+    'my_foreground', // Notification channel ID
+    'Background Service',
+    channelDescription:
+        'This channel is used for background service notifications',
+    importance: Importance.low, // Lower importance level
+    priority: Priority.low, // Lower priority
+    showWhen: false, // Do not show the timestamp
+    ongoing: true, // Keeps the notification persistent
+    autoCancel: false, // Prevents the notification from being dismissed by user
+  );
 
   const NotificationDetails platformChannelSpecifics =
       NotificationDetails(android: androidPlatformChannelSpecifics);
@@ -158,6 +158,7 @@ bool onIosBackground(ServiceInstance service) {
   DartPluginRegistrant.ensureInitialized();
   return true;
 }
+
 // Function to check if the user is logged in and account type is 'worker'
 Future<void> checkUserAndStartService() async {
   User? user = FirebaseAuth.instance.currentUser; // Get the current user
@@ -184,11 +185,11 @@ Future<void> checkUserAndStartService() async {
 
 Future<void> requestStopBackgroundService() async {
   final service = FlutterBackgroundService();
-  
+
   service.invoke('prepareForShutdown');
-  
+
   await Future.delayed(Duration(seconds: 2));
-  
+
   bool isRunning = await service.isRunning();
   print('Background service is running: $isRunning');
 }

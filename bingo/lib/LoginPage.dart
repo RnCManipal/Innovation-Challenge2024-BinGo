@@ -1,6 +1,5 @@
 import 'package:bingo/SignupPage.dart';
 import 'package:bingo/email_verify.dart';
-import 'package:bingo/googlelogin.dart';
 import 'back_service.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
