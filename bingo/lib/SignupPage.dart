@@ -147,7 +147,7 @@ class _SignupPageState extends State<SignupPage> {
                 top: screenSize.height * 0.1,
                 left: screenSize.width * 0.1,
                 child: Text(
-                  "Create a Free\nAccount",
+                  "Create Account",
                   style: TextStyle(
                     fontFamily: 'Jost',
                     fontWeight: FontWeight.bold,
@@ -156,7 +156,7 @@ class _SignupPageState extends State<SignupPage> {
                 ),
               ),
               Positioned(
-                top: screenSize.height * 0.217,
+                top: screenSize.height * 0.197,
                 left: screenSize.width * 0.02,
                 child: TextButton(
                   onPressed: () {},
@@ -204,23 +204,7 @@ class _SignupPageState extends State<SignupPage> {
                   ),
                 ),
               ),
-              Positioned(
-                top: screenSize.height * 0.292,
-                left: screenSize.width * 0.15,
-                child: SizedBox(
-                  width: screenSize.width * 0.9,
-                  height: screenSize.height * 0.04,
-                  child: Text(
-                    "-----------------  or  -----------------",
-                    style: TextStyle(
-                      fontFamily: 'Roboto',
-                      fontWeight: FontWeight.normal,
-                      fontSize: screenSize.width * 0.05,
-                      color: Colors.black.withOpacity(0.80),
-                    ),
-                  ),
-                ),
-              ),
+             
               Positioned(
                 top: screenSize.height * 0.33,
                 left: screenSize.width * 0.05,
@@ -462,7 +446,7 @@ class _SignupPageState extends State<SignupPage> {
                   "Already have an account?",
                   style: TextStyle(
                     fontFamily: 'Jost',
-                    fontWeight: FontWeight.normal,
+                    fontWeight: FontWeight.bold,
                     fontSize: screenSize.width * 0.04,
                     color: const Color.fromARGB(255, 255, 255, 255),
                   ),
@@ -480,11 +464,12 @@ class _SignupPageState extends State<SignupPage> {
                     );
                   },
                   child: Text(
-                    'Login',
+                    '   Login',
                     style: TextStyle(
-                      fontSize: screenSize.height * 0.03,
+
+                      fontSize: screenSize.width * 0.06,
                       fontWeight: FontWeight.bold,
-                      color: const Color.fromARGB(255, 98, 255, 0),
+                      color: Colors.brown,
                     ),
                   ),
                 ),

@@ -1,5 +1,6 @@
 import 'package:bingo/driverReportsTab.dart';
 import 'package:bingo/userReportsTab.dart';
+import 'package:bingo/workerReportTab.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart'; // Import FirebaseAuth if needed
 import 'package:cloud_firestore/cloud_firestore.dart'; // Import FirebaseFirestore if needed
@@ -45,20 +46,21 @@ class _ReportTabState extends State<ReportTab> {
   Widget build(BuildContext context) {
     if (accountType.isEmpty) {
       return const Center(
-        child:
-            CircularProgressIndicator(), // Show a loading indicator while fetching accountType
+        child: CircularProgressIndicator(), // Show a loading indicator while fetching accountType
       );
     } else {
       // Conditional rendering based on accountType
       return Center(
         child: accountType == 'User'
-            ? ViewUserReportsTab()
+            ? ViewUserReportsTab() // Show User Reports
             : accountType == 'Driver'
-                ? const DriverReportTab()
-                : Text(
-                    'Unknown account type: $accountType',
-                    style: const TextStyle(fontSize: 18),
-                  ),
+                ? const DriverReportTab() // Show Driver Reports
+                : accountType == 'Worker'
+                    ? const WorkerReportTab() // Show Worker Reports
+                    : Text(
+                        'Unknown account type: $accountType',
+                        style: const TextStyle(fontSize: 18),
+                      ),
       );
     }
   }

@@ -1,19 +1,21 @@
-import 'package:bingo/MapTabDriver.dart';
+import 'package:bingo/mapTabDriver.dart';
 import 'package:bingo/MapTabUser.dart';
+// import 'package:bingo/mapTabWorker.dart'; // Import your new MapTabWorker widget
+import 'package:bingo/mapTabWorker.dart';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart'; // Import FirebaseAuth if needed
 import 'package:cloud_firestore/cloud_firestore.dart'; // Import FirebaseFirestore if needed
 
 class MapTab extends StatefulWidget {
-  const MapTab({Key? key});
+  const MapTab({Key? key}) : super(key: key);
 
   @override
   State<MapTab> createState() => _MapTabState();
 }
 
 class _MapTabState extends State<MapTab> {
-  String accountType =
-      ''; // Variable to hold account type fetched from Firestore
+  String accountType = ''; // Variable to hold account type fetched from Firestore
 
   @override
   void initState() {
@@ -32,8 +34,7 @@ class _MapTabState extends State<MapTab> {
             .doc(user.uid)
             .get();
         setState(() {
-          accountType = userDoc[
-              'accountType']; // Update accountType from Firestore document
+          accountType = userDoc['accountType']; // Update accountType from Firestore document
         });
       }
     } catch (error) {
@@ -45,20 +46,21 @@ class _MapTabState extends State<MapTab> {
   Widget build(BuildContext context) {
     if (accountType.isEmpty) {
       return const Center(
-        child:
-            CircularProgressIndicator(), // Show a loading indicator while fetching accountType
+        child: CircularProgressIndicator(), // Show a loading indicator while fetching accountType
       );
     } else {
       // Conditional rendering based on accountType
       return Center(
         child: accountType == 'User'
-            ? const BinMap()
+            ? const BinMap() // Widget for 'User'
             : accountType == 'Driver'
-                ? const BinMapDriver()
-                : Text(
-                    'Unknown account type: $accountType',
-                    style: const TextStyle(fontSize: 18),
-                  ),
+            ? const BinMapDriver() // Widget for 'Driver'
+            : accountType == 'Worker'
+            ? const BinMapWorker() // Widget for 'Worker'
+            : Text(
+          'Unknown account type: $accountType',
+          style: const TextStyle(fontSize: 18),
+        ),
       );
     }
   }
