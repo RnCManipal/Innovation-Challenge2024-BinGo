@@ -95,10 +95,39 @@ void onStart(ServiceInstance service) async {
     });
   }
 
+  List<int> dustBincheck = [];
+/*
+Timer.periodic(const Duration(minutes: 1), (timer) async {
+  final QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('bin_data')
+        .where('fill_percent', isLessThan: 75)
+        .get();
+        for (var doc in querySnapshot.docs) {
+        //final fillPercent = doc['fill_percent'];
+        //final binId = doc['bin_id'];
+
+        if (dustBincheck.contains(doc['bin_id'])) { 
+          dustBincheck.remove(doc['bin_id']);
+        }
+        }
+});*/
+
   // Set up the periodic timer for Firestore checks
   Timer.periodic(const Duration(minutes: 1), (timer) async {
     if (service is AndroidServiceInstance) {
       log('Checking Firestore for high fill_percent values');
+
+      // Query Firestore for documents with less than 75
+      final QuerySnapshot querySnapshotLessThan = await FirebaseFirestore
+          .instance
+          .collection('bin_data')
+          .where('fill_percent', isLessThan: 75)
+          .get();
+      for (var doc in querySnapshotLessThan.docs) {
+        if (dustBincheck.contains(doc['bin_id'])) {
+          dustBincheck.remove(doc['bin_id']);
+        }
+      }
 
       // Query Firestore for documents with fill_percent over 75
       final QuerySnapshot querySnapshot = await FirebaseFirestore.instance
@@ -110,14 +139,17 @@ void onStart(ServiceInstance service) async {
         final fillPercent = doc['fill_percent'];
         final binId = doc['bin_id'];
 
-        // Send a notification for each document found
-        await showNotification(
-          'High Fill Percentage Detected',
-          'Bin $binId has a fill percentage of $fillPercent%',
-          DateTime.now()
-              .millisecondsSinceEpoch
-              .remainder(100000), // Unique notification ID
-        );
+        if (!dustBincheck.contains(doc['bin_id'])) {
+          dustBincheck.add(binId);
+          // Send a notification for each document found
+          await showNotification(
+            'High Fill Percentage Detected',
+            'Bin $binId has a fill percentage of $fillPercent%',
+            DateTime.now()
+                .millisecondsSinceEpoch
+                .remainder(100000), // Unique notification ID
+          );
+        }
       }
     }
   });
